@@ -5,7 +5,7 @@ const Navbar = () => {
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        
+
         {/* Logo */}
         <div>
           <Link
@@ -49,13 +49,12 @@ const Navbar = () => {
 
         {/* Profile */}
         <div className="flex items-center gap-3">
-          <button className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-semibold">
-            <Link
-              to={"/profile"}
-            >
-              R
-            </Link>
-          </button>
+          <Link
+            to="/profile"
+            className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-semibold text-lg"
+          >
+            <span>R</span>
+          </Link>
         </div>
 
       </div>

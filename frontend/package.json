@@ -10,6 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+<<<<<<< HEAD
+    "axios": "^1.17.0",
+=======
+    "lucide-react": "^1.17.0",
+>>>>>>> e2afdf75f2f6d71e8d52d5f7e2564a5ecb182966
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.17.0"

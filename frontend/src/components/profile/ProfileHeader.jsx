@@ -1,5 +1,6 @@
 import React from 'react'
 import Button from '../ui/Button'
+import { Link } from 'react-router-dom'
 
 const ProfileHeader = () => {
     return (
@@ -31,9 +32,13 @@ const ProfileHeader = () => {
                         contact
                     </Button>
 
-                    <button className="border px-6 py-3 rounded-lg">
-                        Hire Me
-                    </button>
+                    <Link
+                        to={"/edit-profile"}
+                    >
+                        <button className="border px-6 py-3 rounded-lg">
+                            Edit Profile
+                        </button>
+                    </Link>
                 </div>
             </div>
 
