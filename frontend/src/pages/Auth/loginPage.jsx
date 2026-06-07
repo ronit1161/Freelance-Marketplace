@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { loginUser } from "../../services/authApis";
-import { useNavigate } from 'react-router-dom';
+import { loginUser } from "../services/authApis";
+//import { useNavigate } from 'react-router-dom';
 
 function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
   async function handleLogin(e) {
   e.preventDefault();
@@ -31,11 +31,9 @@ function Login() {
     } else if (role === "freelancer") {
       //window.location.href = "/freelancer-dashboard";
       //navigate("/")
-      navigate("/profile")
       
     } else {
       //window.location.href = "/";
-      navigate("/profile")
       
     }
 

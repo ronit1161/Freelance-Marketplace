@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { registerUser } from "../../services/authApis";
+import { registerUser } from "../services/authApis";
 //import { useNavigate } from "react-router-dom";
 
 function Signup() {
@@ -48,7 +48,7 @@ function Signup() {
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
 
-      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-2xl md:max-w-3xl lg:max-w-4xl">
+      <div className="bg-white p-8 rounded-xl shadow-md w-95">
 
         <h2 className="text-2xl font-bold mb-6 text-center bg-gray-200 p-3 rounded-lg">
           Sign Up

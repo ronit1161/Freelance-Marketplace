@@ -3,15 +3,12 @@ import { Route, Routes } from "react-router-dom";
 import RootLayout from "../components/layout/RootLayout";
 import CreateGig from "../pages/freelancer/CreateGig";
 import FreelancerProfile from "../pages/freelancer/FreelancerProfile";
-<<<<<<< HEAD
 import Orders from "../pages/User/Orders";
-=======
-import GigDetails from "../pages/freelancer/GigDetails";
->>>>>>> 67175829047176df81f4a4fe0b8756e8999ce320
 export default function AppRoutes(){
     return(
         <Routes>
-            {/* <Route path="/login" element={<Login />} /> */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup"element= {<Signup/>}/>
 
             <Route path="/" element={<RootLayout />}>
                 <Route index element={ <FreelancerDashboard /> } />
