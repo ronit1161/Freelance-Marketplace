@@ -4,6 +4,10 @@ import RootLayout from "../components/layout/RootLayout";
 import CreateGig from "../pages/freelancer/CreateGig";
 import FreelancerProfile from "../pages/freelancer/FreelancerProfile";
 import Orders from "../pages/User/Orders";
+import FreelancerDashboard from '../pages/freelancer/FreelancerDashboard';
+import GigDetails from '../pages/freelancer/GigDetails';
+import Login from '../pages/Auth/loginPage';
+import Signup from '../pages/Auth/Register';
 export default function AppRoutes(){
     return(
         <Routes>
