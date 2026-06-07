@@ -1,16 +1,1224 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>React Freelance Marketplace Homepage</title>
-    <meta property="og:image" content="https://bolt.new/static/og_default.png" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:image" content="https://bolt.new/static/og_default.png" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Freelance Marketplace — Database Design</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --bg:        #0d0f14;
+    --surface:   #13161e;
+    --surface2:  #1a1e2a;
+    --border:    #252a38;
+    --accent:    #6c8aff;
+    --accent2:   #ff6b6b;
+    --accent3:   #43e8b0;
+    --accent4:   #f5c542;
+    --text:      #e2e6f0;
+    --muted:     #6b7280;
+    --code-bg:   #0a0c12;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* ── LAYOUT ── */
+  .wrapper { max-width: 1100px; margin: 0 auto; padding: 0 28px 80px; }
+
+  /* ── HEADER ── */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 48px 0 36px;
+    margin-bottom: 56px;
+    position: relative;
+  }
+  .header-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(108,138,255,.1);
+    border: 1px solid rgba(108,138,255,.3);
+    border-radius: 4px;
+    padding: 3px 10px;
+    margin-bottom: 16px;
+  }
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.6rem;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -.02em;
+    color: #fff;
+  }
+  h1 span { color: var(--accent); }
+  .header-meta {
+    display: flex;
+    gap: 24px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  .meta-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 11.5px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .meta-pill .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+  }
+
+  /* ── SECTION TITLES ── */
+  .section { margin-bottom: 64px; }
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h2 .num {
+    font-family: 'DM Mono', monospace;
+    font-size: .9rem;
+    font-weight: 400;
+    color: var(--accent);
+    background: rgba(108,138,255,.1);
+    border: 1px solid rgba(108,138,255,.25);
+    border-radius: 5px;
+    padding: 1px 8px;
+  }
+
+  /* ── ENTITY GRID ── */
+  .entity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+  .entity-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    transition: border-color .2s;
+  }
+  .entity-card:hover { border-color: var(--accent); }
+  .entity-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .entity-desc {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .entity-badge {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    border-radius: 3px;
+    padding: 1px 6px;
+    margin-top: 8px;
+  }
+  .badge-core  { background: rgba(108,138,255,.15); color: var(--accent); border: 1px solid rgba(108,138,255,.25); }
+  .badge-fin   { background: rgba(67,232,176,.12);  color: var(--accent3); border: 1px solid rgba(67,232,176,.25); }
+  .badge-tx    { background: rgba(245,197,66,.12);  color: var(--accent4); border: 1px solid rgba(245,197,66,.25); }
+  .badge-opt   { background: rgba(255,107,107,.12); color: var(--accent2); border: 1px solid rgba(255,107,107,.25); }
+
+  /* ── TABLE SCHEMA BLOCKS ── */
+  .schema-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+  .schema-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .schema-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--accent3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .schema-title::before { content: '◈'; font-size: 13px; }
+  .schema-purpose {
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+  }
+  .schema-table-wrap { overflow-x: auto; }
+  table.schema {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+  table.schema th {
+    font-family: 'DM Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  table.schema td {
+    padding: 9px 16px;
+    border-bottom: 1px solid rgba(37,42,56,.6);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  table.schema tr:last-child td { border-bottom: none; }
+  table.schema tr:hover td { background: rgba(108,138,255,.04); }
+  .col-name { font-family: 'DM Mono', monospace; color: #c8d3ff; font-size: 12.5px; }
+  .col-type { font-family: 'DM Mono', monospace; color: var(--accent4); font-size: 11.5px; }
+  .col-constraint { font-size: 11.5px; }
+  .tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin: 1px 2px 1px 0;
+    white-space: nowrap;
+  }
+  .tag-pk   { background: rgba(245,197,66,.15); color: var(--accent4); border: 1px solid rgba(245,197,66,.3); }
+  .tag-fk   { background: rgba(108,138,255,.15); color: var(--accent);  border: 1px solid rgba(108,138,255,.3); }
+  .tag-uq   { background: rgba(67,232,176,.12);  color: var(--accent3); border: 1px solid rgba(67,232,176,.3); }
+  .tag-nn   { background: rgba(255,107,107,.1);  color: var(--accent2); border: 1px solid rgba(255,107,107,.25); }
+  .tag-def  { background: rgba(160,160,255,.1);  color: #aab0ff; border: 1px solid rgba(160,160,255,.2); }
+  .tag-chk  { background: rgba(255,200,100,.1);  color: #ffc85a; border: 1px solid rgba(255,200,100,.2); }
+  .col-note { font-size: 11.5px; color: var(--muted); }
+
+  /* ── RELATIONSHIPS ── */
+  .rel-list { display: flex; flex-direction: column; gap: 10px; }
+  .rel-item {
+    display: grid;
+    grid-template-columns: 180px 80px 180px 1fr;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 16px;
+    font-size: 12.5px;
+  }
+  .rel-table {
+    font-family: 'DM Mono', monospace;
+    color: var(--accent3);
+    font-size: 12px;
+  }
+  .rel-arrow {
+    font-family: 'DM Mono', monospace;
+    text-align: center;
+    color: var(--accent);
+    font-size: 13px;
+  }
+  .rel-note { color: var(--muted); font-size: 12px; }
+
+  /* ── SQL CODE BLOCKS ── */
+  .sql-wrap {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .sql-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,.02);
+  }
+  .sql-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent4);
+    letter-spacing: .08em;
+  }
+  .sql-dots { display: flex; gap: 5px; }
+  .sql-dots span { width: 8px; height: 8px; border-radius: 50%; }
+  pre.sql {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.75;
+    color: #c9d1e0;
+    padding: 20px 24px;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .kw { color: #6c8aff; }
+  .tp { color: #f5c542; }
+  .cm { color: #4a5568; font-style: italic; }
+  .cn { color: #43e8b0; }
+  .en { color: #ff9f7a; }
+  .vl { color: #ff6b6b; }
+
+  /* ── DESIGN DECISIONS ── */
+  .decision-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 16px;
+  }
+  .decision-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .decision-card h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: .95rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .decision-card h4 .icon {
+    font-size: 16px;
+  }
+  .decision-card p {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+
+  /* ── ER DIAGRAM ── */
+  .er-diagram {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 24px;
+    overflow-x: auto;
+  }
+  pre.er {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    color: #8899bb;
+    white-space: pre;
+  }
+  pre.er .hl   { color: var(--accent3); }
+  pre.er .hl2  { color: var(--accent);  }
+  pre.er .hl3  { color: var(--accent4); }
+  pre.er .hl4  { color: var(--accent2); }
+
+  /* ── INDEX TABLE ── */
+  .index-grid { display: flex; flex-direction: column; gap: 8px; }
+  .index-row {
+    display: grid;
+    grid-template-columns: 180px 180px 100px 1fr;
+    gap: 12px;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 9px 16px;
+    font-size: 12.5px;
+  }
+  .index-table { font-family: 'DM Mono', monospace; color: var(--accent3); font-size: 12px; }
+  .index-col   { font-family: 'DM Mono', monospace; color: var(--accent4); font-size: 12px; }
+  .index-type  { font-family: 'DM Mono', monospace; font-size: 11px; }
+  .index-reason { color: var(--muted); font-size: 12px; }
+
+  /* ── WALLET FLOW ── */
+  .flow-steps { display: flex; flex-direction: column; gap: 0; }
+  .flow-step {
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+  .flow-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .flow-circle {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .flow-connector {
+    width: 2px;
+    min-height: 40px;
+    background: var(--border);
+    flex: 1;
+    margin: 3px 0;
+  }
+  .flow-content {
+    padding: 4px 0 32px;
+  }
+  .flow-content h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: .9rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .flow-content p {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .flow-content code {
+    font-family: 'DM Mono', monospace;
+    font-size: 11.5px;
+    background: rgba(108,138,255,.12);
+    border: 1px solid rgba(108,138,255,.25);
+    border-radius: 3px;
+    padding: 1px 5px;
+    color: var(--accent);
+  }
+
+  /* ── DIVIDER ── */
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 48px 0;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media (max-width: 700px) {
+    h1 { font-size: 1.8rem; }
+    .rel-item { grid-template-columns: 1fr; }
+    .index-row { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<!-- ══════════════════════════════════════════════════
+     HEADER
+══════════════════════════════════════════════════ -->
+<header>
+  <div class="header-tag">Database Design Document</div>
+  <h1>Freelance <span>Marketplace</span><br>Schema Architecture</h1>
+  <div class="header-meta">
+    <span class="meta-pill"><span class="dot" style="background:#6c8aff"></span>8 Tables</span>
+    <span class="meta-pill"><span class="dot" style="background:#43e8b0"></span>Ledger-Based Wallet</span>
+    <span class="meta-pill"><span class="dot" style="background:#f5c542"></span>Escrow Model</span>
+    <span class="meta-pill"><span class="dot" style="background:#ff6b6b"></span>3NF Normalized</span>
+    <span class="meta-pill"><span class="dot" style="background:#aab0ff"></span>MySQL / PostgreSQL</span>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 1: ENTITIES
+══════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">Section 01</div>
+  <h2><span class="num">§1</span> Identified Entities</h2>
+
+  <div class="entity-grid">
+    <div class="entity-card">
+      <div class="entity-name">users</div>
+      <div class="entity-desc">All platform users: clients, freelancers, and admins. Single-table polymorphism via role enum.</div>
+      <span class="entity-badge badge-core">CORE</span>
+    </div>
+    <div class="entity-card">
+      <div class="entity-name">categories</div>
+      <div class="entity-desc">Hierarchical gig taxonomy. Self-referential parent_id supports subcategories.</div>
+      <span class="entity-badge badge-core">CORE</span>
+    </div>
+    <div class="entity-card">
+      <div class="entity-name">gigs</div>
+      <div class="entity-desc">Services listed by freelancers. Tied to category and freelancer user.</div>
+      <span class="entity-badge badge-core">CORE</span>
+    </div>
+    <div class="entity-card">
+      <div class="entity-name">gig_packages</div>
+      <div class="entity-desc">Tiered pricing (BASIC / STANDARD / PREMIUM) per gig. Keeps gigs normalized.</div>
+      <span class="entity-badge badge-core">CORE</span>
+    </div>
+    <div class="entity-card">
+      <div class="entity-name">orders</div>
+      <div class="entity-desc">Tracks the full lifecycle of a purchase: PENDING → COMPLETED / CANCELLED.</div>
+      <span class="entity-badge badge-tx">TRANSACTIONAL</span>
+    </div>
+    <div class="entity-card">
+      <div class="entity-name">wallets</div>
+      <div class="entity-desc">One wallet per user. Stores available + held (escrow) balances. Never mutated directly.</div>
+      <span class="entity-badge badge-fin">FINANCIAL</span>
+    </div>
+    <div class="entity-card">
+      <div class="entity-name">wallet_transactions</div>
+      <div class="entity-desc">Immutable ledger. Every coin movement is recorded here. Source of truth for balance.</div>
+      <span class="entity-badge badge-fin">FINANCIAL</span>
+    </div>
+    <div class="entity-card">
+      <div class="entity-name">reviews</div>
+      <div class="entity-desc">Post-completion review. Strictly one per order. Rating 1–5 + free-text comment.</div>
+      <span class="entity-badge badge-opt">POST-ORDER</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 2: SCHEMAS
+══════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">Section 02</div>
+  <h2><span class="num">§2</span> Detailed Table Schemas</h2>
+
+  <!-- USERS -->
+  <div class="schema-block">
+    <div class="schema-header">
+      <span class="schema-title">users</span>
+      <span class="schema-purpose">All platform identities — clients, freelancers, admins</span>
+    </div>
+    <div class="schema-table-wrap">
+      <table class="schema">
+        <thead>
+          <tr>
+            <th>Column</th><th>Data Type</th><th>Constraints</th><th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="col-name">id</td><td class="col-type">BIGINT UNSIGNED</td><td><span class="tag tag-pk">PK</span><span class="tag tag-nn">NOT NULL</span><span class="tag tag-def">AUTO_INCREMENT</span></td><td class="col-note">Surrogate key</td></tr>
+          <tr><td class="col-name">username</td><td class="col-type">VARCHAR(50)</td><td><span class="tag tag-uq">UNIQUE</span><span class="tag tag-nn">NOT NULL</span></td><td class="col-note">Public display handle</td></tr>
+          <tr><td class="col-name">email</td><td class="col-type">VARCHAR(255)</td><td><span class="tag tag-uq">UNIQUE</span><span class="tag tag-nn">NOT NULL</span></td><td class="col-note">Login identifier</td></tr>
+          <tr><td class="col-name">password_hash</td><td class="col-type">VARCHAR(255)</td><td><span class="tag tag-nn">NOT NULL</span></td><td class="col-note">bcrypt / argon2 hash; never plaintext</td></tr>
+          <tr><td class="col-name">role</td><td class="col-type">ENUM</td><td><span class="tag tag-nn">NOT NULL</span><span class="tag tag-def">DEFAULT 'CLIENT'</span></td><td class="col-note">CLIENT | FREELANCER | ADMIN</td></tr>
+          <tr><td class="col-name">full_name</td><td class="col-type">VARCHAR(100)</td><td>—</td><td class="col-note">Optional display name</td></tr>
+          <tr><td class="col-name">avatar_url</td><td class="col-type">VARCHAR(500)</td><td>—</td><td class="col-note">Profile photo URL</td></tr>
+          <tr><td class="col-name">bio</td><td class="col-type">TEXT</td><td>—</td><td class="col-note">Freelancer portfolio description</td></tr>
+          <tr><td class="col-name">is_active</td><td class="col-type">BOOLEAN</td><td><span class="tag tag-nn">NOT NULL</span><span class="tag tag-def">DEFAULT TRUE</span></td><td class="col-note">Soft-delete / ban flag</td></tr>
+          <tr><td class="col-name">is_verified</td><td class="col-type">BOOLEAN</td><td><span class="tag tag-nn">NOT NULL</span><span class="tag tag-def">DEFAULT FALSE</span></td><td class="col-note">Email verification status</td></tr>
+          <tr><td class="col-name">created_at</td><td class="col-type">TIMESTAMP</td><td><span class="tag tag-nn">NOT NULL</span><span class="tag tag-def">DEFAULT NOW()</span></td><td class="col-note">Registration time</td></tr>
+          <tr><td class="col-name">updated_at</td><td class="col-type">TIMESTAMP</td><td><span class="tag tag-nn">NOT NULL</span><span class="tag tag-def">ON UPDATE NOW()</span></td><td class="col-note">Auto-updated on any row change</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CATEGORIES -->
+  <div class="schema-block">
+    <div class="schema-header">
+      <span class="schema-title">categories</span>
+      <span class="schema-purpose">Hierarchical gig taxonomy (e.g. Design → Logo Design)</span>
+    </div>
+    <div class="schema-table-wrap">
+      <table class="schema">
+        <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td class="col-name">id</td><td class="col-type">INT UNSIGNED</td><td><span class="tag tag-pk">PK</span><span class="tag tag-def">AUTO_INCREMENT</span></td><td class="col-note"></td></tr>
+          <tr><td class="col-name">name</td><td class="col-type">VARCHAR(100)</td><td><span class="tag tag-nn">NOT NULL</span></td><td class="col-note">Display name e.g. "Logo Design"</td></tr>
+          <tr><td class="col-name">slug</td><td class="col-type">VARCHAR(100)</td><td><span class="tag tag-uq">UNIQUE</span><span class="tag tag-nn">NOT NULL</span></td><td class="col-note">URL-safe identifier e.g. "logo-design"</td></tr>
+          <tr><td class="col-name">parent_id</td><td class="col-type">INT UNSIGNED</td><td><span class="tag tag-fk">FK → categories.id</span><span class="tag tag-def">DEFAULT NULL</span></td><td class="col-note">NULL = root category; enables subcategories</td></tr>
+          <tr><td class="col-name">created_at</td><td class="col-type">TIMESTAMP</td><td><span class="tag tag-def">DEFAULT NOW()</span></td><td class="col-note"></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- GIGS -->
+  <div class="schema-block">
+    <div class="schema-header">
+      <span class="schema-title">gigs</span>
+      <span class="schema-purpose">Service listings created by freelancers</span>
+    </div>
+    <div class="schema-table-wrap">
+      <table class="schema">
+        <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td class="col-name">id</td><td class="col-type">BIGINT UNSIGNED</td><td><span class="tag tag-pk">PK</span><span class="tag tag-def">AUTO_INCREMENT</span></td><td class="col-note"></td></tr>
+          <tr><td class="col-name">freelancer_id</td><td class="col-type">BIGINT UNSIGNED</td><td><span class="tag tag-fk">FK → users.id</span><span class="tag tag-nn">NOT NULL</span></td><td class="col-note">CASCADE DELETE: gigs removed when user deleted</td></tr>
+          <tr><td class="col-name">category_id</td><td class="col-type">INT UNSIGNED</td><td><span class="tag tag-fk">FK → categories.id</span><span class="tag tag-nn">NOT NULL</span></td><td class="col-note">RESTRICT DELETE: prevent orphan gigs</td></tr>
+          <tr><td class="col-name">title</td><td class="col-type">VARCHAR(255)</td><td><span class="tag tag-nn">NOT NULL</span></td><td class="col-note">Gig headline</td></tr>
+          <tr><td class="col-name">description</td><td class="col-type">TEXT</td><td><span class="tag tag-nn">NOT NULL</span></td><td class="col-note">Full service description</td></tr>
+          <tr><td class="col-name">status</td><td class="col-type">ENUM</td><td><span class="tag tag-nn">NOT NULL</span><span class="tag tag-def">DEFAULT 'ACTIVE'</span></td><td class="col-note">ACTIVE | PAUSED | DELETED</td></tr>
+          <tr><td class="col-name">created_at</td><td class="col-type">TIMESTAMP</td><td><span class="tag tag-def">DEFAULT NOW()</span></td><td class="col-note"></td></tr>
+          <tr><td class="col-name">updated_at</td><td class="col-type">TIMESTAMP</td><td><span class="tag tag-def">ON UPDATE NOW()</span></td><td class="col-note"></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- GIG PACKAGES -->
+  <div class="schema-block">
+    <div class="schema-header">
+      <span class="schema-title">gig_packages</span>
+      <span class="schema-purpose">Tiered pricing options per gig — keeps gigs table normalized</span>
+    </div>
+    <div class="schema-table-wrap">
+      <table class="schema">
+        <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td class="col-name">id</td><td class="col-type">BIGINT UNSIGNED</td><td><span class="tag tag-pk">PK</span><span class="tag tag-def">AUTO_INCREMENT</span></td><td class="col-note"></td></tr>
+          <tr><td class="col-name">gig_id</td><td class="col-type">BIGINT UNSIGNED</td><td><span class="tag tag-fk">FK → gigs.id</span><span class="tag tag-nn">NOT NULL</span></td><td class="col-note">CASCADE DELETE</td></tr>
+          <tr><td class="col-name">package_type</td><td class="col-type">ENUM</td><td><span class="tag tag-nn">NOT NULL</span></td><td class="col-note">BASIC | STANDARD | PREMIUM</td></tr>
+          <tr><td class="col-name">title</td><td class="col-type">VARCHAR(100)</td><td><span class="tag tag-nn">NOT NULL</span></td><td class="col-note">Package headline (e.g. "Basic Logo")</td></tr>
+          <tr><td class="col-name">description</td><td class="col-type">TEXT</td><td>—</td><td class="col-note">What's included</td></tr>
+          <tr><td class="col-name">price</td><td class="col-type">INT UNSIGNED</td><td><span class="tag tag-nn">NOT NULL</span><span class="tag tag-chk">CHECK > 0</span></td><td class="col-note">Price in coins</td></tr>
+          <tr><td class="col-name">delivery_days</td><td class="col-type">SMALLINT UNSIGNED</td><td><span class="tag tag-nn">NOT NULL</span><span class="tag tag-chk">CHECK > 0</span></td><td class="col-note">Expected delivery window</td></tr>
+          <tr><td class="col-name">revisions</td><td class="col-type">TINYINT UNSIGNED</td><td><span class="tag tag-nn">NOT NULL</span><span class="tag tag-def">DEFAULT 1</span></td><td class="col-note">Number of revision rounds included</td></tr>
+          <tr><td class="col-name">created_at</td><td class="col-type">TIMESTAMP</td><td><span class="tag tag-def">DEFAULT NOW()</span></td><td class="col-note"></td></tr>
+          <tr><td class="col-name" colspan="4"><span class="tag tag-uq">UNIQUE (gig_id, package_type)</span> — prevents duplicate tiers per gig</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ORDERS -->
+  <div class="schema-block">
+    <div class="schema-header">
+      <span class="schema-title">orders</span>
+      <span class="schema-purpose">Core transactional record — bridges client, freelancer, gig, and wallet</span>
+    </div>
+    <div class="schema-table-wrap">
+      <table class="schema">
+        <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td class="col-name">id</td><td class="col-type">BIGINT UNSIGNED</td><td><span class="tag tag-pk">PK</span><span class="tag tag-def">AUTO_INCREMENT</span></td><td class="col-note"></td></tr>
+          <tr><td class="col-name">client_id</td><td class="col-type">BIGINT UNSIGNED</td><td><span class="tag tag-fk">FK → users.id</span><span class="tag tag-nn">NOT NULL</span></td><td class="col-note">RESTRICT DELETE — preserve financial history</td></tr>
+          <tr><td class="col-name">freelancer_id</td><td class="col-type">BIGINT UNSIGNED</td><td><span class="tag tag-fk">FK → users.id</span><span class="tag tag-nn">NOT NULL</span></td><td class="col-note">Denormalized from gig for query speed + history</td></tr>
+          <tr><td class="col-name">gig_id</td><td class="col-type">BIGINT UNSIGNED</td><td><span class="tag tag-fk">FK → gigs.id</span><span class="tag tag-nn">NOT NULL</span></td><td class="col-note">RESTRICT DELETE</td></tr>
+          <tr><td class="col-name">package_id</td><td class="col-type">BIGINT UNSIGNED</td><td><span class="tag tag-fk">FK → gig_packages.id</span><span class="tag tag-def">NULL</span></td><td class="col-note">SET NULL on delete; NULL if no package chosen</td></tr>
+          <tr><td class="col-name">price_snapshot</td><td class="col-type">INT UNSIGNED</td><td><span class="tag tag-nn">NOT NULL</span><span class="tag tag-chk">CHECK > 0</span></td><td class="col-note">Immutable price at order time — survives gig price changes</td></tr>
+          <tr><td class="col-name">requirements</td><td class="col-type">TEXT</td><td>—</td><td class="col-note">Client instructions for the freelancer</td></tr>
+          <tr><td class="col-name">status</td><td class="col-type">ENUM</td><td><span class="tag tag-nn">NOT NULL</span><span class="tag tag-def">DEFAULT 'PENDING'</span></td><td class="col-note">PENDING | COMPLETED | CANCELLED</td></tr>
+          <tr><td class="col-name">created_at</td><td class="col-type">TIMESTAMP</td><td><span class="tag tag-nn">NOT NULL</span><span class="tag tag-def">DEFAULT NOW()</span></td><td class="col-note"></td></tr>
+          <tr><td class="col-name">completed_at</td><td class="col-type">TIMESTAMP</td><td><span class="tag tag-def">NULL</span></td><td class="col-note">Set when status → COMPLETED</td></tr>
+          <tr><td class="col-name">cancelled_at</td><td class="col-type">TIMESTAMP</td><td><span class="tag tag-def">NULL</span></td><td class="col-note">Set when status → CANCELLED</td></tr>
+          <tr><td class="col-name" colspan="4"><span class="tag tag-chk">CHECK (client_id != freelancer_id)</span> — prevents self-ordering</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- WALLETS -->
+  <div class="schema-block">
+    <div class="schema-header">
+      <span class="schema-title">wallets</span>
+      <span class="schema-purpose">One wallet per user — denormalized balance cache on top of the ledger</span>
+    </div>
+    <div class="schema-table-wrap">
+      <table class="schema">
+        <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td class="col-name">id</td><td class="col-type">BIGINT UNSIGNED</td><td><span class="tag tag-pk">PK</span><span class="tag tag-def">AUTO_INCREMENT</span></td><td class="col-note"></td></tr>
+          <tr><td class="col-name">user_id</td><td class="col-type">BIGINT UNSIGNED</td><td><span class="tag tag-fk">FK → users.id</span><span class="tag tag-uq">UNIQUE</span><span class="tag tag-nn">NOT NULL</span></td><td class="col-note">1-to-1 with users; CASCADE DELETE</td></tr>
+          <tr><td class="col-name">available_balance</td><td class="col-type">INT UNSIGNED</td><td><span class="tag tag-nn">NOT NULL</span><span class="tag tag-def">DEFAULT 1000</span><span class="tag tag-chk">CHECK ≥ 0</span></td><td class="col-note">Spendable coins. Initial grant = 1000</td></tr>
+          <tr><td class="col-name">held_balance</td><td class="col-type">INT UNSIGNED</td><td><span class="tag tag-nn">NOT NULL</span><span class="tag tag-def">DEFAULT 0</span><span class="tag tag-chk">CHECK ≥ 0</span></td><td class="col-note">Escrowed coins locked to active orders</td></tr>
+          <tr><td class="col-name">created_at</td><td class="col-type">TIMESTAMP</td><td><span class="tag tag-def">DEFAULT NOW()</span></td><td class="col-note"></td></tr>
+          <tr><td class="col-name">updated_at</td><td class="col-type">TIMESTAMP</td><td><span class="tag tag-def">ON UPDATE NOW()</span></td><td class="col-note">Updated only via transaction procedures</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- WALLET TRANSACTIONS -->
+  <div class="schema-block">
+    <div class="schema-header">
+      <span class="schema-title">wallet_transactions</span>
+      <span class="schema-purpose">Immutable financial ledger — the absolute source of truth for all coin movements</span>
+    </div>
+    <div class="schema-table-wrap">
+      <table class="schema">
+        <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td class="col-name">id</td><td class="col-type">BIGINT UNSIGNED</td><td><span class="tag tag-pk">PK</span><span class="tag tag-def">AUTO_INCREMENT</span></td><td class="col-note"></td></tr>
+          <tr><td class="col-name">wallet_id</td><td class="col-type">BIGINT UNSIGNED</td><td><span class="tag tag-fk">FK → wallets.id</span><span class="tag tag-nn">NOT NULL</span></td><td class="col-note">RESTRICT DELETE — ledger rows must be retained</td></tr>
+          <tr><td class="col-name">order_id</td><td class="col-type">BIGINT UNSIGNED</td><td><span class="tag tag-fk">FK → orders.id</span><span class="tag tag-def">NULL</span></td><td class="col-note">SET NULL if order deleted; links tx to order</td></tr>
+          <tr><td class="col-name">transaction_type</td><td class="col-type">ENUM</td><td><span class="tag tag-nn">NOT NULL</span></td><td class="col-note">CREDIT | DEBIT | HOLD | RELEASE | REFUND</td></tr>
+          <tr><td class="col-name">amount</td><td class="col-type">INT UNSIGNED</td><td><span class="tag tag-nn">NOT NULL</span><span class="tag tag-chk">CHECK > 0</span></td><td class="col-note">Always positive; direction inferred from type</td></tr>
+          <tr><td class="col-name">balance_after</td><td class="col-type">INT UNSIGNED</td><td><span class="tag tag-nn">NOT NULL</span></td><td class="col-note">Snapshot of available_balance after this tx</td></tr>
+          <tr><td class="col-name">held_after</td><td class="col-type">INT UNSIGNED</td><td><span class="tag tag-nn">NOT NULL</span></td><td class="col-note">Snapshot of held_balance after this tx</td></tr>
+          <tr><td class="col-name">description</td><td class="col-type">VARCHAR(255)</td><td>—</td><td class="col-note">Human-readable audit note</td></tr>
+          <tr><td class="col-name">created_at</td><td class="col-type">TIMESTAMP</td><td><span class="tag tag-nn">NOT NULL</span><span class="tag tag-def">DEFAULT NOW()</span></td><td class="col-note">Immutable — no updated_at on this table</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- REVIEWS -->
+  <div class="schema-block">
+    <div class="schema-header">
+      <span class="schema-title">reviews</span>
+      <span class="schema-purpose">Post-completion feedback — strictly one per completed order</span>
+    </div>
+    <div class="schema-table-wrap">
+      <table class="schema">
+        <thead><tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td class="col-name">id</td><td class="col-type">BIGINT UNSIGNED</td><td><span class="tag tag-pk">PK</span><span class="tag tag-def">AUTO_INCREMENT</span></td><td class="col-note"></td></tr>
+          <tr><td class="col-name">order_id</td><td class="col-type">BIGINT UNSIGNED</td><td><span class="tag tag-fk">FK → orders.id</span><span class="tag tag-uq">UNIQUE</span><span class="tag tag-nn">NOT NULL</span></td><td class="col-note">UNIQUE enforces one review per order at DB level</td></tr>
+          <tr><td class="col-name">reviewer_id</td><td class="col-type">BIGINT UNSIGNED</td><td><span class="tag tag-fk">FK → users.id</span><span class="tag tag-nn">NOT NULL</span></td><td class="col-note">Must match order.client_id (validated in app layer)</td></tr>
+          <tr><td class="col-name">reviewee_id</td><td class="col-type">BIGINT UNSIGNED</td><td><span class="tag tag-fk">FK → users.id</span><span class="tag tag-nn">NOT NULL</span></td><td class="col-note">Must match order.freelancer_id</td></tr>
+          <tr><td class="col-name">rating</td><td class="col-type">TINYINT UNSIGNED</td><td><span class="tag tag-nn">NOT NULL</span><span class="tag tag-chk">CHECK 1–5</span></td><td class="col-note">Star rating 1 to 5</td></tr>
+          <tr><td class="col-name">comment</td><td class="col-type">TEXT</td><td>—</td><td class="col-note">Optional free-text feedback</td></tr>
+          <tr><td class="col-name">created_at</td><td class="col-type">TIMESTAMP</td><td><span class="tag tag-nn">NOT NULL</span><span class="tag tag-def">DEFAULT NOW()</span></td><td class="col-note">Immutable — reviews cannot be edited</td></tr>
+          <tr><td class="col-name" colspan="4"><span class="tag tag-chk">CHECK (reviewer_id != reviewee_id)</span> — prevents self-review</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 3: RELATIONSHIPS
+══════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">Section 03</div>
+  <h2><span class="num">§3</span> Table Relationships</h2>
+
+  <div class="rel-list">
+    <div class="rel-item">
+      <span class="rel-table">users</span>
+      <span class="rel-arrow">1 ──── 1</span>
+      <span class="rel-table">wallets</span>
+      <span class="rel-note">Each user has exactly one wallet (UNIQUE FK on user_id)</span>
+    </div>
+    <div class="rel-item">
+      <span class="rel-table">users (FREELANCER)</span>
+      <span class="rel-arrow">1 ──── N</span>
+      <span class="rel-table">gigs</span>
+      <span class="rel-note">A freelancer can list many gigs</span>
+    </div>
+    <div class="rel-item">
+      <span class="rel-table">categories</span>
+      <span class="rel-arrow">1 ──── N</span>
+      <span class="rel-table">gigs</span>
+      <span class="rel-note">One category holds many gigs</span>
+    </div>
+    <div class="rel-item">
+      <span class="rel-table">categories</span>
+      <span class="rel-arrow">1 ──── N</span>
+      <span class="rel-table">categories</span>
+      <span class="rel-note">Self-referential parent/child hierarchy for subcategories</span>
+    </div>
+    <div class="rel-item">
+      <span class="rel-table">gigs</span>
+      <span class="rel-arrow">1 ──── N</span>
+      <span class="rel-table">gig_packages</span>
+      <span class="rel-note">One gig has up to 3 packages (BASIC / STANDARD / PREMIUM)</span>
+    </div>
+    <div class="rel-item">
+      <span class="rel-table">gigs</span>
+      <span class="rel-arrow">1 ──── N</span>
+      <span class="rel-table">orders</span>
+      <span class="rel-note">One gig can receive many orders over time</span>
+    </div>
+    <div class="rel-item">
+      <span class="rel-table">users (CLIENT)</span>
+      <span class="rel-arrow">1 ──── N</span>
+      <span class="rel-table">orders</span>
+      <span class="rel-note">A client can place many orders</span>
+    </div>
+    <div class="rel-item">
+      <span class="rel-table">users (FREELANCER)</span>
+      <span class="rel-arrow">1 ──── N</span>
+      <span class="rel-table">orders</span>
+      <span class="rel-note">A freelancer can receive many orders</span>
+    </div>
+    <div class="rel-item">
+      <span class="rel-table">orders</span>
+      <span class="rel-arrow">1 ──── 1</span>
+      <span class="rel-table">reviews</span>
+      <span class="rel-note">At most one review per completed order (UNIQUE on order_id)</span>
+    </div>
+    <div class="rel-item">
+      <span class="rel-table">wallets</span>
+      <span class="rel-arrow">1 ──── N</span>
+      <span class="rel-table">wallet_transactions</span>
+      <span class="rel-note">Every coin movement on a wallet is one ledger row</span>
+    </div>
+    <div class="rel-item">
+      <span class="rel-table">orders</span>
+      <span class="rel-arrow">1 ──── N</span>
+      <span class="rel-table">wallet_transactions</span>
+      <span class="rel-note">One order produces multiple transaction events (HOLD, RELEASE/DEBIT, CREDIT)</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 4: ER DIAGRAM
+══════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">Section 04</div>
+  <h2><span class="num">§4</span> ER Diagram (Text)</h2>
+  <div class="er-diagram">
+<pre class="er">
+<span class="hl">┌─────────────────┐</span>          <span class="hl">┌──────────────────┐</span>
+<span class="hl">│     users       │</span>          <span class="hl">│    categories    │</span>
+<span class="hl">├─────────────────┤</span>          <span class="hl">├──────────────────┤</span>
+<span class="hl3">│ id (PK)         │</span>          <span class="hl3">│ id (PK)          │</span>
+│ username        │          │ name             │
+│ email           │          │ slug             │
+│ password_hash   │          │ parent_id (FK)──┐│
+│ role [ENUM]     │          └──────────────────┘│
+│ is_active       │                 ▲ self-ref   │
+└───────┬─────────┘          ───────┘            │
+        │ 1                                      │
+        │                                        │
+   ┌────┴──────────────────────────────────┐     │
+   │                                       │     │
+   ▼ 1:1                         1:N ▼     │     │
+<span class="hl2">┌──────────────┐</span>        <span class="hl2">┌──────────────────┐</span>  │
+<span class="hl2">│   wallets    │</span>        <span class="hl2">│      gigs        │</span>◄─┘
+<span class="hl2">├──────────────┤</span>        <span class="hl2">├──────────────────┤</span>
+<span class="hl3">│ id (PK)      │</span>        <span class="hl3">│ id (PK)          │</span>
+│ user_id (FK) │        │ freelancer_id FK │
+│ available_bal│        │ category_id FK   │
+│ held_balance │        │ title            │
+└──────┬───────┘        │ status [ENUM]    │
+       │ 1:N            └────────┬─────────┘
+       │                         │ 1:N
+       ▼                         ▼
+<span class="hl4">┌────────────────────┐</span>  <span class="hl4">┌──────────────────┐</span>
+<span class="hl4">│ wallet_transactions│</span>  <span class="hl4">│  gig_packages    │</span>
+<span class="hl4">├────────────────────┤</span>  <span class="hl4">├──────────────────┤</span>
+<span class="hl3">│ id (PK)            │</span>  <span class="hl3">│ id (PK)          │</span>
+│ wallet_id (FK)     │  │ gig_id (FK)      │
+│ order_id (FK)──┐   │  │ package_type ENUM│
+│ type [ENUM]    │   │  │ price            │
+│ amount         │   │  │ delivery_days    │
+│ balance_after  │   │  └──────────────────┘
+│ held_after     │   │
+└────────────────────┘   │
+                         │ used in
+                   ┌─────▼───────────────────┐
+                   <span class="hl">│         orders          │</span>
+                   <span class="hl">├─────────────────────────┤</span>
+                   <span class="hl3">│ id (PK)                 │</span>
+                   │ client_id (FK→users)    │
+                   │ freelancer_id (FK→users)│
+                   │ gig_id (FK)             │
+                   │ package_id (FK, NULL)   │
+                   │ price_snapshot          │
+                   │ status [ENUM]           │
+                   │ created_at              │
+                   │ completed_at (NULL)     │
+                   └────────────┬────────────┘
+                                │ 1:1
+                                ▼
+                   <span class="hl2">┌─────────────────────────┐</span>
+                   <span class="hl2">│         reviews         │</span>
+                   <span class="hl2">├─────────────────────────┤</span>
+                   <span class="hl3">│ id (PK)                 │</span>
+                   │ order_id (FK, UNIQUE)   │
+                   │ reviewer_id (FK→users)  │
+                   │ reviewee_id (FK→users)  │
+                   │ rating [1–5]            │
+                   │ comment                 │
+                   └─────────────────────────┘
+</pre>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 5: WALLET FLOW
+══════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">Section 05</div>
+  <h2><span class="num">§5</span> Wallet & Escrow Flow</h2>
+  <div class="flow-steps">
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-circle">1</div><div class="flow-connector"></div></div>
+      <div class="flow-content">
+        <h4>User Registration</h4>
+        <p>A <code>wallets</code> row is created automatically. <code>available_balance = 1000</code>, <code>held_balance = 0</code>. A single <code>CREDIT</code> transaction is written to <code>wallet_transactions</code> as the opening ledger entry.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-circle">2</div><div class="flow-connector"></div></div>
+      <div class="flow-content">
+        <h4>Client Places Order → HOLD</h4>
+        <p>Inside a single DB transaction: check <code>available_balance ≥ price</code>, then <code>available_balance -= price</code>, <code>held_balance += price</code>, insert <code>HOLD</code> row in <code>wallet_transactions</code>, insert <code>orders</code> row with <code>status = PENDING</code>. Atomicity guarantees either all or nothing.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-circle">3</div><div class="flow-connector"></div></div>
+      <div class="flow-content">
+        <h4>Order in Progress</h4>
+        <p>Coins remain in <code>held_balance</code>. Neither client nor freelancer can touch them. The order status stays <code>PENDING</code>.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-circle">4</div><div class="flow-connector"></div></div>
+      <div class="flow-content">
+        <h4>Client Marks Complete → RELEASE + CREDIT</h4>
+        <p>Atomic transaction: <code>orders.status = COMPLETED</code>, <code>completed_at = NOW()</code>. Client wallet: <code>held_balance -= price</code>, insert <code>DEBIT</code> (escrow exit). Freelancer wallet: <code>available_balance += price</code>, insert <code>CREDIT</code> row. Two ledger entries, one DB transaction.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-circle">5</div><div class="flow-connector"></div></div>
+      <div class="flow-content">
+        <h4>Order Cancelled → REFUND</h4>
+        <p>If <code>status = PENDING</code>: <code>held_balance -= price</code>, <code>available_balance += price</code> on client wallet, insert <code>REFUND</code> row. Order <code>status = CANCELLED</code>, <code>cancelled_at = NOW()</code>. No COMPLETED order can ever be cancelled (enforced at app layer).</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-circle">6</div></div>
+      <div class="flow-content">
+        <h4>Client Leaves Review</h4>
+        <p>Only permitted if <code>orders.status = COMPLETED</code>. App checks no row exists in <code>reviews</code> for this <code>order_id</code>, then inserts. The <code>UNIQUE(order_id)</code> constraint on <code>reviews</code> is a final guard — even a race condition can't produce two reviews for the same order.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 6: DESIGN DECISIONS
+══════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">Section 06</div>
+  <h2><span class="num">§6</span> Design Decisions</h2>
+  <div class="decision-grid">
+    <div class="decision-card">
+      <h4><span class="icon">🏛️</span> Single Users Table</h4>
+      <p>All roles share one table with a <code>role</code> ENUM. Avoids joining multiple identity tables for auth. Role-specific data (bio for freelancers) is nullable. Simplifies permissions checks.</p>
+    </div>
+    <div class="decision-card">
+      <h4><span class="icon">📒</span> Ledger-Based Wallet</h4>
+      <p>The wallet table holds a denormalized balance for read performance, but it is only ever mutated inside a transaction that simultaneously inserts a ledger row. You can always re-derive balance by summing <code>wallet_transactions</code>.</p>
+    </div>
+    <div class="decision-card">
+      <h4><span class="icon">💰</span> Price Snapshot on Orders</h4>
+      <p><code>price_snapshot</code> captures the coin amount at the moment of purchase. If the freelancer later changes their package price, historical orders remain accurate — critical for financial audits.</p>
+    </div>
+    <div class="decision-card">
+      <h4><span class="icon">🔒</span> Escrow via Held Balance</h4>
+      <p>Splitting the wallet into <code>available_balance</code> and <code>held_balance</code> models a two-step escrow natively. The client can't double-spend held funds, and the freelancer can't access them until completion.</p>
+    </div>
+    <div class="decision-card">
+      <h4><span class="icon">📦</span> Gig Packages Normalization</h4>
+      <p>Extracting BASIC/STANDARD/PREMIUM into <code>gig_packages</code> prevents adding 9+ columns to <code>gigs</code>. A <code>UNIQUE(gig_id, package_type)</code> constraint prevents a freelancer from accidentally creating two BASIC tiers.</p>
+    </div>
+    <div class="decision-card">
+      <h4><span class="icon">🔗</span> freelancer_id Denormalized on Orders</h4>
+      <p>Although <code>freelancer_id</code> can be derived via <code>gigs</code>, storing it directly on <code>orders</code> allows fast dashboard queries ("all my orders") without a join, and preserves it if the gig is later deleted.</p>
+    </div>
+    <div class="decision-card">
+      <h4><span class="icon">⭐</span> Review Integrity Guards</h4>
+      <p><code>UNIQUE(order_id)</code> on <code>reviews</code> prevents duplicates even under concurrent requests. The <code>CHECK (reviewer_id != reviewee_id)</code> prevents self-reviews. App layer validates order is COMPLETED before insert.</p>
+    </div>
+    <div class="decision-card">
+      <h4><span class="icon">🏷️</span> Soft Deletes on Gigs & Users</h4>
+      <p><code>gigs.status = 'DELETED'</code> and <code>users.is_active = FALSE</code> allow logical removal without breaking FK integrity on historical orders, transactions, and reviews.</p>
+    </div>
+    <div class="decision-card">
+      <h4><span class="icon">🗂️</span> Hierarchical Categories</h4>
+      <p>Self-referential <code>parent_id</code> in <code>categories</code> supports unlimited nesting depth (e.g., "Services → Design → Logo Design") with a single table, keeping queries simple for 2–3 level hierarchies.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 7: INDEXING
+══════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">Section 07</div>
+  <h2><span class="num">§7</span> Indexing Strategy</h2>
+  <div class="index-grid">
+    <div class="index-row" style="background:var(--surface2);"><span class="index-table" style="color:var(--muted);font-size:11px;">TABLE</span><span class="index-col" style="color:var(--muted);font-size:11px;">COLUMN(S)</span><span class="index-type" style="color:var(--muted);">TYPE</span><span class="index-reason" style="color:var(--muted);">REASON</span></div>
+    <div class="index-row"><span class="index-table">users</span><span class="index-col">email</span><span class="index-type" style="color:var(--accent3);">UNIQUE</span><span class="index-reason">Login lookups; duplicates blocked</span></div>
+    <div class="index-row"><span class="index-table">users</span><span class="index-col">username</span><span class="index-type" style="color:var(--accent3);">UNIQUE</span><span class="index-reason">Profile URL routing; duplicates blocked</span></div>
+    <div class="index-row"><span class="index-table">gigs</span><span class="index-col">freelancer_id</span><span class="index-type" style="color:var(--accent);">B-TREE</span><span class="index-reason">Dashboard: "all gigs by this freelancer"</span></div>
+    <div class="index-row"><span class="index-table">gigs</span><span class="index-col">category_id</span><span class="index-type" style="color:var(--accent);">B-TREE</span><span class="index-reason">Browse/filter by category</span></div>
+    <div class="index-row"><span class="index-table">gigs</span><span class="index-col">status</span><span class="index-type" style="color:var(--accent);">B-TREE</span><span class="index-reason">Filter active gigs; most queries use WHERE status='ACTIVE'</span></div>
+    <div class="index-row"><span class="index-table">gig_packages</span><span class="index-col">gig_id, package_type</span><span class="index-type" style="color:var(--accent3);">UNIQUE</span><span class="index-reason">Enforce one tier per gig; fast package lookup</span></div>
+    <div class="index-row"><span class="index-table">orders</span><span class="index-col">client_id</span><span class="index-type" style="color:var(--accent);">B-TREE</span><span class="index-reason">Client order history page</span></div>
+    <div class="index-row"><span class="index-table">orders</span><span class="index-col">freelancer_id</span><span class="index-type" style="color:var(--accent);">B-TREE</span><span class="index-reason">Freelancer dashboard: incoming orders</span></div>
+    <div class="index-row"><span class="index-table">orders</span><span class="index-col">status</span><span class="index-type" style="color:var(--accent);">B-TREE</span><span class="index-reason">Filter PENDING orders for processing jobs</span></div>
+    <div class="index-row"><span class="index-table">wallets</span><span class="index-col">user_id</span><span class="index-type" style="color:var(--accent3);">UNIQUE</span><span class="index-reason">1-to-1 lookup; enforces one wallet per user</span></div>
+    <div class="index-row"><span class="index-table">wallet_transactions</span><span class="index-col">wallet_id</span><span class="index-type" style="color:var(--accent);">B-TREE</span><span class="index-reason">Transaction history per wallet</span></div>
+    <div class="index-row"><span class="index-table">wallet_transactions</span><span class="index-col">order_id</span><span class="index-type" style="color:var(--accent);">B-TREE</span><span class="index-reason">Audit: all transactions linked to an order</span></div>
+    <div class="index-row"><span class="index-table">wallet_transactions</span><span class="index-col">created_at</span><span class="index-type" style="color:var(--accent);">B-TREE</span><span class="index-reason">Time-range reporting, statement generation</span></div>
+    <div class="index-row"><span class="index-table">reviews</span><span class="index-col">order_id</span><span class="index-type" style="color:var(--accent3);">UNIQUE</span><span class="index-reason">One review per order; fast existence check</span></div>
+    <div class="index-row"><span class="index-table">reviews</span><span class="index-col">reviewee_id</span><span class="index-type" style="color:var(--accent);">B-TREE</span><span class="index-reason">Aggregate rating queries for a freelancer's profile</span></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 8: SQL CREATE TABLE STATEMENTS
+══════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">Section 08</div>
+  <h2><span class="num">§8</span> SQL CREATE TABLE Statements</h2>
+
+  <!-- USERS -->
+  <div class="sql-wrap">
+    <div class="sql-header">
+      <span class="sql-label">SQL — users</span>
+      <div class="sql-dots"><span style="background:#ff6b6b"></span><span style="background:#f5c542"></span><span style="background:#43e8b0"></span></div>
+    </div>
+<pre class="sql"><span class="kw">CREATE TABLE</span> users (
+  id            <span class="tp">BIGINT UNSIGNED</span>    <span class="cn">NOT NULL AUTO_INCREMENT</span>,
+  username      <span class="tp">VARCHAR(50)</span>        <span class="cn">NOT NULL</span>,
+  email         <span class="tp">VARCHAR(255)</span>       <span class="cn">NOT NULL</span>,
+  password_hash <span class="tp">VARCHAR(255)</span>       <span class="cn">NOT NULL</span>,
+  role          <span class="tp">ENUM</span>(<span class="en">'CLIENT'</span>, <span class="en">'FREELANCER'</span>, <span class="en">'ADMIN'</span>)
+                                     <span class="cn">NOT NULL DEFAULT</span> <span class="en">'CLIENT'</span>,
+  full_name     <span class="tp">VARCHAR(100)</span>,
+  avatar_url    <span class="tp">VARCHAR(500)</span>,
+  bio           <span class="tp">TEXT</span>,
+  is_active     <span class="tp">BOOLEAN</span>            <span class="cn">NOT NULL DEFAULT TRUE</span>,
+  is_verified   <span class="tp">BOOLEAN</span>            <span class="cn">NOT NULL DEFAULT FALSE</span>,
+  created_at    <span class="tp">TIMESTAMP</span>          <span class="cn">NOT NULL DEFAULT CURRENT_TIMESTAMP</span>,
+  updated_at    <span class="tp">TIMESTAMP</span>          <span class="cn">NOT NULL DEFAULT CURRENT_TIMESTAMP
+                                     ON UPDATE CURRENT_TIMESTAMP</span>,
+
+  <span class="cn">PRIMARY KEY</span> (id),
+  <span class="cn">UNIQUE</span> (email),
+  <span class="cn">UNIQUE</span> (username)
+);</pre>
+  </div>
+
+  <!-- CATEGORIES -->
+  <div class="sql-wrap">
+    <div class="sql-header">
+      <span class="sql-label">SQL — categories</span>
+      <div class="sql-dots"><span style="background:#ff6b6b"></span><span style="background:#f5c542"></span><span style="background:#43e8b0"></span></div>
+    </div>
+<pre class="sql"><span class="kw">CREATE TABLE</span> categories (
+  id         <span class="tp">INT UNSIGNED</span>  <span class="cn">NOT NULL AUTO_INCREMENT</span>,
+  name       <span class="tp">VARCHAR(100)</span>  <span class="cn">NOT NULL</span>,
+  slug       <span class="tp">VARCHAR(100)</span>  <span class="cn">NOT NULL</span>,
+  parent_id  <span class="tp">INT UNSIGNED</span>  <span class="cn">DEFAULT NULL</span>,
+  created_at <span class="tp">TIMESTAMP</span>     <span class="cn">NOT NULL DEFAULT CURRENT_TIMESTAMP</span>,
+
+  <span class="cn">PRIMARY KEY</span> (id),
+  <span class="cn">UNIQUE</span> (slug),
+  <span class="cn">FOREIGN KEY</span> (parent_id) <span class="kw">REFERENCES</span> categories(id)
+    <span class="kw">ON DELETE SET NULL</span>
+);</pre>
+  </div>
+
+  <!-- GIGS -->
+  <div class="sql-wrap">
+    <div class="sql-header">
+      <span class="sql-label">SQL — gigs</span>
+      <div class="sql-dots"><span style="background:#ff6b6b"></span><span style="background:#f5c542"></span><span style="background:#43e8b0"></span></div>
+    </div>
+<pre class="sql"><span class="kw">CREATE TABLE</span> gigs (
+  id            <span class="tp">BIGINT UNSIGNED</span> <span class="cn">NOT NULL AUTO_INCREMENT</span>,
+  freelancer_id <span class="tp">BIGINT UNSIGNED</span> <span class="cn">NOT NULL</span>,
+  category_id   <span class="tp">INT UNSIGNED</span>    <span class="cn">NOT NULL</span>,
+  title         <span class="tp">VARCHAR(255)</span>    <span class="cn">NOT NULL</span>,
+  description   <span class="tp">TEXT</span>            <span class="cn">NOT NULL</span>,
+  status        <span class="tp">ENUM</span>(<span class="en">'ACTIVE'</span>, <span class="en">'PAUSED'</span>, <span class="en">'DELETED'</span>)
+                                  <span class="cn">NOT NULL DEFAULT</span> <span class="en">'ACTIVE'</span>,
+  created_at    <span class="tp">TIMESTAMP</span>       <span class="cn">NOT NULL DEFAULT CURRENT_TIMESTAMP</span>,
+  updated_at    <span class="tp">TIMESTAMP</span>       <span class="cn">NOT NULL DEFAULT CURRENT_TIMESTAMP
+                                  ON UPDATE CURRENT_TIMESTAMP</span>,
+
+  <span class="cn">PRIMARY KEY</span> (id),
+  <span class="cn">FOREIGN KEY</span> (freelancer_id) <span class="kw">REFERENCES</span> users(id) <span class="kw">ON DELETE CASCADE</span>,
+  <span class="cn">FOREIGN KEY</span> (category_id)   <span class="kw">REFERENCES</span> categories(id) <span class="kw">ON DELETE RESTRICT</span>,
+  <span class="cm">-- Composite index for browse + filter</span>
+  <span class="cn">INDEX</span> idx_gigs_freelancer (freelancer_id),
+  <span class="cn">INDEX</span> idx_gigs_category_status (category_id, status)
+);</pre>
+  </div>
+
+  <!-- GIG_PACKAGES -->
+  <div class="sql-wrap">
+    <div class="sql-header">
+      <span class="sql-label">SQL — gig_packages</span>
+      <div class="sql-dots"><span style="background:#ff6b6b"></span><span style="background:#f5c542"></span><span style="background:#43e8b0"></span></div>
+    </div>
+<pre class="sql"><span class="kw">CREATE TABLE</span> gig_packages (
+  id             <span class="tp">BIGINT UNSIGNED</span>  <span class="cn">NOT NULL AUTO_INCREMENT</span>,
+  gig_id         <span class="tp">BIGINT UNSIGNED</span>  <span class="cn">NOT NULL</span>,
+  package_type   <span class="tp">ENUM</span>(<span class="en">'BASIC'</span>, <span class="en">'STANDARD'</span>, <span class="en">'PREMIUM'</span>) <span class="cn">NOT NULL</span>,
+  title          <span class="tp">VARCHAR(100)</span>     <span class="cn">NOT NULL</span>,
+  description    <span class="tp">TEXT</span>,
+  price          <span class="tp">INT UNSIGNED</span>     <span class="cn">NOT NULL</span>,
+  delivery_days  <span class="tp">SMALLINT UNSIGNED</span> <span class="cn">NOT NULL</span>,
+  revisions      <span class="tp">TINYINT UNSIGNED</span> <span class="cn">NOT NULL DEFAULT 1</span>,
+  created_at     <span class="tp">TIMESTAMP</span>        <span class="cn">NOT NULL DEFAULT CURRENT_TIMESTAMP</span>,
+
+  <span class="cn">PRIMARY KEY</span> (id),
+  <span class="cn">UNIQUE</span> (gig_id, package_type),   <span class="cm">-- one tier per gig</span>
+  <span class="cn">CONSTRAINT</span> chk_pkg_price    <span class="kw">CHECK</span> (price > <span class="vl">0</span>),
+  <span class="cn">CONSTRAINT</span> chk_pkg_delivery <span class="kw">CHECK</span> (delivery_days > <span class="vl">0</span>),
+  <span class="cn">FOREIGN KEY</span> (gig_id) <span class="kw">REFERENCES</span> gigs(id) <span class="kw">ON DELETE CASCADE</span>
+);</pre>
+  </div>
+
+  <!-- ORDERS -->
+  <div class="sql-wrap">
+    <div class="sql-header">
+      <span class="sql-label">SQL — orders</span>
+      <div class="sql-dots"><span style="background:#ff6b6b"></span><span style="background:#f5c542"></span><span style="background:#43e8b0"></span></div>
+    </div>
+<pre class="sql"><span class="kw">CREATE TABLE</span> orders (
+  id              <span class="tp">BIGINT UNSIGNED</span> <span class="cn">NOT NULL AUTO_INCREMENT</span>,
+  client_id       <span class="tp">BIGINT UNSIGNED</span> <span class="cn">NOT NULL</span>,
+  freelancer_id   <span class="tp">BIGINT UNSIGNED</span> <span class="cn">NOT NULL</span>,
+  gig_id          <span class="tp">BIGINT UNSIGNED</span> <span class="cn">NOT NULL</span>,
+  package_id      <span class="tp">BIGINT UNSIGNED</span> <span class="cn">DEFAULT NULL</span>,
+  price_snapshot  <span class="tp">INT UNSIGNED</span>    <span class="cn">NOT NULL</span>,   <span class="cm">-- immutable price at order time</span>
+  requirements    <span class="tp">TEXT</span>,
+  status          <span class="tp">ENUM</span>(<span class="en">'PENDING'</span>, <span class="en">'COMPLETED'</span>, <span class="en">'CANCELLED'</span>)
+                                  <span class="cn">NOT NULL DEFAULT</span> <span class="en">'PENDING'</span>,
+  created_at      <span class="tp">TIMESTAMP</span>       <span class="cn">NOT NULL DEFAULT CURRENT_TIMESTAMP</span>,
+  completed_at    <span class="tp">TIMESTAMP</span>       <span class="cn">DEFAULT NULL</span>,
+  cancelled_at    <span class="tp">TIMESTAMP</span>       <span class="cn">DEFAULT NULL</span>,
+
+  <span class="cn">PRIMARY KEY</span> (id),
+  <span class="cn">CONSTRAINT</span> chk_order_no_selfbuy  <span class="kw">CHECK</span> (client_id != freelancer_id),
+  <span class="cn">CONSTRAINT</span> chk_order_price       <span class="kw">CHECK</span> (price_snapshot > <span class="vl">0</span>),
+
+  <span class="cn">FOREIGN KEY</span> (client_id)     <span class="kw">REFERENCES</span> users(id)         <span class="kw">ON DELETE RESTRICT</span>,
+  <span class="cn">FOREIGN KEY</span> (freelancer_id) <span class="kw">REFERENCES</span> users(id)         <span class="kw">ON DELETE RESTRICT</span>,
+  <span class="cn">FOREIGN KEY</span> (gig_id)        <span class="kw">REFERENCES</span> gigs(id)          <span class="kw">ON DELETE RESTRICT</span>,
+  <span class="cn">FOREIGN KEY</span> (package_id)    <span class="kw">REFERENCES</span> gig_packages(id)  <span class="kw">ON DELETE SET NULL</span>,
+
+  <span class="cn">INDEX</span> idx_orders_client     (client_id),
+  <span class="cn">INDEX</span> idx_orders_freelancer (freelancer_id),
+  <span class="cn">INDEX</span> idx_orders_status     (status)
+);</pre>
+  </div>
+
+  <!-- WALLETS -->
+  <div class="sql-wrap">
+    <div class="sql-header">
+      <span class="sql-label">SQL — wallets</span>
+      <div class="sql-dots"><span style="background:#ff6b6b"></span><span style="background:#f5c542"></span><span style="background:#43e8b0"></span></div>
+    </div>
+<pre class="sql"><span class="kw">CREATE TABLE</span> wallets (
+  id                <span class="tp">BIGINT UNSIGNED</span> <span class="cn">NOT NULL AUTO_INCREMENT</span>,
+  user_id           <span class="tp">BIGINT UNSIGNED</span> <span class="cn">NOT NULL</span>,
+  available_balance <span class="tp">INT UNSIGNED</span>    <span class="cn">NOT NULL DEFAULT 1000</span>,
+  held_balance      <span class="tp">INT UNSIGNED</span>    <span class="cn">NOT NULL DEFAULT 0</span>,
+  created_at        <span class="tp">TIMESTAMP</span>       <span class="cn">NOT NULL DEFAULT CURRENT_TIMESTAMP</span>,
+  updated_at        <span class="tp">TIMESTAMP</span>       <span class="cn">NOT NULL DEFAULT CURRENT_TIMESTAMP
+                                    ON UPDATE CURRENT_TIMESTAMP</span>,
+
+  <span class="cn">PRIMARY KEY</span> (id),
+  <span class="cn">UNIQUE</span> (user_id),
+  <span class="cn">CONSTRAINT</span> chk_wallet_available <span class="kw">CHECK</span> (available_balance >= <span class="vl">0</span>),
+  <span class="cn">CONSTRAINT</span> chk_wallet_held      <span class="kw">CHECK</span> (held_balance >= <span class="vl">0</span>),
+  <span class="cn">FOREIGN KEY</span> (user_id) <span class="kw">REFERENCES</span> users(id) <span class="kw">ON DELETE CASCADE</span>
+);</pre>
+  </div>
+
+  <!-- WALLET_TRANSACTIONS -->
+  <div class="sql-wrap">
+    <div class="sql-header">
+      <span class="sql-label">SQL — wallet_transactions</span>
+      <div class="sql-dots"><span style="background:#ff6b6b"></span><span style="background:#f5c542"></span><span style="background:#43e8b0"></span></div>
+    </div>
+<pre class="sql"><span class="kw">CREATE TABLE</span> wallet_transactions (
+  id               <span class="tp">BIGINT UNSIGNED</span> <span class="cn">NOT NULL AUTO_INCREMENT</span>,
+  wallet_id        <span class="tp">BIGINT UNSIGNED</span> <span class="cn">NOT NULL</span>,
+  order_id         <span class="tp">BIGINT UNSIGNED</span> <span class="cn">DEFAULT NULL</span>,
+  transaction_type <span class="tp">ENUM</span>(<span class="en">'CREDIT'</span>, <span class="en">'DEBIT'</span>, <span class="en">'HOLD'</span>, <span class="en">'RELEASE'</span>, <span class="en">'REFUND'</span>)
+                                   <span class="cn">NOT NULL</span>,
+  amount           <span class="tp">INT UNSIGNED</span>    <span class="cn">NOT NULL</span>,
+  balance_after    <span class="tp">INT UNSIGNED</span>    <span class="cn">NOT NULL</span>,  <span class="cm">-- snapshot: available_balance</span>
+  held_after       <span class="tp">INT UNSIGNED</span>    <span class="cn">NOT NULL</span>,  <span class="cm">-- snapshot: held_balance</span>
+  description      <span class="tp">VARCHAR(255)</span>,
+  created_at       <span class="tp">TIMESTAMP</span>       <span class="cn">NOT NULL DEFAULT CURRENT_TIMESTAMP</span>,
+  <span class="cm">-- NOTE: No updated_at. Ledger rows are IMMUTABLE.</span>
+
+  <span class="cn">PRIMARY KEY</span> (id),
+  <span class="cn">CONSTRAINT</span> chk_tx_amount <span class="kw">CHECK</span> (amount > <span class="vl">0</span>),
+  <span class="cn">FOREIGN KEY</span> (wallet_id) <span class="kw">REFERENCES</span> wallets(id) <span class="kw">ON DELETE RESTRICT</span>,
+  <span class="cn">FOREIGN KEY</span> (order_id)  <span class="kw">REFERENCES</span> orders(id)  <span class="kw">ON DELETE SET NULL</span>,
+
+  <span class="cn">INDEX</span> idx_wtx_wallet     (wallet_id),
+  <span class="cn">INDEX</span> idx_wtx_order      (order_id),
+  <span class="cn">INDEX</span> idx_wtx_created_at (created_at)
+);</pre>
+  </div>
+
+  <!-- REVIEWS -->
+  <div class="sql-wrap">
+    <div class="sql-header">
+      <span class="sql-label">SQL — reviews</span>
+      <div class="sql-dots"><span style="background:#ff6b6b"></span><span style="background:#f5c542"></span><span style="background:#43e8b0"></span></div>
+    </div>
+<pre class="sql"><span class="kw">CREATE TABLE</span> reviews (
+  id           <span class="tp">BIGINT UNSIGNED</span> <span class="cn">NOT NULL AUTO_INCREMENT</span>,
+  order_id     <span class="tp">BIGINT UNSIGNED</span> <span class="cn">NOT NULL</span>,
+  reviewer_id  <span class="tp">BIGINT UNSIGNED</span> <span class="cn">NOT NULL</span>,
+  reviewee_id  <span class="tp">BIGINT UNSIGNED</span> <span class="cn">NOT NULL</span>,
+  rating       <span class="tp">TINYINT UNSIGNED</span> <span class="cn">NOT NULL</span>,
+  comment      <span class="tp">TEXT</span>,
+  created_at   <span class="tp">TIMESTAMP</span>       <span class="cn">NOT NULL DEFAULT CURRENT_TIMESTAMP</span>,
+
+  <span class="cn">PRIMARY KEY</span> (id),
+  <span class="cn">UNIQUE</span> (order_id),             <span class="cm">-- DB-level guarantee: one review per order</span>
+  <span class="cn">CONSTRAINT</span> chk_rating      <span class="kw">CHECK</span> (rating <span class="kw">BETWEEN</span> <span class="vl">1</span> <span class="kw">AND</span> <span class="vl">5</span>),
+  <span class="cn">CONSTRAINT</span> chk_no_selfrev  <span class="kw">CHECK</span> (reviewer_id != reviewee_id),
+
+  <span class="cn">FOREIGN KEY</span> (order_id)    <span class="kw">REFERENCES</span> orders(id) <span class="kw">ON DELETE RESTRICT</span>,
+  <span class="cn">FOREIGN KEY</span> (reviewer_id) <span class="kw">REFERENCES</span> users(id)  <span class="kw">ON DELETE RESTRICT</span>,
+  <span class="cn">FOREIGN KEY</span> (reviewee_id) <span class="kw">REFERENCES</span> users(id)  <span class="kw">ON DELETE RESTRICT</span>,
+
+  <span class="cn">INDEX</span> idx_reviews_reviewee (reviewee_id)   <span class="cm">-- aggregate ratings per freelancer</span>
+);</pre>
+  </div>
+</div>
+
+<hr>
+<p style="text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);padding-bottom:16px;">
+  Freelance Marketplace · Database Architecture · 8 Tables · 3NF Normalized · Ledger-Based Wallet
+</p>
+
+</div>
+</body>
 </html>
