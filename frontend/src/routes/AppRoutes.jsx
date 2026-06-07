@@ -7,6 +7,7 @@ export default function AppRoutes(){
     return(
         <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/signup"element= {<Signup/>}/>
 
             <Route path="/" element={<RootLayout />}>
                 <Route index element={<h1>Home Page</h1>} />
