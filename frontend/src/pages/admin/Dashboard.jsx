@@ -37,7 +37,6 @@ const Dashboard = () => {
             rounded-xl
             bg-white
             shadow-sm
-            hover:scale-105
             transition-all
             duration-300"
                     >
@@ -58,21 +57,15 @@ const Dashboard = () => {
           rounded-3xl
           p-6
           shadow-sm
-          hover:shadow-xl
-          hover:scale-105
           transition-all
           duration-300
           cursor-pointer"
                 >
                     <p className="text-gray-500">Total Revenue</p>
 
-                    <h2 className="text-3xl font-bold mt-2 hover:text-blue-600">
+                    <h2 className="text-3xl font-bold mt-2">
                         ₹1,28,430
                     </h2>
-
-                    <span className="text-green-600 text-sm">
-                        +12.4%
-                    </span>
                 </div>
 
                 {/* Users */}
@@ -82,8 +75,6 @@ const Dashboard = () => {
           rounded-3xl
           p-6
           shadow-sm
-          hover:shadow-xl
-          hover:scale-105
           transition-all
           duration-300
           cursor-pointer"
@@ -93,10 +84,6 @@ const Dashboard = () => {
                     <h2 className="text-3xl font-bold mt-2">
                         1,240
                     </h2>
-
-                    <span className="text-green-600 text-sm">
-                        +8.1%
-                    </span>
                 </div>
 
                 {/* Gigs */}
@@ -106,8 +93,6 @@ const Dashboard = () => {
           rounded-3xl
           p-6
           shadow-sm
-          hover:shadow-xl
-          hover:scale-105
           transition-all
           duration-300
           cursor-pointer"
@@ -117,10 +102,6 @@ const Dashboard = () => {
                     <h2 className="text-3xl font-bold mt-2">
                         4,892
                     </h2>
-
-                    <span className="text-yellow-600 text-sm">
-                        Stable
-                    </span>
                 </div>
 
                 {/* Reports */}
@@ -130,8 +111,6 @@ const Dashboard = () => {
           rounded-3xl
           p-6
           shadow-sm
-          hover:shadow-xl
-          hover:scale-105
           transition-all
           duration-300
           cursor-pointer"
@@ -143,10 +122,6 @@ const Dashboard = () => {
                     <h2 className="text-3xl font-bold mt-2">
                         14
                     </h2>
-
-                    <span className="text-red-500 text-sm">
-                        -15%
-                    </span>
                 </div>
 
             </div>
@@ -200,7 +175,7 @@ const Dashboard = () => {
 
                             <span
                                 className="
-                opacity-0
+                opacity-100
                 group-hover:opacity-100
                 transition-all
                 duration-300
@@ -218,11 +193,8 @@ const Dashboard = () => {
                 bg-[#0058be]
                 w-full
                 rounded-t-xl
-                hover:bg-blue-700
-                hover:scale-105
                 transition-all
-                duration-300
-                cursor-pointer"
+                duration-300"
                                 style={{
                                     height: `${item.amount / 40}px`
                                 }}
@@ -267,7 +239,6 @@ const Dashboard = () => {
                                 px-5
                                 py-2
                                 rounded-xl
-                                hover:scale-105
                                 transition-all"
                     >
                         Add User
@@ -295,7 +266,6 @@ const Dashboard = () => {
                         <tr
                             className="
               border-b
-              hover:bg-blue-50
               transition-all
               duration-300"
                         >
@@ -309,7 +279,6 @@ const Dashboard = () => {
                   px-3
                   py-1
                   rounded-full
-                  hover:scale-110
                   transition-all
                   inline-block"
                                 >
@@ -325,7 +294,6 @@ const Dashboard = () => {
                         <tr
                             className="
               border-b
-              hover:bg-blue-50
               transition-all
               duration-300"
                         >
@@ -351,7 +319,6 @@ const Dashboard = () => {
 
                         <tr
                             className="
-              hover:bg-blue-50
               transition-all
               duration-300"
                         >

@@ -11,7 +11,7 @@ export default function FreelancerDashboard() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold">
-            Welcome Back, Ronit 👋
+            Welcome Back, Ronit
           </h1>
 
           <p className="text-gray-500 mt-2">
@@ -41,7 +41,7 @@ export default function FreelancerDashboard() {
 
             <button className="bg-blue-600 text-white px-4 py-2 rounded-lg">
               <Link
-                to={"/create-gig"}
+                to={"create-gig"}
               >Create Gig</Link>
             </button>
 
@@ -49,14 +49,22 @@ export default function FreelancerDashboard() {
 
           <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
 
-            <GigCard />
-            <GigCard />
-            <GigCard />
+            <Link to="/gig-details">
+              <GigCard />
+            </Link>
+
+            <Link to="/gig-details">
+              <GigCard />
+            </Link>
+
+            <Link to="/gig-details">
+              <GigCard />
+            </Link>
 
           </div>
         </section>
 
-        
+
         {/* Recent Orders */}
         <section className="bg-white rounded-xl shadow-sm mt-10 p-6">
           <h2 className="text-xl font-semibold mb-4">

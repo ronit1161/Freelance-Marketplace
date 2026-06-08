@@ -1,7 +1,15 @@
 import React from 'react'
 import Navbar from '../../components/layout/Navbar'
+import { Navigate, useNavigate } from 'react-router-dom';
 
 const CreateGig = () => {
+
+  const navigate = useNavigate();
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    navigate("/freelancer");
+  };
+
   return (
     <>
       <div className='mx-96 my-40'>
@@ -9,7 +17,7 @@ const CreateGig = () => {
         <h1 className='text-4xl my-5'>Craft Your Digital Offering</h1>
         <p>Hi there! I am a passionate Software Engineer with 10 years of experience specializing in Java development.</p>
 
-        <form className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Gig Title */}
           <div>
             <label className="block text-sm font-medium mb-2">

@@ -4,11 +4,12 @@ const GigCard = () => {
     return (
         <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition">
 
-            <img
+            {/* <img
                 src="/gig.jpg"
                 alt=""
                 className="h-48 w-full object-cover"
-            />
+            /> */}
+            <div className="h-48 w-full object-cover flex items-center justify-center">Gig image</div>
 
             <div className="p-5">
 
@@ -19,7 +20,7 @@ const GigCard = () => {
                 <div className="flex justify-between mt-4">
 
                     <span className="text-yellow-500">
-                        ★ 4.9
+                        4.9
                     </span>
 
                     <span className="font-bold">
