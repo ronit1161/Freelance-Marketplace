@@ -26,22 +26,22 @@ const Navbar = () => {
             Home
           </Link>
 
-          <Link
+          {/* <Link
             to="/browse"
             className="text-gray-700 hover:text-[#0058be] transition"
           >
-            Browse Gigs
-          </Link>
+            Gigs
+          </Link> */}
 
-          <Link
+          {/* <Link
             to="/projects"
             className="text-gray-700 hover:text-[#0058be] transition"
           >
             Projects
-          </Link>
+          </Link> */}
 
           <Link
-            to="/about"
+            to="/profile"
             className="text-gray-700 hover:text-[#0058be] transition"
           >
             About
@@ -52,7 +52,6 @@ const Navbar = () => {
 
         {/* Profile */}
         <div className="flex items-center gap-3">
-          <Button>Logout</Button>
           <Link
             to="/profile"
             className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-semibold text-lg"

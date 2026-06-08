@@ -2,7 +2,7 @@ import React from "react";
 
 const GigDetails = () => {
     return (
-        <div className="bg-gray-50 min-h-screen px-10 py-8">
+        <div className="bg-gray-50 min-h-screen px-10 py-8 max-w-7xl m-auto">
 
             {/* Breadcrumb */}
             <p className="text-sm text-gray-500 mb-4">
@@ -37,15 +37,11 @@ const GigDetails = () => {
                                 </h3>
 
                                 <p className="text-sm text-gray-500">
-                                    ⭐ 4.9 (124 Reviews)
+                                    4.9 (124 Reviews)
                                 </p>
                             </div>
 
                         </div>
-
-                        <button className="border px-5 py-2 rounded-lg hover:bg-gray-100">
-                            Save
-                        </button>
 
                     </div>
 
@@ -90,8 +86,6 @@ const GigDetails = () => {
               bg-white
               p-6
               rounded-2xl
-              hover:shadow-lg
-              hover:scale-105
               transition-all"
                         >
                             <h3 className="font-bold mb-3">
@@ -109,8 +103,6 @@ const GigDetails = () => {
               bg-white
               p-6
               rounded-2xl
-              hover:shadow-lg
-              hover:scale-105
               transition-all"
                         >
                             <h3 className="font-bold mb-3">
@@ -135,14 +127,14 @@ const GigDetails = () => {
 
                         <ul className="space-y-3">
 
-                            <li>✅ 10+ years of design experience</li>
+                            <li>10+ years of design experience</li>
 
                             <li>
-                                ✅ Direct collaboration and revisions
+                                Direct collaboration and revisions
                             </li>
 
                             <li>
-                                ✅ Print-ready and web-ready delivery
+                                Print-ready and web-ready delivery
                             </li>
 
                         </ul>
@@ -221,7 +213,6 @@ const GigDetails = () => {
               text-white
               py-3
               rounded-xl
-              hover:scale-105
               transition-all"
                         >
                             Order Now
@@ -233,8 +224,7 @@ const GigDetails = () => {
               mt-4
               border
               py-3
-              rounded-xl
-              hover:bg-gray-100"
+              rounded-xl"
                         >
                             Contact Seller
                         </button>
