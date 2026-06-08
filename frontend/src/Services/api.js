@@ -8,11 +8,50 @@ let walletState = {
     { id: 'TXN-8201', type: 'Deposit', amount: 3000.00, date: 'Apr 10, 2026', status: 'Success', statusColor: 'text-emerald-600 bg-emerald-50' }
   ]
 };
-
+const mockGigs = [
+  {
+    id: 'GIG-702',
+    title: 'Senior 3D Abstract Data Visualizer',
+    freelancer: 'Elena Rostova',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&h=120&q=80',
+    rate: '$85/hr',
+    rating: '4.9 (124 reviews)',
+    tags: ['Cinema4D', 'Data Art', 'Abstract'],
+    description: 'Specializing in converting complex corporate reports and metric arrays into breathtaking 3D graphical art packages for digital distributions.'
+  },
+  {
+    id: 'GIG-511',
+    title: 'Brand Identity & Accessibility Designer',
+    freelancer: 'Marcus Chen',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&h=120&q=80',
+    rate: '$95/hr',
+    rating: '5.0 (82 reviews)',
+    tags: ['WCAG Guidelines', 'Typography', 'Figma'],
+    description: 'Expert design layouts focused on modern typographic structures, high-contrast access compliance, and comprehensive global design system documentation.'
+  },
+  {
+    id: 'GIG-403',
+    title: 'Editorial Illustrator & Storyboard Artist',
+    freelancer: 'Sarah Jenkins',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&h=120&q=80',
+    rate: '$70/hr',
+    rating: '4.8 (210 reviews)',
+    tags: ['Vector Illustration', 'Q3 Reports', 'Procreate'],
+    description: 'Hand-crafted digital vector artwork customized for print, corporate blogs, newsletters, and high-profile annual market forecast summaries.'
+  }
+];
+// Inside export const api = { ... } add:
+export const gigsApi = {
+  // Keep your existing getProjects, addProject, etc. exactly the same...
+  
+  getGigs: () => {
+    return [...mockGigs];
+  }
+};
 // Keeping original mock trackers intact for the rest of your app dashboard
 let mockProjects = [
   {
-    id: '#NT-2024-081',
+    id: 'NT-2024-081',
     title: 'Editorial Illustration Series',
     description: 'Creating 12 custom editorial illustrations for the upcoming Q3 Market Report with a focus on abstract data visualization.',
     status: 'ACTIVE',
@@ -20,12 +59,22 @@ let mockProjects = [
     stage: 'Drafting Stage',
     progress: 65,
     progressBarColor: 'bg-blue-600',
-    actionLabel: 'Open Portal',
-    actionStyle: 'border border-gray-200 text-blue-600 hover:bg-gray-50',
-    avatars: ['https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80']
+    avatars: ['https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80'],
+ 
+   // ADDED DETAILED DUMMY DATA LOOKUP
+   detailedBrief: 'This project involves collaborating closely with the marketing and data analytics teams to translate complex financial statistics from the Q3 Forecast into user-friendly visual graphics. Deliverables include 12 high-resolution vector assets optimized for digital dashboards and print reports.',
+   startDate: 'May 12, 2026',
+   estimatedDelivery: 'July 28, 2026',
+   teamLead: 'Sarah Jenkins (Lead Illustrator)',
+   priority: 'High',
+   milestones: [
+     { name: 'Concept & Moodboards', done: true },
+     { name: 'Wireframe Layouts', done: true },
+     { name: 'Color Abstract Renderings (6/12)', done: false },     { name: 'Final Review & Vector Output', done: false }
+   ]
   },
   {
-    id: '#NT-2024-079',
+    id: 'NT-2024-079',
     title: 'Brand Guidelines Refresh',
     description: 'Updating typography and color accessibility guidelines for the global brand platform.',
     status: 'REVIEW PENDING',
@@ -33,9 +82,20 @@ let mockProjects = [
     stage: 'Final Feedback',
     progress: 90,
     progressBarColor: 'bg-amber-700',
-    actionLabel: 'Action Required',
-    actionStyle: 'bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium',
-    avatars: ['https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&h=100&q=80']
+    avatars: ['https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&h=100&q=80'],
+   
+   // ADDED DETAILED DUMMY DATA LOOKUP
+   detailedBrief: 'A thorough audit and overhaul of the core brand styling kits to ensure total adherence to WCAG 2.1 AA digital contrast rules. This covers rewriting the brand layout type-scale parameters, picking accessible replacement hex codes for corporate styling systems, and compiling a Figma component UI library.',
+   startDate: 'April 02, 2026',
+   estimatedDelivery: 'June 15, 2026',
+   teamLead: 'Marcus Chen (Systems Architect)',
+   priority: 'Critical',
+   milestones: [
+     { name: 'Global Brand Contrast Audit', done: true },
+     { name: 'Typography Scale Reconstruction', done: true },
+     { name: 'Component Library Migration', done: true },
+     { name: 'Stakeholder Compliance Sign-Off', done: false }
+   ]
   }
 ];
 
@@ -122,4 +182,14 @@ export const api = {
     ];
     return walletState.currentBalance;
   }
+};
+
+export const mapi = {
+  getProjects: () => [...mockProjects],
+  getFinancialSummary: () => mockFinancialData,
+  
+ // ADDED NEW ENDPOINT FUNCTION
+ getProjectById: (id) => {
+   return mockProjects.find(project => project.id === id) || null;
+ }
 };
