@@ -1,11 +1,11 @@
 # Architecture
 
-Frontend
-    |
-API Gateway
-    |
---------------------------------
+    Frontend
+        |
+    API Gateway
+        |
+----------------------
 | Auth | Gig | Order |
---------------------------------
-    |
-MySQL
+----------------------
+        |
+       MySQL
