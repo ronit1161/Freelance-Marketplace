@@ -1,5 +1,6 @@
 // import React from 'react'
 import { Link } from 'react-router-dom'
+import Button from '../ui/Button'
 
 const Navbar = () => {
   return (
@@ -47,8 +48,11 @@ const Navbar = () => {
           </Link>
         </nav>
 
+
+
         {/* Profile */}
         <div className="flex items-center gap-3">
+          <Button>Logout</Button>
           <Link
             to="/profile"
             className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-semibold text-lg"
