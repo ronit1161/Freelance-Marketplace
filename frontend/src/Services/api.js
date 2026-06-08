@@ -8,7 +8,46 @@ let walletState = {
     { id: 'TXN-8201', type: 'Deposit', amount: 3000.00, date: 'Apr 10, 2026', status: 'Success', statusColor: 'text-emerald-600 bg-emerald-50' }
   ]
 };
-
+const mockGigs = [
+  {
+    id: 'GIG-702',
+    title: 'Senior 3D Abstract Data Visualizer',
+    freelancer: 'Elena Rostova',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&h=120&q=80',
+    rate: '$85/hr',
+    rating: '4.9 (124 reviews)',
+    tags: ['Cinema4D', 'Data Art', 'Abstract'],
+    description: 'Specializing in converting complex corporate reports and metric arrays into breathtaking 3D graphical art packages for digital distributions.'
+  },
+  {
+    id: 'GIG-511',
+    title: 'Brand Identity & Accessibility Designer',
+    freelancer: 'Marcus Chen',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&h=120&q=80',
+    rate: '$95/hr',
+    rating: '5.0 (82 reviews)',
+    tags: ['WCAG Guidelines', 'Typography', 'Figma'],
+    description: 'Expert design layouts focused on modern typographic structures, high-contrast access compliance, and comprehensive global design system documentation.'
+  },
+  {
+    id: 'GIG-403',
+    title: 'Editorial Illustrator & Storyboard Artist',
+    freelancer: 'Sarah Jenkins',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&h=120&q=80',
+    rate: '$70/hr',
+    rating: '4.8 (210 reviews)',
+    tags: ['Vector Illustration', 'Q3 Reports', 'Procreate'],
+    description: 'Hand-crafted digital vector artwork customized for print, corporate blogs, newsletters, and high-profile annual market forecast summaries.'
+  }
+];
+// Inside export const api = { ... } add:
+export const gigsApi = {
+  // Keep your existing getProjects, addProject, etc. exactly the same...
+  
+  getGigs: () => {
+    return [...mockGigs];
+  }
+};
 // Keeping original mock trackers intact for the rest of your app dashboard
 let mockProjects = [
   {

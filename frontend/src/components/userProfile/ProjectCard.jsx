@@ -12,7 +12,7 @@ export default function ProjectCard({ project }) {
         </div>
         
         <div className="flex items-center -space-x-2">
-          <img className="w-7 h-7 rounded-full border-2 border-white object-cover" src={project.avatars[0]} alt="Talent" />
+          {/* <img className="w-7 h-7 rounded-full border-2 border-white object-cover" src={project.avatars[0]} alt="Talent" /> */}
           {project.status === 'ACTIVE' && (
             <div className="w-7 h-7 rounded-full border-2 border-white bg-blue-100 text-blue-600 text-[10px] font-bold flex items-center justify-center">
               +2
