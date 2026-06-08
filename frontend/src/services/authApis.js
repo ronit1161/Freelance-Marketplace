@@ -1,38 +1,33 @@
-import axios from "axios";
+const USERS_KEY = "freelance_users";
+const SESSION_KEY = "auth_user";
 
-
-
-const API = axios.create({
-  baseURL: "http://localhost:8080", 
-});
-
-
-
-// register user api
 export const registerUser = async (formData) => {
-  try {
-    const response = await API.post("/register", formData);
-    return response.data; //success or fail is returend
-  } catch (error) {
-    
-    throw error.response?.data || "Something went wrong";
+  const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+
+  if (users.some((u) => u.email === formData.email)) {
+    throw { message: "Email already exists" };
   }
+
+  const newUser = { id: Date.now(), ...formData };
+  users.push(newUser);
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+
+  return { success: true, user: { name: newUser.name, role: newUser.role, email: newUser.email } };
 };
 
+export async function loginUser({ email, password }) {
+  const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+  const user = users.find((u) => u.email === email && u.password === password);
 
-
-//login user api
-
-export async function loginUser(data) {
-  try {
-    const response = await API.post("/login", data); 
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || "Login failed";
+  if (!user) {
+    throw { message: "Invalid email or password" };
   }
+
+  localStorage.setItem(SESSION_KEY, JSON.stringify({
+    email: user.email,
+    role: user.role,
+    name: user.name,
+  }));
+
+  return { role: user.role, name: user.name, email: user.email };
 }
-
-
-
-
-
