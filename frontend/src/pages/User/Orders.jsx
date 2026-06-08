@@ -82,9 +82,9 @@ export default function Orders() {
               <ProjectCard key={project.id} project={project} />
             ))}
           </div>
-          {/* <div className="space-y-6">
+          <div className="space-y-6">
             <SpendingSummary />
-          </div> */}
+          </div>
         </div>
       )}
 
