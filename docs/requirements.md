@@ -8,11 +8,16 @@ The Freelance Marketplace is a platform that connects clients and freelancers in
 
 A client is a user who purchases services from freelancers.
 
-Responsibilities:
-- Browse gigs
-- Place orders
-- Manage wallet
-- Review freelancers
+Pages and functionalities:
+- Profile page
+- Dashboard 
+    -analytics
+- Wallet
+- orders
+    - progress report to client
+    - review for completed orders**
+    - cancel order
+- search gigs
 
 ### Freelancer
 
@@ -20,10 +25,25 @@ A freelancer is a user who provides services through gigs.
 
 Responsibilities:
 - Create gigs
-- Manage orders
-- Deliver work
-- Earn coins
-- Build reputation
+    - edit gig
+- Profile page
+- Dashboard 
+    -analytics
+- Wallet
+- my gigs
+- orders
+    - progress report to client
+    - view review
+    - cancel order
+
+
+### Admin
+
+- View users
+- Delete user
+- Remove gigs
+- analytics
+    - Earning charts
 
 ## Core Business Flow
 
@@ -47,6 +67,5 @@ PENDING → IN_PROGRESS → COMPLETED
 ## Future Scope
 
 - Notifications
-- Admin Dashboard
 - Advanced Search
 - Real-Time Chat

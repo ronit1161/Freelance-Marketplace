@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import GigCard from "../../components/profile/GigList";
-import CategoryCard from "../../components/userProfile/CategoryCard";
+import GigCard from "../../components/profile/GigCard";
+import CategoryCard from "../../components/client/CategoryCard";
 import FreelancerCard from "./FreelancerCard";
 import StepCard from "./StepCard";
 

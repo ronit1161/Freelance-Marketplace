@@ -1,5 +1,5 @@
 import HireCard from "../../components/profile/HireCard";
-import ProjectCard from "../../components/userProfile/ProjectCard";
+import ProjectCard from "../../components/client/ProjectCard";
 
 export default function ClientProfile() {
     return (

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { registerUser } from "../../services/authApis";
 
-function Signup() {
+function RegisterPage() {
   const [role, setRole] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -141,4 +141,4 @@ function Signup() {
   );
 }
 
-export default Signup;
+export default RegisterPage;

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../services/authApis";
 
-function Login() {
+function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -15,8 +15,8 @@ function Login() {
     try {
       const res = await loginUser({ email, password });
 
-      if (res.role === "client") navigate("/orders");
-      else if (res.role === "freelancer") navigate("/");
+      if (res.role === "client") navigate("/client");
+      else if (res.role === "freelancer") navigate("/freelancer");
       else if (res.role === "admin") navigate("/admin");
       else navigate("/");
     } catch (err) {
@@ -76,4 +76,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default LoginPage;

@@ -28,38 +28,23 @@ const Dashboard = () => {
                     </h1>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex gap-4">
 
-                    <button
-                        className="
-            px-5 py-2
-            rounded-xl
-            bg-white
-            shadow-sm
-            transition-all
-            duration-300"
-                    >
-                        Export Report
-                    </button>
-
-
-
-                </div>
             </div>
 
             <div className="grid grid-cols-4 gap-6 mb-10">
 
                 {/* Revenue */}
+
+                {/* cards */}
                 <div
                     className="
-          bg-white
-          rounded-3xl
-          p-6
-          shadow-sm
-          transition-all
-          duration-300
-          cursor-pointer"
+                        bg-white
+                        rounded-3xl
+                        p-6
+                        shadow-sm
+                        transition-all
+                        duration-300
+                        cursor-pointer"
                 >
                     <p className="text-gray-500">Total Revenue</p>
 
@@ -71,13 +56,13 @@ const Dashboard = () => {
                 {/* Users */}
                 <div
                     className="
-          bg-white
-          rounded-3xl
-          p-6
-          shadow-sm
-          transition-all
-          duration-300
-          cursor-pointer"
+                        bg-white
+                        rounded-3xl
+                        p-6
+                        shadow-sm
+                        transition-all
+                        duration-300
+                        cursor-pointer"
                 >
                     <p className="text-gray-500">Total Users</p>
 
