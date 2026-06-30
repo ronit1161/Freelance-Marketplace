@@ -1,12 +1,12 @@
-# Project Overview
+# Freelance Marketplace - Requirements Specification
 
-The Freelance Marketplace is a platform that connects clients and freelancers in a single ecosystem where services can be discovered, purchased, delivered, and reviewed.
+## 1. Introduction
 
-## User Types
+The Freelance Marketplace is a web-based platform that connects clients with freelancers. Clients can browse and purchase services offered by freelancers, while freelancers can create gigs, manage orders, and earn income through the platform.
 
-### Client
+The system acts as an intermediary to facilitate secure transactions, communication, and project management between clients and freelancers.
 
-A client is a user who purchases services from freelancers.
+---
 
 Pages and functionalities:
 - Profile page
@@ -19,9 +19,14 @@ Pages and functionalities:
     - cancel order
 - search gigs
 
-### Freelancer
+* Provide a platform for freelancers to offer services.
+* Allow clients to discover and purchase services.
+* Manage the complete order lifecycle.
+* Enable communication between clients and freelancers.
+* Provide a secure wallet-based payment mechanism.
+* Build trust through ratings and reviews.
 
-A freelancer is a user who provides services through gigs.
+---
 
 Responsibilities:
 - Create gigs
@@ -45,26 +50,31 @@ Responsibilities:
 - analytics
     - Earning charts
 
-## Core Business Flow
+## Client
 
-1. User Registration
-2. Gig Creation
-3. Gig Discovery
-4. Order Placement
-5. Wallet Deduction
-6. Work Submission
-7. Order Completion
-8. Review & Rating
+A client can:
 
-## Wallet System
+* Register and Login
+* Search for services
+* View gig details
+* Place orders
+* Manage wallet balance
+* Communicate with freelancers
+* Review completed orders
 
-The platform uses virtual coins...
+## Freelancer
 
-## Order Lifecycle
+A freelancer can:
 
-PENDING → IN_PROGRESS → COMPLETED
+* Register and Login
+* Create and manage gigs
+* Receive and manage orders
+* Deliver completed work
+* Earn virtual coins
+* Communicate with clients
+* View ratings and reviews
 
-## Future Scope
+## Admin
 
 - Notifications
 - Advanced Search
