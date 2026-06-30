@@ -8,7 +8,16 @@ The system acts as an intermediary to facilitate secure transactions, communicat
 
 ---
 
-# 2. Objectives
+Pages and functionalities:
+- Profile page
+- Dashboard 
+    -analytics
+- Wallet
+- orders
+    - progress report to client
+    - review for completed orders**
+    - cancel order
+- search gigs
 
 * Provide a platform for freelancers to offer services.
 * Allow clients to discover and purchase services.
@@ -19,7 +28,27 @@ The system acts as an intermediary to facilitate secure transactions, communicat
 
 ---
 
-# 3. User Roles
+Responsibilities:
+- Create gigs
+    - edit gig
+- Profile page
+- Dashboard 
+    -analytics
+- Wallet
+- my gigs
+- orders
+    - progress report to client
+    - view review
+    - cancel order
+
+
+### Admin
+
+- View users
+- Delete user
+- Remove gigs
+- analytics
+    - Earning charts
 
 ## Client
 
@@ -47,130 +76,6 @@ A freelancer can:
 
 ## Admin
 
-An admin can:
-
-* Manage users
-* Manage gigs
-* Manage orders
-* Monitor wallet transactions
-* Moderate reviews
-* View platform statistics
-
----
-
-# 4. Functional Requirements
-
-## Authentication
-
-* User Registration
-* User Login
-* JWT Authentication
-* Role-Based Access Control
-* Password Encryption
-
-## Gig Management
-
-* Create Gig
-* Update Gig
-* Delete Gig
-* Search Gig
-* Filter Gig
-* View Gig Details
-
-## Order Management
-
-* Place Order
-* Cancel Order
-* Submit Delivery
-* Accept Delivery
-* Track Order Status
-
-## Wallet Management
-
-* Deposit Virtual Coins
-* Hold Coins During Order
-* Release Coins On Completion
-* Refund Coins On Cancellation
-* View Transaction History
-
-## Messaging
-
-* Send Messages
-* Receive Messages
-* View Message History
-
-## Reviews
-
-* Submit Review
-* Submit Rating
-* View Reviews
-* Calculate Average Rating
-
-## Admin Functions
-
-* User Management
-* Gig Management
-* Order Monitoring
-* Review Moderation
-* Analytics Dashboard
-
----
-
-# 5. Non-Functional Requirements
-
-## Performance
-
-* Fast page loading
-* Efficient API response times
-
-## Security
-
-* JWT Authentication
-* Password Hashing
-* Role-Based Authorization
-
-## Scalability
-
-* Modular architecture
-* Future microservice support
-
-## Reliability
-
-* Data consistency
-* Proper exception handling
-
-## Usability
-
-* Responsive UI
-* User-friendly navigation
-
----
-
-# 6. Technology Stack
-
-Frontend:
-
-* React
-* React Router
-* Tailwind CSS
-
-Backend:
-
-* Java
-* Spring Boot
-* Spring Security
-* Hibernate
-
-Database:
-
-* PostgreSQL / MySQL
-
-Infrastructure:
-
-* Docker
-* Docker Compose
-
-Deployment:
-
-* Vercel
-* Render / Railway
+- Notifications
+- Advanced Search
+- Real-Time Chat

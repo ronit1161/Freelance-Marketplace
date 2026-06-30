@@ -1,5 +1,5 @@
-import  { useState } from 'react';
-import { api } from '../../Services/api'; // Adding API lookup reference
+import { useState } from 'react';
+import { api } from '../../services/api'; // Adding API lookup reference
 import { ArrowLeft, Clock, CheckCircle2, AlertCircle } from 'lucide-react'; // Adding icon assets
 
 export default function ProjectCard({ project }) {
@@ -13,7 +13,7 @@ export default function ProjectCard({ project }) {
 
     return (
       <div className="bg-white rounded-2xl border border-blue-200 p-6 shadow-md space-y-6 animate-in fade-in duration-200">
-        <button 
+        <button
           onClick={() => setIsViewingDetails(false)}
           className="flex items-center space-x-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 transition"
         >
@@ -45,7 +45,7 @@ export default function ProjectCard({ project }) {
               <p className="text-xs font-bold text-slate-800">{liveProject.stage}</p>
             </div>
           </div>
-          
+
           <div className="border border-gray-50 bg-gray-50/30 rounded-xl p-3 flex items-center space-x-2.5">
             {liveProject.progress === 100 ? (
               <CheckCircle2 size={16} className="text-emerald-500" />
@@ -72,7 +72,7 @@ export default function ProjectCard({ project }) {
           </span>
           <span className="text-xs text-gray-400 font-medium">ID: {project.id}</span>
         </div>
-        
+
         {/* <div className="flex items-center -space-x-2">
           <img className="w-7 h-7 rounded-full border-2 border-white object-cover" src={project.avatars[0]} alt="Talent" />
           {project.status === 'ACTIVE' && (
@@ -93,15 +93,15 @@ export default function ProjectCard({ project }) {
             <span className="text-gray-500">{project.progress}% Complete</span>
           </div>
           <div className="w-full bg-gray-100 rounded-full h-2">
-            <div 
-              className={`h-2 rounded-full ${project.progressBarColor}`} 
+            <div
+              className={`h-2 rounded-full ${project.progressBarColor}`}
               style={{ width: `${project.progress}%` }}
             ></div>
           </div>
         </div>
-        
+
         {/* MODIFIED BUTTON PART ONLY: Changes action trigger target state locally */}
-        <button 
+        <button
           onClick={() => setIsViewingDetails(true)}
           className="text-sm px-5 py-2 rounded-full transition whitespace-nowrap border border-gray-200 text-blue-600 hover:bg-gray-50 font-medium"
         >
