@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Star, ShieldCheck, Clock, Zap, MessageSquare } from 'lucide-react';
 import { gigsApi } from '../../../services/api';
+import OrderCheckoutModal from '../components/OrderCheckoutModal';
 
 export default function GigDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [gig, setGig] = useState(null);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [contactFeedback, setContactFeedback] = useState('');
 
   useEffect(() => {
     const fetchedGig = gigsApi.getGigs().find(g => g.id === id);
@@ -30,8 +33,18 @@ export default function GigDetailsPage() {
   const ratingVal = gig.rating.split(' ')[0];
   const reviewsCount = gig.rating.split(' ')[1] ? gig.rating.split(' ')[1].replace('(', '') : '0';
 
+  const handleOrderSuccess = (createdOrder) => {
+    setIsCheckoutOpen(false);
+    navigate('/client/projects');
+  };
+
+  const handleContactSeller = () => {
+    setContactFeedback(`Contact request sent to ${gig.freelancer}. They will reach out shortly!`);
+    setTimeout(() => setContactFeedback(''), 4000);
+  };
+
   return (
-    <div className="bg-gray-50 min-h-screen px-10 py-8 max-w-7xl m-auto animate-in fade-in duration-200">
+    <div className="bg-gray-50 min-h-screen px-10 py-8 max-w-7xl m-auto animate-in fade-in duration-200 relative">
       {/* Return Navigation */}
       <button 
         onClick={() => navigate('/gigs')}
@@ -39,6 +52,12 @@ export default function GigDetailsPage() {
       >
         <ArrowLeft size={16} /> <span>Back to Marketplace</span>
       </button>
+
+      {contactFeedback && (
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 text-blue-800 rounded-xl text-sm font-medium animate-in fade-in">
+          {contactFeedback}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* LEFT SIDE - Gig Info */}
@@ -121,16 +140,31 @@ export default function GigDetailsPage() {
               <li className="flex items-center gap-2">💬 Commercial Use</li>
             </ul>
 
-            <button className="w-full bg-[#0058be] hover:bg-[#004bb0] text-white py-3 rounded-xl transition font-semibold flex items-center justify-center space-x-2 shadow-sm">
-              <Zap size={16} fill="currentColor" /> <span>Order Service Now</span>
+            <button 
+              onClick={() => setIsCheckoutOpen(true)}
+              className="w-full bg-[#0058be] hover:bg-[#004bb0] text-white py-3.5 rounded-xl transition font-semibold flex items-center justify-center space-x-2 shadow-md hover:shadow-lg active:scale-[0.99]"
+            >
+              <Zap size={18} fill="currentColor" /> <span>Order Service Now</span>
             </button>
 
-            <button className="w-full mt-4 border border-gray-200 hover:bg-gray-50 text-slate-700 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition">
+            <button 
+              onClick={handleContactSeller}
+              className="w-full mt-4 border border-gray-200 hover:bg-gray-50 text-slate-700 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition"
+            >
               <MessageSquare size={16} /> <span>Contact Seller</span>
             </button>
           </div>
         </div>
       </div>
+
+      {/* Checkout Modal */}
+      <OrderCheckoutModal 
+        gig={gig}
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+        onOrderSuccess={handleOrderSuccess}
+      />
     </div>
   );
 }
+

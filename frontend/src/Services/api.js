@@ -132,6 +132,88 @@ export const api = {
     mockProjects = [structuredProject, ...mockProjects];
     return structuredProject;
   },
+  createOrder: ({ gigId, gigTitle, freelancerName, amount, brief, deliveryDays }) => {
+    const numericAmount = parseFloat(amount) || 150;
+    const randomId = Math.floor(1000 + Math.random() * 9000);
+    const newOrder = {
+      id: `ORD-${randomId}`,
+      gigId,
+      title: gigTitle,
+      description: brief || 'Custom order requirements submitted by client.',
+      status: 'ACTIVE',
+      statusColor: 'bg-emerald-100 text-emerald-700',
+      stage: 'In Development',
+      progress: 25,
+      progressBarColor: 'bg-blue-600',
+      amount: numericAmount,
+      freelancerName,
+      startDate: 'Today',
+      estimatedDelivery: `${deliveryDays || 3} Days`,
+      detailedBrief: brief,
+      avatars: ['https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80'],
+      milestones: [
+        { name: 'Requirements & Brief Submitted', done: true },
+        { name: 'Initial Design Draft', done: false },
+        { name: 'Final Review & Deliverables', done: false }
+      ]
+    };
+
+    mockProjects = [newOrder, ...mockProjects];
+
+    // Deduct escrow amount from client wallet balance & record transaction
+    walletState.currentBalance = Math.max(0, walletState.currentBalance - numericAmount);
+    walletState.history = [
+      {
+        id: `TXN-${randomId}`,
+        type: 'Escrow Hold',
+        amount: -numericAmount,
+        date: 'Today',
+        status: 'Held in Escrow',
+        statusColor: 'text-amber-600 bg-amber-50'
+      },
+      ...walletState.history
+    ];
+
+    return newOrder;
+  },
+
+  deliverOrder: (orderId) => {
+    const order = mockProjects.find(p => p.id === orderId);
+    if (order) {
+      order.status = 'REVIEW PENDING';
+      order.statusColor = 'bg-orange-100 text-orange-700';
+      order.stage = 'Work Delivered - Review Required';
+      order.progress = 90;
+      order.progressBarColor = 'bg-amber-600';
+    }
+    return order;
+  },
+
+  approveOrder: (orderId) => {
+    const order = mockProjects.find(p => p.id === orderId);
+    if (order) {
+      order.status = 'COMPLETED';
+      order.statusColor = 'bg-blue-100 text-blue-700';
+      order.stage = 'Order Completed & Escrow Released';
+      order.progress = 100;
+      order.progressBarColor = 'bg-emerald-600';
+
+      // Record release transaction
+      walletState.history = [
+        {
+          id: `TXN-${Math.floor(1000 + Math.random() * 9000)}`,
+          type: 'Escrow Release',
+          amount: order.amount || 150,
+          date: 'Today',
+          status: 'Payment Settled',
+          statusColor: 'text-emerald-600 bg-emerald-50'
+        },
+        ...walletState.history
+      ];
+    }
+    return order;
+  },
+
   getFinancialSummary: () => mockFinancialData,
 
   // --- NEW WALLET API FUNCTIONS (Synchronous) ---
@@ -188,8 +270,7 @@ export const mapi = {
   getProjects: () => [...mockProjects],
   getFinancialSummary: () => mockFinancialData,
   
- // ADDED NEW ENDPOINT FUNCTION
- getProjectById: (id) => {
-   return mockProjects.find(project => project.id === id) || null;
- }
-};
+  getProjectById: (id) => {
+    return mockProjects.find(project => project.id === id) || null;
+  }
+};

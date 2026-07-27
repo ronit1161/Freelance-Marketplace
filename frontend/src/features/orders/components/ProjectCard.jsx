@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { api } from '../../../services/api'; // Adding API lookup reference
-import { ArrowLeft, Clock, CheckCircle2, AlertCircle } from 'lucide-react'; // Adding icon assets
+import { api } from '../../../services/api';
+import { ArrowLeft, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import ReviewModal from '../../reviews/components/ReviewModal';
 
 export default function ProjectCard({ project }) {
-  // ADDING CODE ONLY: Local intercept state flag tracker
   const [isViewingDetails, setIsViewingDetails] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+
 
   // ADDING CODE ONLY: If viewing details is toggled, intercept and render this profile view layout
   if (isViewingDetails) {
@@ -58,9 +60,36 @@ export default function ProjectCard({ project }) {
             </div>
           </div>
         </div>
+
+        {/* Action Controls for Client */}
+        {liveProject.status !== 'COMPLETED' ? (
+          <div className="pt-2 border-t border-gray-100 flex gap-2">
+            <button
+              onClick={() => {
+                api.approveOrder(liveProject.id);
+                setIsReviewModalOpen(true);
+              }}
+              className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm"
+            >
+              <CheckCircle2 size={15} /> <span>Approve Work & Release Escrow</span>
+            </button>
+          </div>
+        ) : (
+          <div className="p-3 bg-emerald-50 text-emerald-700 rounded-xl text-xs font-bold text-center border border-emerald-100">
+            Order Completed • Escrow Released
+          </div>
+        )}
+
+        <ReviewModal
+          isOpen={isReviewModalOpen}
+          onClose={() => setIsReviewModalOpen(false)}
+          projectTitle={liveProject.title}
+          onSubmitReview={() => setIsReviewModalOpen(false)}
+        />
       </div>
     );
   }
+
 
   // --- STANDARD CARD VIEW (Kept fully intact) ---
   return (

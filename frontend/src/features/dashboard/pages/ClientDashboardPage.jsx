@@ -25,16 +25,16 @@ export default function ClientDashboard() {
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Welcome back, Adrian</h1>
           <p className="text-gray-500 mt-1">Manage your ongoing creative partnerships and find your next talent.</p>
         </div>
-        
+
         <div className="flex space-x-3">
-          <button 
+          <button
             onClick={() => setIsModalOpen(true)}
             className="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2.5 rounded-full text-sm font-semibold flex items-center shadow-sm transition"
           >
-            <Plus size={16} className="mr-2" /> Post a New Request
+            Post a New Request
           </button>
-          
-          <button 
+
+          <button
             onClick={() => navigate('/gigs')}
             className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-full text-sm font-semibold flex items-center transition"
           >
@@ -51,8 +51,8 @@ export default function ClientDashboard() {
         <div className="lg:col-span-2 space-y-6">
           <div className="flex justify-between items-center mb-2">
             <h2 className="text-xl font-bold text-slate-900">Recent Projects</h2>
-            <button 
-              onClick={() => navigate('/client/projects')} 
+            <button
+              onClick={() => navigate('/client/projects')}
               className="text-xs font-semibold text-blue-600 hover:underline"
             >
               View All
@@ -67,10 +67,10 @@ export default function ClientDashboard() {
         </div>
       </div>
 
-      <CreateProjectModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        onProjectCreated={handleCreateProject} 
+      <CreateProjectModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onProjectCreated={handleCreateProject}
       />
     </div>
   );

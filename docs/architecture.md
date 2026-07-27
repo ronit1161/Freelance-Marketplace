@@ -75,7 +75,7 @@ Responsibilities:
 
 Technology:
 
-* PostgreSQL
+* MySQL
 
 Responsibilities:
 
