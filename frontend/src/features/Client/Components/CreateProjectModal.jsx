@@ -35,7 +35,7 @@ export default function CreateProjectModal({ isOpen, onClose }) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
             <div className="bg-white rounded-2xl border border-gray-200 shadow-2xl w-full max-w-md p-6 relative animate-in fade-in zoom-in duration-200">
-                
+
                 {/* Header */}
                 <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-5">
                     <div className="flex items-center gap-2.5">
