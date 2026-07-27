@@ -17,8 +17,7 @@ export function getClientWallet(userId) {
 
 
 export function addMoneyToWallet(userId, amount) {
-    const numericAmount = Number(amount) || 0;
-    mockWallet.heldBalance += numericAmount;
-    mockWallet.totalBalance += numericAmount;
-    mockWallet.availableBalance += numericAmount;
+    mockWallet.heldBalance += amount;
+    mockWallet.totalBalance += amount;
+    mockWallet.availableBalance += amount;
 }

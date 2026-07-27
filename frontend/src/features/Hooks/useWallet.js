@@ -17,7 +17,7 @@ export const useWallet = (userId) => {
             setWallet(data);
         } catch (err) {
             if (err.name !== "AbortError") {
-                setError(err.message || "Failed to fetch wallet");
+                setError(err.message || "Failed to fetch orders");
             }
         } finally {
             if (!controller.signal.aborted) {
