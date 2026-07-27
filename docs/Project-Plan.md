@@ -130,7 +130,7 @@ Build the complete frontend using dummy data before backend integration.
 
 ## Technology
 
-* MySQL / PostgreSQL
+* MySQL
 
 ## Core Tables
 
