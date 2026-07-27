@@ -15,14 +15,10 @@ export default function ClientDashboard() {
     return (
         <div className="min-h-screen bg-gray-50/50 py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto space-y-6">
-                
+
                 {/* Hero Header Banner */}
-                <div className="bg-gradient-to-r from-slate-900 via-[#003b82] to-[#0058be] rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+                <div className="bg-blue-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
                     <div className="space-y-2 relative z-10">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-blue-200 text-xs font-semibold backdrop-blur-md">
-                            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                            <span>Client Workspace</span>
-                        </div>
                         <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Welcome back!</h1>
                         <p className="text-sm text-blue-100/80 max-w-lg">
                             Manage active orders, post new project requests, and track your wallet escrow balance.
@@ -53,7 +49,7 @@ export default function ClientDashboard() {
 
                 {/* Main Content Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-                    
+
                     {/* Wallet Summary Card */}
                     <div className="lg:col-span-1">
                         <div className="flex items-center justify-between mb-3">
