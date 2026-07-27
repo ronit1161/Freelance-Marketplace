@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Star, ShieldCheck, Clock, Zap, MessageSquare } from 'lucide-react';
-import { gigsApi } from '../../../services/api';
+import { ArrowLeft, Star,Zap, MessageSquare } from 'lucide-react';
+import { gigsApi } from '../../../Services/api';
 
 export default function GigDetailsPage() {
   const { id } = useParams();

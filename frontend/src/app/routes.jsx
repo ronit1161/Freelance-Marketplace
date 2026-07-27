@@ -13,10 +13,10 @@ import EditProfile from "../features/profile/pages/EditProfilePage";
 import FreelancerProfile from "../features/profile/pages/FreelancerProfilePage";
 
 // Client pages
-import ClientDashboard from "../features/dashboard/pages/ClientDashboardPage";
-import ClientProjects from "../features/orders/pages/ClientProjectsPage";
-import ClientWallet from "../features/wallet/pages/WalletPage";
+import ClientDashboard from "../features/Client/Pages/ClientDashboard";
 import ClientProfile from "../features/profile/pages/ClientProfilePage";
+import OrdersPage from "../features/orders/pages/OrdersPage";
+import WalletPage from "../features/wallet/pages/WalletPage";
 
 // Gig pages
 import GigMarketplacePage from "../features/gigs/pages/GigMarketplacePage";
@@ -24,6 +24,7 @@ import GigDetailsPage from "../features/gigs/pages/GigDetailsPage";
 
 // Admin page
 import Dashboard from "../features/dashboard/pages/AdminDashboardPage";
+
 
 export default function AppRoutes() {
   return (
@@ -35,7 +36,7 @@ export default function AppRoutes() {
 
       <Route path="/" element={<RootLayout />}>
         <Route index element={<HomePage />} />
-        
+
         {/* Gig Marketplace */}
         <Route path="gigs" element={<GigMarketplacePage />} />
         <Route path="gigs/:id" element={<GigDetailsPage />} />
@@ -51,9 +52,9 @@ export default function AppRoutes() {
         {/* Client Console */}
         <Route path="client">
           <Route index element={<ClientDashboard />} />
-          <Route path="projects" element={<ClientProjects />} />
-          <Route path="wallet" element={<ClientWallet />} />
+          <Route path="wallet" element={<WalletPage />} />
           <Route path="profile" element={<ClientProfile />} />
+          <Route path="orders" element={<OrdersPage />} />
         </Route>
 
         {/* Admin Console */}
