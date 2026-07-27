@@ -33,7 +33,7 @@ function RegisterPage() {
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-xl shadow-md w-95">
+      <div className="bg-white p-8 rounded-xl shadow-md w-[650px]">
         <h2 className="text-2xl font-bold mb-6 text-center bg-gray-200 p-3 rounded-lg">
           Sign Up
         </h2>
@@ -111,7 +111,7 @@ function RegisterPage() {
             />
             <p>
               I agree to the{" "}
-              <a href="#" className="text-blue-500 hover:underline">
+              <a href="/terms" className="text-blue-500 hover:underline">
                 Terms & Conditions
               </a>
             </p>

@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import RootLayout from "../components/layout/RootLayout";
 import LoginPage from "../features/auth/pages/LoginPage";
 import RegisterPage from "../features/auth/pages/RegisterPage";
+import Terms from "../features/auth/pages/Terms";
 import HomePage from "../features/home/pages/HomePage";
 import NotFoundPage from "../components/common/NotFoundPage";
 
@@ -29,6 +30,7 @@ export default function AppRoutes() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<RegisterPage />} />
+      <Route path="/terms" element={<Terms />} />
       <Route path="/register" element={<RegisterPage />} />
 
       <Route path="/" element={<RootLayout />}>
