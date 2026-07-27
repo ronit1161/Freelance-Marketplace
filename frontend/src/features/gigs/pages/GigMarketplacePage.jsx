@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import GigCard from '../components/GigCard';
-import { gigsApi } from '../../../services/api';
+import { gigsApi } from '../../../Services/api';
 
 export default function GigMarketplacePage() {
   const navigate = useNavigate();

@@ -1,31 +1,21 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { Bell, LogOut } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Bell, LogOut, RefreshCw } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const session = localStorage.getItem("auth_user");
-    if (session) {
-      setUser(JSON.parse(session));
-    } else {
-      setUser(null);
-    }
-  }, [location]);
+  const { user, logout, switchRole } = useAuth();
 
   const handleLogout = () => {
-    localStorage.removeItem("auth_user");
-    setUser(null);
+    logout();
     navigate("/login");
   };
+
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        
+
         {/* Logo & Role indicator */}
         <div className="flex items-center space-x-3">
           <Link to="/" className="text-2xl font-bold text-[#0058be]">
@@ -118,7 +108,7 @@ const Navbar = () => {
               </Link>
 
               {/* Logout Button */}
-              <button 
+              <button
                 onClick={handleLogout}
                 className="text-gray-400 hover:text-red-600 p-1.5 rounded-lg transition"
                 title="Log Out"

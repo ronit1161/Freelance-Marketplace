@@ -1,96 +1,116 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import GigCard from "../../gigs/components/GigCard";
 import StatCard from "../../profile/components/StatCard";
-import OrderRow from "../../orders/components/OrderRow";
+import { api, gigsApi } from "../../../services/api";
+import { CheckCircle2, Clock, UploadCloud } from "lucide-react";
 
 export default function FreelancerDashboard() {
+  const [gigs] = useState(() => gigsApi.getGigs());
+  const [projects, setProjects] = useState(() => api.getProjects());
+  const [deliverySuccess, setDeliverySuccess] = useState('');
+
+  const handleDeliverWork = (projectId) => {
+    api.deliverOrder(projectId);
+    setProjects([...api.getProjects()]);
+    setDeliverySuccess(`Deliverable submitted for order #${projectId}. Awaiting client approval.`);
+    setTimeout(() => setDeliverySuccess(''), 4000);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gray-50 p-6 animate-in fade-in duration-200">
+      <div className="max-w-7xl mx-auto space-y-8">
 
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">
-            Welcome Back, Ronit
-          </h1>
-
-          <p className="text-gray-500 mt-2">
-            Here's what's happening with your freelancing business.
-          </p>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-
-          <StatCard title="Total Earnings" value="₹45,000" />
-          <StatCard title="Active Orders" value="8" />
-          <StatCard title="Completed Orders" value="54" />
-          <StatCard title="Pending Reviews" value="3" />
-          <StatCard title="Active Gigs" value="5" />
-
-        </div>
-
-
-        {/* My Gigs */}
-        <section className="mt-10">
-          <div className="flex justify-between items-center mb-6">
-
-            <h2 className="text-xl font-semibold">
-              My Gigs
-            </h2>
-
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg">
-              <Link
-                to={"create-gig"}
-              >Create Gig</Link>
-            </button>
-
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+              Freelancer Console
+            </h1>
+            <p className="text-gray-500 mt-1">
+              Manage your active gigs, client orders, and earnings payout.
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <Link
+            to="/freelancer/create-gig"
+            className="bg-[#0058be] hover:bg-[#004bb0] text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition shadow-sm inline-flex items-center gap-2 self-start"
+          >
+            Create New Gig
+          </Link>
+        </div>
 
-            <Link to="/gig-details">
-              <GigCard />
-            </Link>
+        {deliverySuccess && (
+          <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-sm font-medium">
+            {deliverySuccess}
+          </div>
+        )}
 
-            <Link to="/gig-details">
-              <GigCard />
-            </Link>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <StatCard title="Total Earnings" value="$5,420.50" />
+          <StatCard title="Active Projects" value={projects.filter(p => p.status === 'ACTIVE').length.toString()} />
+          <StatCard title="Active Gigs" value={gigs.length.toString()} />
+          <StatCard title="Pending Review" value={projects.filter(p => p.status === 'REVIEW PENDING').length.toString()} />
+        </div>
 
-            <Link to="/gig-details">
-              <GigCard />
-            </Link>
+        {/* Active Incoming Client Orders Section */}
+        <section className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-4">
+          <h2 className="text-xl font-bold text-slate-900">
+            Active Client Orders
+          </h2>
 
+          <div className="divide-y divide-gray-100">
+            {projects.map((proj) => (
+              <div key={proj.id} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded ${proj.statusColor}`}>
+                      {proj.status}
+                    </span>
+                    <span className="text-xs text-gray-400">ID: {proj.id}</span>
+                  </div>
+                  <h4 className="font-bold text-slate-900 text-base">{proj.title}</h4>
+                  <p className="text-xs text-gray-500 max-w-xl">{proj.description}</p>
+                </div>
+
+                <div className="flex items-center gap-3 shrink-0">
+                  {proj.status === 'ACTIVE' && (
+                    <button
+                      onClick={() => handleDeliverWork(proj.id)}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+                    >
+                      <UploadCloud size={16} /> <span>Submit Work Deliverable</span>
+                    </button>
+                  )}
+                  {proj.status === 'REVIEW PENDING' && (
+                    <span className="text-xs font-bold text-amber-600 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-100 flex items-center gap-1">
+                      <Clock size={14} /> Pending Client Sign-Off
+                    </span>
+                  )}
+                  {proj.status === 'COMPLETED' && (
+                    <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100 flex items-center gap-1">
+                      <CheckCircle2 size={14} /> Order Completed
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
-
-        {/* Recent Orders */}
-        <section className="bg-white rounded-xl shadow-sm mt-10 p-6">
-          <h2 className="text-xl font-semibold mb-4">
-            Recent Orders
+        {/* My Gigs Catalog */}
+        <section className="space-y-4">
+          <h2 className="text-xl font-bold text-slate-900">
+            Published Marketplace Gigs
           </h2>
 
-          <div className="space-y-4">
-
-            <OrderRow
-              project="React Dashboard"
-              client="John Doe"
-              status="In Progress"
-            />
-
-            <OrderRow
-              project="Portfolio Website"
-              client="Sarah"
-              status="Completed"
-            />
-
-            <OrderRow
-              project="E-Commerce App"
-              client="David"
-              status="Pending"
-            />
-
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {gigs.map((gigItem) => (
+              <Link key={gigItem.id} to={`/gigs/${gigItem.id}`}>
+                <GigCard gig={gigItem} />
+              </Link>
+            ))}
           </div>
         </section>
 

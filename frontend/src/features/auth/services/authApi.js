@@ -1,33 +1,30 @@
-const USERS_KEY = "freelance_users";
-const SESSION_KEY = "auth_user";
 
-export const registerUser = async (formData) => {
-  const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+import axios from "axios";
 
-  if (users.some((u) => u.email === formData.email)) {
-    throw { message: "Email already exists" };
+const API = axios.create({
+  baseURL: "http://localhost:8080",
+});
+
+export const loginUser = async ({ email, password }) => {
+  try {
+    const response = await API.post("/login", { email, password });
+    return response.data;  // returns user details here
+  } catch (error) {
+    
+    throw { 
+      message: error.response?.data?.message || "Login failed. Please try again."
+    };
   }
-
-  const newUser = { id: Date.now(), ...formData };
-  users.push(newUser);
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-
-  return { success: true, user: { name: newUser.name, role: newUser.role, email: newUser.email } };
 };
 
-export async function loginUser({ email, password }) {
-  const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
-  const user = users.find((u) => u.email === email && u.password === password);
-
-  if (!user) {
-    throw { message: "Invalid email or password" };
+export const registerUser = async (formData) => {
+  try {
+    const response = await API.post("/register", formData);
+    return response.data;
+  } catch (error) {
+    
+    throw { 
+      message: error.response?.data?.message || "Registration failed. Please try again."
+    };
   }
-
-  localStorage.setItem(SESSION_KEY, JSON.stringify({
-    email: user.email,
-    role: user.role,
-    name: user.name,
-  }));
-
-  return { role: user.role, name: user.name, email: user.email };
-}
+};
