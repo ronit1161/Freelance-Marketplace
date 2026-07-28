@@ -1,7 +1,9 @@
-package com.freelancemarketplace.entitiy;
+package com.freelancemarketplace.modules.user.entity;
 
 
+import com.freelancemarketplace.entitiy.BaseEntity;
 import com.freelancemarketplace.enums.UserRoles;
+import com.freelancemarketplace.modules.wallet.entity.Wallet;
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.CascadeType;

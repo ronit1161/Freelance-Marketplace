@@ -3,7 +3,7 @@ package com.freelancemarketplace.modules.transactions.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import com.freelancemarketplace.entitiy.Transaction;
+import com.freelancemarketplace.modules.transactions.entity.Transaction;
 import com.freelancemarketplace.modules.transactions.records.CreateTransactionRecord;
 import com.freelancemarketplace.modules.transactions.records.TransactionResponseRecord;
 

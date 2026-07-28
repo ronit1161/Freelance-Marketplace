@@ -1,7 +1,9 @@
-package com.freelancemarketplace.entitiy;
+package com.freelancemarketplace.modules.catagory.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.freelancemarketplace.entitiy.BaseEntity;
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.CascadeType;
