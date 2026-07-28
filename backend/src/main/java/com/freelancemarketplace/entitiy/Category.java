@@ -1,4 +1,4 @@
-package com.freelancemarketplace.entities;
+package com.freelancemarketplace.entitiy;
 
 import java.util.ArrayList;
 import java.util.List;

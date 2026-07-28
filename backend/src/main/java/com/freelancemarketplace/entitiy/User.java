@@ -1,6 +1,8 @@
-package com.freelancemarketplace.entities;
+package com.freelancemarketplace.entitiy;
+
 
 import com.freelancemarketplace.enums.UserRoles;
+
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -39,8 +41,16 @@ public class User extends BaseEntity{
 	private String bioData;
 	@Column(name="is_active")
 	private boolean isActive=true;
-	@Column(name="is_verified")
-	private boolean isVerified=false;
+	
+	@Column (name = "skills")
+	private String skills ; 
+	
+	@Column(name = "experience")
+	private Integer experience ;
+	
+	@Column(name="is_blocked")
+	private boolean is_blocked=false;
+	
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "wallet_id",unique = true,nullable = false)
 	private Wallet wallet;

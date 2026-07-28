@@ -1,4 +1,4 @@
-package com.freelancemarketplace.entities;
+package com.freelancemarketplace.entitiy;
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
