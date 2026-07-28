@@ -13,7 +13,9 @@ public record UserResponseRecord(
 	    UserRoles role,
 	    String bioData,
 	    boolean isActive,
-	    boolean isVerified,
+	    boolean isBlocked,
+	    String skills,
+	    Integer experience,
 	    Long walletId,
 	    LocalDateTime createdOn
 	    )

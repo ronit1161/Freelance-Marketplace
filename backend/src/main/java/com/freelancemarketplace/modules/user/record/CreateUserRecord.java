@@ -31,5 +31,10 @@ public record CreateUserRecord(
 		@NotBlank(message = "Role cannot be blank")
 		UserRoles role,
 		@NotBlank(message = "bio data cannot be blank")
-		String bioData
+		String bioData,
+		@NotBlank(message = "skills cannot be blank")
+		String skills,
+		@NotBlank(message = "experience cannot be blank")
+		@Max(value = 75,message = "experience cannot be more than 75")
+		Integer experience
 		) {}

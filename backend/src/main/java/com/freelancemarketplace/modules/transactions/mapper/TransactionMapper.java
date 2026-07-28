@@ -3,7 +3,11 @@ package com.freelancemarketplace.modules.transactions.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+<<<<<<< HEAD
 import com.freelancemarketplace.modules.transactions.entity.Transaction;
+=======
+import com.freelancemarketplace.entity.Transaction;
+>>>>>>> e11697e (completed transcation and review records)
 import com.freelancemarketplace.modules.transactions.records.CreateTransactionRecord;
 import com.freelancemarketplace.modules.transactions.records.TransactionResponseRecord;
 
