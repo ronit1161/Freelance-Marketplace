@@ -26,8 +26,8 @@ public class Transaction extends BaseEntity{
 	private BigDecimal amount; 
 	private String description;
 	@Enumerated(EnumType.STRING)
-	@Column(name="transcation_type")
-	private TransactionType transcationType;
+	@Column(name="transaction_type")
+	private TransactionType transactionType;
 	@Enumerated(EnumType.STRING)
 	@Column(name="transaction_status")
 	private TransactionStatus transactionStatus=TransactionStatus.PENDING;

@@ -1,0 +1,14 @@
+package modules.wallet.mapper;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+import entities.Wallet;
+import modules.wallet.record.WalletResponseRecord;
+
+@Mapper(componentModel = "spring")
+public interface WalletMapper {
+	
+	@Mapping(target = "userId",source = "user.id")
+	WalletResponseRecord toDto(Wallet entity);
+}
