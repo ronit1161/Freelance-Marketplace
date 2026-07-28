@@ -1,9 +1,9 @@
-package entities;
+package com.freelancemarketplace.entities;
 
 import java.math.BigDecimal;
 
-import enums.TransactionStatus;
-import enums.TransactionType;
+import com.freelancemarketplace.enums.TransactionStatus;
+import com.freelancemarketplace.enums.TransactionType;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

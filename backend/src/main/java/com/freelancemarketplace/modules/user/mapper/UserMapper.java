@@ -1,11 +1,11 @@
-package modules.user.mapper;
+package com.freelancemarketplace.modules.user.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import entities.User;
-import modules.user.record.CreateUserRecord;
-import modules.user.record.UserResponseRecord;
+import com.freelancemarketplace.entities.User;
+import com.freelancemarketplace.modules.user.record.CreateUserRecord;
+import com.freelancemarketplace.modules.user.record.UserResponseRecord;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {

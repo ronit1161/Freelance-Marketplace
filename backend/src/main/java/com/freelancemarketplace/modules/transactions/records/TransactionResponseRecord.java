@@ -1,10 +1,10 @@
-package modules.transactions.records;
+package com.freelancemarketplace.modules.transactions.records;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import enums.TransactionStatus;
-import enums.TransactionType;
+import com.freelancemarketplace.enums.TransactionStatus;
+import com.freelancemarketplace.enums.TransactionType;
 
 public record TransactionResponseRecord(
 		Long id,

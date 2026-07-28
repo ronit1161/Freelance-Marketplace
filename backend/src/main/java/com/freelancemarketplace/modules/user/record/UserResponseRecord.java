@@ -1,8 +1,8 @@
-package modules.user.record;
+package com.freelancemarketplace.modules.user.record;
 
 import java.time.LocalDateTime;
 
-import enums.UserRoles;
+import com.freelancemarketplace.enums.UserRoles;
 
 public record UserResponseRecord(
 		Long id,

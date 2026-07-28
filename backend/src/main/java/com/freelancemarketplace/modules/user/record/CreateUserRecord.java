@@ -1,10 +1,10 @@
-package modules.user.record;
+package com.freelancemarketplace.modules.user.record;
 
 import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import enums.UserRoles;
+import com.freelancemarketplace.enums.UserRoles;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record CreateUserRecord(

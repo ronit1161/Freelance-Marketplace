@@ -1,8 +1,8 @@
-package modules.wallet.record;
+package com.freelancemarketplace.modules.wallet.record;
 
 import java.math.BigDecimal;
 
-import enums.TransactionType;
+import com.freelancemarketplace.enums.TransactionType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 

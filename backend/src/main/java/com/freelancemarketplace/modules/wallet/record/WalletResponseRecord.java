@@ -1,4 +1,4 @@
-package modules.wallet.record;
+package com.freelancemarketplace.modules.wallet.record;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

@@ -1,4 +1,4 @@
-package enums;
+package com.freelancemarketplace.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 

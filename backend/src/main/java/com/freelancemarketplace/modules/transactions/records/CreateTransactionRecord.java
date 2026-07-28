@@ -1,9 +1,9 @@
-package modules.transactions.records;
+package com.freelancemarketplace.modules.transactions.records;
 
 import java.math.BigDecimal;
 
-import enums.TransactionStatus;
-import enums.TransactionType;
+import com.freelancemarketplace.enums.TransactionStatus;
+import com.freelancemarketplace.enums.TransactionType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 

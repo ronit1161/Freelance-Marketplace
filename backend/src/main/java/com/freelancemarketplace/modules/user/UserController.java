@@ -1,4 +1,4 @@
-package modules.user;
+package com.freelancemarketplace.modules.user;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

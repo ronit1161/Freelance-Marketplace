@@ -1,11 +1,11 @@
-package modules.transactions.mapper;
+package com.freelancemarketplace.modules.transactions.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import entities.Transaction;
-import modules.transactions.records.CreateTransactionRecord;
-import modules.transactions.records.TransactionResponseRecord;
+import com.freelancemarketplace.entities.Transaction;
+import com.freelancemarketplace.modules.transactions.records.CreateTransactionRecord;
+import com.freelancemarketplace.modules.transactions.records.TransactionResponseRecord;
 
 @Mapper(componentModel = "spring")
 public interface TransactionMapper {

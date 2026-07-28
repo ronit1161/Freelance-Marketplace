@@ -1,4 +1,4 @@
-package entities;
+package com.freelancemarketplace.entities;
 
 
 import jakarta.persistence.Entity;
