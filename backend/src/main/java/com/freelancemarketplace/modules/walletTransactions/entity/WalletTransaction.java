@@ -1,7 +1,10 @@
-package com.freelancemarketplace.entitiy;
+package com.freelancemarketplace.modules.walletTransactions.entity;
 
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.Column;
+
+import com.freelancemarketplace.entitiy.BaseEntity;
+import com.freelancemarketplace.modules.transactions.entity.Transaction;
+import com.freelancemarketplace.modules.wallet.entity.Wallet;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;

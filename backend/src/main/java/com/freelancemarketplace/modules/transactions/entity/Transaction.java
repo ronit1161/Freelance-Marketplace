@@ -1,7 +1,8 @@
-package com.freelancemarketplace.entitiy;
+package com.freelancemarketplace.modules.transactions.entity;
 
 import java.math.BigDecimal;
 
+import com.freelancemarketplace.entitiy.BaseEntity;
 import com.freelancemarketplace.enums.TransactionStatus;
 import com.freelancemarketplace.enums.TransactionType;
 

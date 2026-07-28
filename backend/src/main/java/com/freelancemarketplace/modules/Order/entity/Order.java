@@ -1,8 +1,11 @@
-package com.freelancemarketplace.entitiy;
+package com.freelancemarketplace.modules.Order.entity;
 
 import java.math.BigDecimal;
 
+import com.freelancemarketplace.entitiy.BaseEntity;
 import com.freelancemarketplace.enums.OrderStatus;
+import com.freelancemarketplace.modules.gigs.entity.Gigs;
+import com.freelancemarketplace.modules.user.entity.User;
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;

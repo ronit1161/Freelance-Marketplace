@@ -3,8 +3,9 @@ package com.freelancemarketplace.modules.wallet.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import com.freelancemarketplace.entitiy.WalletTransaction;
+
 import com.freelancemarketplace.modules.wallet.record.CreateWalletTransactionRecord;
+import com.freelancemarketplace.modules.walletTransactions.entity.WalletTransaction;
 
 @Mapper(componentModel = "spring")
 public interface WalletTransactionmapper {
