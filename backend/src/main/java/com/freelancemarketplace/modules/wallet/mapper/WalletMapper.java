@@ -3,11 +3,7 @@ package com.freelancemarketplace.modules.wallet.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-<<<<<<< HEAD
 import com.freelancemarketplace.modules.wallet.entity.Wallet;
-=======
-import com.freelancemarketplace.entity.Wallet;
->>>>>>> e11697e (completed transcation and review records)
 import com.freelancemarketplace.modules.wallet.record.WalletResponseRecord;
 @Mapper(componentModel = "spring")
 public interface WalletMapper {
