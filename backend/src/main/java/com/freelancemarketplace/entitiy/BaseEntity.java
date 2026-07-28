@@ -1,4 +1,4 @@
-package com.freelancemarketplace.entities;
+package com.freelancemarketplace.entitiy;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,7 +21,7 @@ import lombok.ToString;
 @ToString
 public class BaseEntity {
 	@Id
-	@GeneratedValue(strategy = GenerationType.UUID)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@CreationTimestamp //generates auto date at the entity creation time
 	@Column(name="created_on")

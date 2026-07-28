@@ -1,6 +1,7 @@
-package com.freelancemarketplace.entities;
+package com.freelancemarketplace.entitiy;
 
-
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;

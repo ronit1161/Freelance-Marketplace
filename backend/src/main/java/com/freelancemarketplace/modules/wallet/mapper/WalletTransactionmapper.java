@@ -3,7 +3,7 @@ package com.freelancemarketplace.modules.wallet.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import com.freelancemarketplace.entities.WalletTransaction;
+import com.freelancemarketplace.entitiy.WalletTransaction;
 import com.freelancemarketplace.modules.wallet.record.CreateWalletTransactionRecord;
 
 @Mapper(componentModel = "spring")
