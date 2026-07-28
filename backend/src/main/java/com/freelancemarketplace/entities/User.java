@@ -1,6 +1,6 @@
-package entities;
+package com.freelancemarketplace.entities;
 
-import enums.UserRoles;
+import com.freelancemarketplace.enums.UserRoles;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

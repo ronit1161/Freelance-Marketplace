@@ -1,9 +1,9 @@
-package entities;
+package com.freelancemarketplace.entities;
 
 import java.math.BigDecimal;
 
-import enums.TransactionStatus;
-import enums.TransactionType;
+import com.freelancemarketplace.enums.TransactionStatus;
+import com.freelancemarketplace.enums.TransactionType;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,8 +26,8 @@ public class Transaction extends BaseEntity{
 	private BigDecimal amount; 
 	private String description;
 	@Enumerated(EnumType.STRING)
-	@Column(name="transcation_type")
-	private TransactionType transcationType;
+	@Column(name="transaction_type")
+	private TransactionType transactionType;
 	@Enumerated(EnumType.STRING)
 	@Column(name="transaction_status")
 	private TransactionStatus transactionStatus=TransactionStatus.PENDING;

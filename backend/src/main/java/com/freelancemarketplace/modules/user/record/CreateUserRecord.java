@@ -1,15 +1,13 @@
-package modules.user.dto;
+package com.freelancemarketplace.modules.user.record;
 
 import jakarta.validation.constraints.*;
-import lombok.ToString;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import enums.UserRoles;
+import com.freelancemarketplace.enums.UserRoles;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record CreatedUserRequest(
+public record CreateUserRecord(
 		@NotBlank(message = "user name cannot be blank")
 		@Size(min = 3,max = 20)
 		String userName,

@@ -1,4 +1,4 @@
-package entities;
+package com.freelancemarketplace.entities;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
