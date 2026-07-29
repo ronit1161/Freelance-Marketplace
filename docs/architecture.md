@@ -1,225 +1,119 @@
-# Freelance Marketplace - System Architecture
+# Freelance Marketplace - System Architecture Document
 
-## Architecture Overview
+## 1. Executive Summary
 
-The system follows a three-tier architecture:
-
-Client Layer
-↓
-Application Layer
-↓
-Database Layer
+The **Freelance Marketplace** platform is a full-stack web application connecting Clients, Freelancers, and Administrators in a digital service ecosystem. It features role-based access control, service gig listings, a strict order execution lifecycle, an Escrow-protected virtual wallet, ratings & reviews, and administrative platform controls.
 
 ---
 
-# 1. Client Layer (Frontend)
+## 2. Architectural Overview
 
-Technology:
+The application follows a clean **Three-Tier Architecture**:
 
-* React
-* Tailwind CSS
-* React Router
-
-Responsibilities:
-
-* User Interface
-* Routing
-* Form Validation
-* API Consumption
-* State Management
-
-Main Modules:
-
-* Authentication
-* Homepage
-* Gig Management
-* Orders
-* Wallet
-* Messaging
-* Reviews
-* Admin Dashboard
+```
++-------------------------------------------------------------+
+|                      CLIENT LAYER                           |
+|      Single Page Application (React 18 + Vite + Tailwind)   |
++-------------------------------------------------------------+
+                              | HTTP / REST (JSON)
+                              v
++-------------------------------------------------------------+
+|                    APPLICATION LAYER                        |
+|       Layered Monolith (Spring Boot 3 + Spring Security)    |
+|      [Controller] -> [Service] -> [Repository/DAO]          |
++-------------------------------------------------------------+
+                              | JPA / JDBC (Hibernate)
+                              v
++-------------------------------------------------------------+
+|                      DATABASE LAYER                         |
+|               Relational Database (MySQL 8)                 |
++-------------------------------------------------------------+
+```
 
 ---
 
-# 2. Application Layer (Backend)
+## 3. Technology Stack
 
-Technology:
+### Frontend Architecture
+- **Framework**: React 18 with Vite
+- **Routing**: React Router DOM (v6)
+- **Styling**: Tailwind CSS (Vanilla CSS design system)
+- **HTTP Client**: Axios with centralized request/response interceptors (`apiClient.js`)
+- **State & Auth**: React Context API (`AuthContext.jsx`) with persistent local storage
+- **Icons**: Lucide React
 
-* Spring Boot
-* Spring Security
-* Hibernate
-* JPA
+### Backend Architecture
+- **Framework**: Java 17 / Spring Boot 3
+- **Security**: Spring Security with JWT (JSON Web Tokens)
+- **Persistence**: Spring Data JPA & Hibernate ORM
+- **Database Driver**: MySQL Connector/J
+- **Build Tool**: Apache Maven
 
-Architecture Pattern:
-
-Controller
-↓
-Service
-↓
-Repository
-↓
-Database
-
-Responsibilities:
-
-* Business Logic
-* Authentication
-* Authorization
-* Order Processing
-* Wallet Processing
-* Data Validation
+### Database Tier
+- **Engine**: MySQL 8.0
+- **Entity Identification**: Auto-increment / Numeric IDs with base timestamps (`createdOn`, `lastUpdated`)
 
 ---
 
-# 3. Database Layer
+## 4. Layered Monolith Architecture
 
-Technology:
+The backend is structured into domain modules (`auth`, `user`, `gig`, `order`, `wallet`, `transaction`, `review`, `category`). Each module follows strict separation of concerns:
 
-* MySQL
-
-Responsibilities:
-
-* Data Storage
-* Data Integrity
-* Relationship Management
-
----
-
-# Core Modules
-
-## Authentication Module
-
-Responsibilities:
-
-* Registration
-* Login
-* JWT Generation
-* Role Management
+1. **Controller Layer (`*.controller`)**:
+   - Handles REST HTTP requests/responses.
+   - Validates incoming DTOs and handles response wrapping via `ApiResponse<T>`.
+2. **Service Layer (`*.service`)**:
+   - Encapsulates domain logic, financial escrow rules, and order state transitions.
+   - Transactional boundary (`@Transactional`).
+3. **Repository Layer (`*.repository`)**:
+   - Extends `JpaRepository<Entity, Long>` for data access and custom JPQL queries.
+4. **Data Transfer Objects (`*.dto`)**:
+   - Decouples internal database entities from external API contracts.
 
 ---
 
-## User Module
+## 5. Security & Authentication Flow
 
-Responsibilities:
+```
+[ Client ] ---> POST /api/auth/login ---> [ AuthController ]
+                                                  |
+                                          Validate Credentials
+                                                  |
+[ Client ] <--- JWT Token + User Info <-----------+
+    |
+    | (Include "Authorization: Bearer <token>" in headers)
+    v
+[ Spring Security Filter Chain ] ---> Validate Token ---> Execute Request
+```
 
-* Profile Management
-* User Information
-
----
-
-## Gig Module
-
-Responsibilities:
-
-* Gig Creation
-* Gig Management
-* Gig Search
-
----
-
-## Order Module
-
-Responsibilities:
-
-* Order Placement
-* Order Tracking
-* Order Completion
-
-Order States:
-
-PENDING
-IN_PROGRESS
-DELIVERED
-COMPLETED
-CANCELLED
+- **Stateless Authentication**: Requests are authenticated via JWT Bearer Tokens.
+- **Role-Based Authorization (RBAC)**: Enforces access rules for `CLIENT`, `FREELANCER`, and `ADMIN` roles across endpoints.
 
 ---
 
-## Wallet Module
+## 6. Escrow & Wallet Architecture
 
-Responsibilities:
+The wallet system guarantees financial safety between clients and freelancers through automated Escrow lifecycle management:
 
-* Coin Management
-* Escrow Handling
-* Refund Processing
+```
+1. Order Placed (CLIENT)
+   └── Deducts Available Balance -> Moves funds to Held (Escrow) Balance.
+   └── Creates ESCROW_HOLD Transaction record.
 
-Transaction Types:
+2. Order Delivery & Acceptance (FREELANCER / CLIENT)
+   └── Order status transitions to COMPLETED.
+   └── Held funds are transferred to Freelancer's Available Balance.
+   └── Creates RELEASE Transaction record.
 
-DEPOSIT
-WITHDRAWAL
-HOLD
-RELEASE
-REFUND
-
----
-
-## Messaging Module
-
-Responsibilities:
-
-* Client-Freelancer Communication
-* Order Discussions
+3. Order Cancellation
+   └── Order status transitions to CANCELLED.
+   └── Held funds return from Escrow back to Client's Available Balance.
+   └── Creates REFUND Transaction record.
+```
 
 ---
 
-## Review Module
+## 7. Deployment & Containerization
 
-Responsibilities:
-
-* Ratings
-* Reviews
-* Reputation Management
-
----
-
-# Future Microservice Architecture
-
-The project will initially be developed as a monolith.
-
-After successful completion, the following services may be extracted:
-
-## Auth Service
-
-* Authentication
-* Authorization
-
-## Gig Service
-
-* Gig Management
-* Search
-
-## Order Service
-
-* Orders
-* Wallet Processing
-
-Architecture:
-
-Frontend
-↓
-API Gateway
-↓
-Auth Service
-Gig Service
-Order Service
-
----
-
-# Deployment Architecture
-
-Frontend:
-React Application
-↓
-Vercel
-
-Backend:
-Spring Boot Application
-↓
-Render / Railway
-
-Database:
-PostgreSQL
-↓
-Cloud Database Provider
-
-Docker Compose will be used for local development and testing.
+- **Containerization**: Prepared for containerized orchestration via `Dockerfile` (Frontend & Backend) and `docker-compose.yml` for unified execution with MySQL.
+- **Production Targets**: Frontend (Vercel/Netlify), Backend (Render/Railway), Database (Managed MySQL).
