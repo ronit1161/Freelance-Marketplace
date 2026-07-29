@@ -2,8 +2,12 @@ package com.freelancemarketplace.modules.gigs.entity;
 
 import java.math.BigDecimal;
 
+
 import com.freelancemarketplace.common.entity.BaseEntity;
-import com.freelancemarketplace.modules.catagory.entity.Category;
+
+
+import com.freelancemarketplace.modules.category.entity.Category;
+
 import com.freelancemarketplace.modules.user.entity.User;
 
 import jakarta.persistence.AttributeOverride;
