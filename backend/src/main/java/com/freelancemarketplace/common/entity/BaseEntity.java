@@ -26,6 +26,7 @@ public class BaseEntity {
 	@CreationTimestamp //generates auto date at the entity creation time
 	@Column(name="created_on")
 	private LocalDate createdOn;
+	
 	@UpdateTimestamp //generates auto datetime(Timestamp)  at the entity updation time
 	@Column(name="last_updated")
 	private LocalDateTime lastUpdated;	

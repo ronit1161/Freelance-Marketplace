@@ -1,11 +1,17 @@
 package com.freelancemarketplace.modules.admin.service;
 
-import org.springframework.stereotype.Service;
+import java.util.List;
 
-import lombok.RequiredArgsConstructor;
+import com.freelancemarketplace.modules.admin.record.UserDetailsRecord;
+import com.freelancemarketplace.modules.admin.record.UserSummaryRecord;
 
-@Service
-@RequiredArgsConstructor
-public class AdminUserService {
+public interface AdminUserService {
 
+    List<UserSummaryRecord> getAllUsers();
+
+    UserDetailsRecord getUser(Long id);
+
+    void blockUser(Long id);
+
+    void unblockUser(Long id);
 }
