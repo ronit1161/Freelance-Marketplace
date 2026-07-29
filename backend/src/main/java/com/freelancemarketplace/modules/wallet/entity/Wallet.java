@@ -33,6 +33,5 @@ public class Wallet extends BaseEntity {
 	@Column(name = "total_balance", nullable = false, precision = 15, scale = 4)
     private BigDecimal totalBalance=BigDecimal.ZERO;//for balance held for eskrow implementation
 	@OneToOne(mappedBy = "wallet")
-	@JoinColumn
 	private User user;
 }

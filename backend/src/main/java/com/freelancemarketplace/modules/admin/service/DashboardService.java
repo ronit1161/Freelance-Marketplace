@@ -1,11 +1,7 @@
 package com.freelancemarketplace.modules.admin.service;
 
-import org.springframework.stereotype.Service;
+import com.freelancemarketplace.modules.admin.record.DashboardRecord;
 
-import lombok.RequiredArgsConstructor;
-
-@Service
-@RequiredArgsConstructor
-public class DashboardService {
-
+public interface DashboardService {
+    DashboardRecord getDashboard();
 }
