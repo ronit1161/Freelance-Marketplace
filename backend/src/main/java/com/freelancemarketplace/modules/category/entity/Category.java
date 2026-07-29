@@ -1,4 +1,4 @@
-package com.freelancemarketplace.modules.catagory.entity;
+package com.freelancemarketplace.modules.category.entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,12 @@ public class Category extends BaseEntity {
     private Category parentCategory;
 
     // 2. The Parent Side: ONE category has MANY subcategories
-    @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(
+		    mappedBy = "parentCategory",
+		    cascade = CascadeType.ALL,
+		    orphanRemoval = true,
+		    fetch = FetchType.LAZY 
+		)
     private List<Category> subCategories = new ArrayList<>();
 	
 }
