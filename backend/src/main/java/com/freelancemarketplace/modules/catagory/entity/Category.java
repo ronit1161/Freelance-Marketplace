@@ -23,18 +23,9 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @Table(name = "categories")
-@AttributeOverride(name="id",column = @Column(name="category_id"))
+@AttributeOverride(name = "id", column = @Column(name = "category_id"))
 public class Category extends BaseEntity {
-	@Column(name="category_name",length = 30,nullable = false)
-	private String categoryName;
-	@Column(name="category_slug",nullable = false,unique = true)
-	private String categorySlug;//URL safe identifier
-	@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
-    private Category parentCategory;
+    @Column(name = "category_name", length = 30, nullable = false)
+    private String categoryName;
 
-    // 2. The Parent Side: ONE category has MANY subcategories
-    @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Category> subCategories = new ArrayList<>();
-	
 }
