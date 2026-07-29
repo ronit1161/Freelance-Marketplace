@@ -22,14 +22,19 @@ public record CreateUserRecord(
 		        message = "Password must be at least 8 characters long and contain uppercase, lowercase, digit, and special character"
 		    )
 		@JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // 1. Never serialize to JSON output
-		String password,
+		String hashedPassword,
 		@NotBlank(message = "full name cannot be blank")
 		@Size(min = 3,max = 20)
 		String fullName,
 		@NotBlank(message = "full name cannot be blank")
 		String profileAvatarURL,
-		@NotBlank(message = "Role cannot be blank")
+		@NotNull(message = "Role cannot be blank")
 		UserRoles role,
 		@NotBlank(message = "bio data cannot be blank")
-		String bioData
+		String bioData,
+		@NotBlank(message = "skills cannot be blank")
+		String skills,
+		@NotNull(message = "experience cannot be blank")
+		@Max(value = 75,message = "experience cannot be more than 75")
+		Integer experience
 		) {}

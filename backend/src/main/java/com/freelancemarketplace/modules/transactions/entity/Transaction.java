@@ -1,8 +1,7 @@
 package com.freelancemarketplace.modules.transactions.entity;
-
 import java.math.BigDecimal;
 
-import com.freelancemarketplace.entitiy.BaseEntity;
+import com.freelancemarketplace.common.entity.BaseEntity;
 import com.freelancemarketplace.enums.TransactionStatus;
 import com.freelancemarketplace.enums.TransactionType;
 
@@ -31,7 +30,7 @@ public class Transaction extends BaseEntity{
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name="transcation_type")
-	private TransactionType transcationType;
+	private TransactionType transactionType;
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name="transaction_status")

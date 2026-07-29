@@ -7,8 +7,8 @@ import com.freelancemarketplace.modules.transactions.records.TransactionResponse
 public record WalletTransactionResponse(
 		Long id,
 	    TransactionResponseRecord transaction,
-	    WalletResponseRecord clientWallet,
-	    WalletResponseRecord freelancerWallet,
-	    LocalDateTime createdAt
+	    Long clientWalletId,
+	    Long freelancerWalletId,
+	    LocalDateTime createdOn
 		) 
 {}

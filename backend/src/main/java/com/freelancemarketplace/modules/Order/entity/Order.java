@@ -1,8 +1,8 @@
-package com.freelancemarketplace.modules.Order.entity;
 
+package com.freelancemarketplace.modules.Order.entity;
 import java.math.BigDecimal;
 
-import com.freelancemarketplace.entitiy.BaseEntity;
+import com.freelancemarketplace.common.entity.BaseEntity;
 import com.freelancemarketplace.enums.OrderStatus;
 import com.freelancemarketplace.modules.gigs.entity.Gigs;
 import com.freelancemarketplace.modules.user.entity.User;

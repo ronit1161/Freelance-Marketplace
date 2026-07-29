@@ -1,7 +1,7 @@
 package com.freelancemarketplace.modules.user.entity;
 
 
-import com.freelancemarketplace.entitiy.BaseEntity;
+import com.freelancemarketplace.common.entity.BaseEntity;
 import com.freelancemarketplace.enums.UserRoles;
 import com.freelancemarketplace.modules.wallet.entity.Wallet;
 
@@ -43,7 +43,8 @@ public class User extends BaseEntity{
 	private String bioData;
 	@Column(name="is_active")
 	private boolean isActive=true;
-	
+	@Column(name="is_deleted")
+	private boolean isDeleted=false;
 	@Column (name = "skills")
 	private String skills ; 
 	

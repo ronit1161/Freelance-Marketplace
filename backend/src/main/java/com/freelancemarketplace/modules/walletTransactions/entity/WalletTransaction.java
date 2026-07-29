@@ -1,7 +1,7 @@
 package com.freelancemarketplace.modules.walletTransactions.entity;
 
 
-import com.freelancemarketplace.entitiy.BaseEntity;
+import com.freelancemarketplace.common.entity.BaseEntity;
 import com.freelancemarketplace.modules.transactions.entity.Transaction;
 import com.freelancemarketplace.modules.wallet.entity.Wallet;
 

@@ -1,4 +1,4 @@
-package com.freelancemarketplace.entitiy;
+package com.freelancemarketplace.common.entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,3 +31,4 @@ public class BaseEntity {
 	@Column(name="last_updated")
 	private LocalDateTime lastUpdated;	
 }
+

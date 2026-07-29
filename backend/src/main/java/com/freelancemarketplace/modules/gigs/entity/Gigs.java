@@ -1,10 +1,13 @@
 package com.freelancemarketplace.modules.gigs.entity;
 
 import java.math.BigDecimal;
-import java.util.List;
 
-import com.freelancemarketplace.entitiy.BaseEntity;
-import com.freelancemarketplace.modules.catagory.entity.Category;
+
+import com.freelancemarketplace.common.entity.BaseEntity;
+
+
+import com.freelancemarketplace.modules.category.entity.Category;
+
 import com.freelancemarketplace.modules.user.entity.User;
 
 import jakarta.persistence.AttributeOverride;
@@ -13,7 +16,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
