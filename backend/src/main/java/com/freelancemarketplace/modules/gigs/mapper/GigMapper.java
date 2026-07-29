@@ -1,11 +1,11 @@
 package com.freelancemarketplace.modules.gigs.mapper;
 
-import javax.xml.transform.Source;
-
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-
+import com.freelancemarketplace.modules.gigs.entity.Gigs;
+import com.freelancemarketplace.modules.gigs.records.CreateGigRecord;
+import com.freelancemarketplace.modules.gigs.records.GigResponseRecord;
 
 @Mapper(componentModel = "spring")
 public interface GigMapper 

@@ -1,12 +1,7 @@
-<<<<<<<< HEAD:backend/src/main/java/com/freelancemarketplace/modules/transactions/entity/Transaction.java
 package com.freelancemarketplace.modules.transactions.entity;
-========
-package com.freelancemarketplace.entity;
->>>>>>>> e11697e (completed transcation and review records):backend/src/main/java/com/freelancemarketplace/entity/Transaction.java
-
 import java.math.BigDecimal;
 
-import com.freelancemarketplace.entitiy.BaseEntity;
+import com.freelancemarketplace.common.entity.BaseEntity;
 import com.freelancemarketplace.enums.TransactionStatus;
 import com.freelancemarketplace.enums.TransactionType;
 
@@ -35,7 +30,7 @@ public class Transaction extends BaseEntity{
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name="transcation_type")
-	private TransactionType transcationType;
+	private TransactionType transactionType;
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name="transaction_status")

@@ -1,11 +1,7 @@
-<<<<<<<< HEAD:backend/src/main/java/com/freelancemarketplace/modules/user/entity/User.java
 package com.freelancemarketplace.modules.user.entity;
-========
-package com.freelancemarketplace.entity;
->>>>>>>> e11697e (completed transcation and review records):backend/src/main/java/com/freelancemarketplace/entity/User.java
 
 
-import com.freelancemarketplace.entitiy.BaseEntity;
+import com.freelancemarketplace.common.entity.BaseEntity;
 import com.freelancemarketplace.enums.UserRoles;
 import com.freelancemarketplace.modules.wallet.entity.Wallet;
 
@@ -47,7 +43,8 @@ public class User extends BaseEntity{
 	private String bioData;
 	@Column(name="is_active")
 	private boolean isActive=true;
-	
+	@Column(name="is_deleted")
+	private boolean isDeleted=false;
 	@Column (name = "skills")
 	private String skills ; 
 	

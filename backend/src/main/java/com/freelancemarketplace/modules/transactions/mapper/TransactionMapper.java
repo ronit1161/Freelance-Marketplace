@@ -15,5 +15,6 @@ public interface TransactionMapper {
 	@Mapping(target = "lastUpdated",ignore = true)
 	Transaction toEntity(CreateTransactionRecord dto);
 	
+	
 	TransactionResponseRecord toDto(Transaction entity);
 }

@@ -1,12 +1,8 @@
-<<<<<<<< HEAD:backend/src/main/java/com/freelancemarketplace/modules/gigs/entity/Gigs.java
 package com.freelancemarketplace.modules.gigs.entity;
-========
-package com.freelancemarketplace.entity;
->>>>>>>> e11697e (completed transcation and review records):backend/src/main/java/com/freelancemarketplace/entity/Gigs.java
 
 import java.math.BigDecimal;
 
-import com.freelancemarketplace.entitiy.BaseEntity;
+import com.freelancemarketplace.common.entity.BaseEntity;
 import com.freelancemarketplace.modules.catagory.entity.Category;
 import com.freelancemarketplace.modules.user.entity.User;
 
@@ -16,10 +12,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-<<<<<<<< HEAD:backend/src/main/java/com/freelancemarketplace/modules/gigs/entity/Gigs.java
-
-========
->>>>>>>> e11697e (completed transcation and review records):backend/src/main/java/com/freelancemarketplace/entity/Gigs.java
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

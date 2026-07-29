@@ -1,12 +1,8 @@
-<<<<<<<< HEAD:backend/src/main/java/com/freelancemarketplace/modules/review/entity/Review.java
 package com.freelancemarketplace.modules.review.entity;
 
-import com.freelancemarketplace.entitiy.BaseEntity;
+import com.freelancemarketplace.common.entity.BaseEntity;
 import com.freelancemarketplace.modules.Order.entity.Order;
 import com.freelancemarketplace.modules.user.entity.User;
-========
-package com.freelancemarketplace.entity;
->>>>>>>> e11697e (completed transcation and review records):backend/src/main/java/com/freelancemarketplace/entity/Review.java
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;

@@ -1,13 +1,8 @@
-<<<<<<<< HEAD:backend/src/main/java/com/freelancemarketplace/modules/catagory/entity/Category.java
 package com.freelancemarketplace.modules.catagory.entity;
-========
-package com.freelancemarketplace.entity;
->>>>>>>> e11697e (completed transcation and review records):backend/src/main/java/com/freelancemarketplace/entity/Category.java
-
 import java.util.ArrayList;
 import java.util.List;
 
-import com.freelancemarketplace.entitiy.BaseEntity;
+import com.freelancemarketplace.common.entity.BaseEntity;
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.CascadeType;
