@@ -1,14 +1,9 @@
-<<<<<<<< HEAD:backend/src/main/java/com/freelancemarketplace/modules/walletTransactions/entity/WalletTransaction.java
 package com.freelancemarketplace.modules.walletTransactions.entity;
 
 
-import com.freelancemarketplace.entitiy.BaseEntity;
+import com.freelancemarketplace.common.entity.BaseEntity;
 import com.freelancemarketplace.modules.transactions.entity.Transaction;
 import com.freelancemarketplace.modules.wallet.entity.Wallet;
-========
-package com.freelancemarketplace.entity;
-
->>>>>>>> e11697e (completed transcation and review records):backend/src/main/java/com/freelancemarketplace/entity/WalletTransaction.java
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

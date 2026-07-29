@@ -1,17 +1,10 @@
-<<<<<<<< HEAD:backend/src/main/java/com/freelancemarketplace/modules/wallet/entity/Wallet.java
 package com.freelancemarketplace.modules.wallet.entity;
 
 import java.math.BigDecimal;
-import java.util.List;
 
-import com.freelancemarketplace.entitiy.BaseEntity;
+import com.freelancemarketplace.common.entity.BaseEntity;
 import com.freelancemarketplace.modules.user.entity.User;
 
-========
-package com.freelancemarketplace.entity;
-
-import java.math.BigDecimal;
->>>>>>>> e11697e (completed transcation and review records):backend/src/main/java/com/freelancemarketplace/entity/Wallet.java
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,6 +30,5 @@ public class Wallet extends BaseEntity {
 	@Column(name = "total_balance", nullable = false, precision = 15, scale = 4)
     private BigDecimal totalBalance=BigDecimal.ZERO;//for balance held for eskrow implementation
 	@OneToOne(mappedBy = "wallet")
-	@JoinColumn
 	private User user;
 }

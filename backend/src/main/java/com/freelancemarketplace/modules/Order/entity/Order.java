@@ -1,12 +1,8 @@
-<<<<<<<< HEAD:backend/src/main/java/com/freelancemarketplace/modules/Order/entity/Order.java
-package com.freelancemarketplace.modules.Order.entity;
-========
-package com.freelancemarketplace.entity;
->>>>>>>> e11697e (completed transcation and review records):backend/src/main/java/com/freelancemarketplace/entity/Order.java
 
+package com.freelancemarketplace.modules.Order.entity;
 import java.math.BigDecimal;
 
-import com.freelancemarketplace.entitiy.BaseEntity;
+import com.freelancemarketplace.common.entity.BaseEntity;
 import com.freelancemarketplace.enums.OrderStatus;
 import com.freelancemarketplace.modules.gigs.entity.Gigs;
 import com.freelancemarketplace.modules.user.entity.User;

@@ -1,8 +1,8 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { loginUser as apiLoginUser, registerUser as apiRegisterUser } from "../features/auth/services/authApi";
+import { marketplaceStore } from "../Services/marketplaceStore";
 
 const AuthContext = createContext(null);
-
 const SESSION_KEY = "auth_user";
 
 export function AuthProvider({ children }) {
@@ -24,11 +24,10 @@ export function AuthProvider({ children }) {
   };
 
   const register = async (formData) => {
-    const res = await apiRegisterUser(formData);
-    const userData = { email: formData.email, name: formData.name, role: formData.role || "client" };
+    const userData = await apiRegisterUser(formData);
     setUser(userData);
     localStorage.setItem(SESSION_KEY, JSON.stringify(userData));
-    return res;
+    return userData;
   };
 
   const logout = () => {

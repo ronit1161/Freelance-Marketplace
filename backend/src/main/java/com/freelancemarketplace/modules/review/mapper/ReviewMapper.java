@@ -3,7 +3,7 @@ package com.freelancemarketplace.modules.review.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import com.freelancemarketplace.entity.Review;
+import com.freelancemarketplace.modules.review.entity.Review;
 import com.freelancemarketplace.modules.review.record.ReviewResponseRecord;
 
 @Mapper(componentModel = "spring")

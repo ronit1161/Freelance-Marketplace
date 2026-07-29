@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import com.freelancemarketplace.modules.catagory.entity.Category;
+import com.freelancemarketplace.modules.category.entity.Category;
 
 
 
