@@ -1,4 +1,3 @@
-import React from 'react'
 import GigCard from '../../gigs/components/GigCard'
 
 const MygigSection = () => {

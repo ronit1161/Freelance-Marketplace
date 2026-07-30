@@ -1,6 +1,4 @@
-import React from 'react'
-import Navbar from '../../../components/layout/Navbar'
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const CreateGig = () => {
 

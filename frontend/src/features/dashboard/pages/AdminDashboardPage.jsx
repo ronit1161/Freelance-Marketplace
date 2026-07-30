@@ -1,4 +1,3 @@
-import React from "react";
 
 const Dashboard = () => {
   // Revenue Data for Graph

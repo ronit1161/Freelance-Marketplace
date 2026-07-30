@@ -1,4 +1,3 @@
-import React from 'react'
 import ProfileHeader from '../components/ProfileHeader'
 import AboutSection from '../components/AboutSection'
 import ReviewSection from '../components/ReviewSection'

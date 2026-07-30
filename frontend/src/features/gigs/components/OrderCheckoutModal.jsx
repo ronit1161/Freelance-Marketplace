@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { X, ShieldCheck, Zap, Lock, CheckCircle2 } from 'lucide-react';
-import { api } from '../../../services/api';
+import { createOrder } from '../../../services/orderApi';
 
 export default function OrderCheckoutModal({ gig, isOpen, onClose, onOrderSuccess }) {
   const [brief, setBrief] = useState('');
@@ -15,17 +15,17 @@ export default function OrderCheckoutModal({ gig, isOpen, onClose, onOrderSucces
   const serviceFee = 5.00;
   const totalPrice = basePrice + serviceFee;
 
-  const handleCheckoutSubmit = (e) => {
+  const handleCheckoutSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      const createdOrder = api.createOrder({
+    try {
+      const createdOrder = await createOrder({
         gigId: gig.id,
         gigTitle: gig.title,
         freelancerName: gig.freelancer,
         amount: totalPrice,
-        brief,
+        requirements: brief,
         deliveryDays: 3
       });
 
@@ -35,7 +35,10 @@ export default function OrderCheckoutModal({ gig, isOpen, onClose, onOrderSucces
       setTimeout(() => {
         onOrderSuccess(createdOrder);
       }, 1200);
-    }, 600);
+    } catch (err) {
+      setIsSubmitting(false);
+      alert(err?.message || "Failed to place order");
+    }
   };
 
   return (

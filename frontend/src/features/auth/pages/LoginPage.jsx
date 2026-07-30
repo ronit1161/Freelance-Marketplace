@@ -1,23 +1,25 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { loginUser } from "../services/authApi";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   async function handleLogin(e) {
     e.preventDefault();
     setError("");
 
     try {
-      const res = await loginUser({ email, password });
+      const res = await login({ email, password });
+      const role = (res?.role || "").toUpperCase();
 
-      if (res.role === "client") navigate("/client");
-      else if (res.role === "freelancer") navigate("/freelancer");
-      else if (res.role === "admin") navigate("/admin");
+      if (role === "CLIENT") navigate("/client");
+      else if (role === "FREELANCER") navigate("/freelancer");
+      else if (role === "ADMIN") navigate("/admin");
       else navigate("/");
     } catch (err) {
       setError(err?.message || "Login failed");
@@ -66,9 +68,9 @@ function LoginPage() {
 
           <p className="text-sm text-center">
             Don't have an account?{" "}
-            <a href="/signup" className="text-blue-500 hover:underline">
+            <Link to="/signup" className="text-blue-500 hover:underline">
               Sign up
-            </a>
+            </Link>
           </p>
         </form>
       </div>
