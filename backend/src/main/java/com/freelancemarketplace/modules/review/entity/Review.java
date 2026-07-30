@@ -29,7 +29,7 @@ public class Review extends BaseEntity {
 	@JoinColumn(name = "freelancer_id")
 	private User freelancer;
 	@OneToOne
-	@JoinColumn(name="order_id")
+	@JoinColumn(name="order_id" , unique = true)
 	private Order order;
 	private Integer rating;
 	private String comment;
