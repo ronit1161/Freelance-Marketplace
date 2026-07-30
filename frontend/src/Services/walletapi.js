@@ -1,23 +1,17 @@
-const mockWallet = {
-    "availableBalance": 12500.5000,
-    "heldBalance": 2500.2500,
-    "totalBalance": 15008.7500,
-    "user": {
-        "id": 108,
-        "username": "johndoe",
-        "email": "johndoe@example.com",
-        "firstName": "John",
-        "lastName": "Doe"
-    }
-}
+import apiClient from "./apiClient";
 
-export function getClientWallet(userId) {
-    return mockWallet;
-}
+export const getWallet = async () => {
+  const response = await apiClient.get("/wallet");
+  return response.data;
+};
 
+export const getWalletTransactions = async () => {
+  const response = await apiClient.get("/wallet/transactions");
+  return response.data;
+};
 
-export function addMoneyToWallet(userId, amount) {
-    mockWallet.heldBalance += amount;
-    mockWallet.totalBalance += amount;
-    mockWallet.availableBalance += amount;
-}
+export const addMoneyToWallet = async (userId, amount) => {
+  const response = await apiClient.post("/wallet/add", { userId, amount });
+  return response.data;
+};
+

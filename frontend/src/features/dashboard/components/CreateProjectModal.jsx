@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createOrder } from "../../../Services/ordersApi";
+import { createOrder } from "../../../services/orderApi";
 import { X, FolderPlus, Loader2, AlertCircle } from "lucide-react";
 
 export default function CreateProjectModal({ isOpen, onClose }) {
@@ -14,14 +14,12 @@ export default function CreateProjectModal({ isOpen, onClose }) {
         const payload = Object.fromEntries(formData);
         try {
             await createOrder(payload);
-            // On success, clear the stored inputs
             setState({ error: null, success: true, values: { freelancerId: "", gigId: "", requirements: "" } });
-            e.target.reset(); // Reset the DOM form
+            e.target.reset();
             onClose();
         } catch (err) {
-            // On failure, preserve the typed payload in state alongside the error message!
             setState({
-                error: err.message,
+                error: err.message || "Failed to submit request",
                 success: false,
                 values: payload,
             });
@@ -64,21 +62,6 @@ export default function CreateProjectModal({ isOpen, onClose }) {
 
                 <form onSubmit={handleFormSubmit} className="space-y-4">
                     <div>
-                        <label htmlFor="freelancerId" className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
-                            Freelancer ID
-                        </label>
-                        <input
-                            id="freelancerId"
-                            name="freelancerId"
-                            type="text"
-                            required
-                            placeholder="e.g. 204"
-                            defaultValue={state.values.freelancerId || ""}
-                            className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-900 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be] transition"
-                        />
-                    </div>
-
-                    <div>
                         <label htmlFor="gigId" className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
                             Gig ID
                         </label>
@@ -104,7 +87,7 @@ export default function CreateProjectModal({ isOpen, onClose }) {
                             required
                             placeholder="Describe scope, deliverables, and timeline..."
                             defaultValue={state.values.requirements || ""}
-                            className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-900 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be] transition resize-none"
+                            className="w-full px-[#3.5] py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-900 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be] transition resize-none"
                         />
                     </div>
 

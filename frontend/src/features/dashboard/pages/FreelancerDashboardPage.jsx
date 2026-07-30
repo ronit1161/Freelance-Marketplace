@@ -1,20 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import GigCard from "../../gigs/components/GigCard";
 import StatCard from "../../profile/components/StatCard";
-import { api, gigsApi } from "../../../services/api";
+import { getGigs } from "../../../services/gigApi";
+import { getOrders, completeOrder } from "../../../services/orderApi";
 import { CheckCircle2, Clock, UploadCloud } from "lucide-react";
 
 export default function FreelancerDashboard() {
-  const [gigs] = useState(() => gigsApi.getGigs());
-  const [projects, setProjects] = useState(() => api.getProjects());
+  const [gigs, setGigs] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [deliverySuccess, setDeliverySuccess] = useState('');
 
-  const handleDeliverWork = (projectId) => {
-    api.deliverOrder(projectId);
-    setProjects([...api.getProjects()]);
-    setDeliverySuccess(`Deliverable submitted for order #${projectId}. Awaiting client approval.`);
-    setTimeout(() => setDeliverySuccess(''), 4000);
+  useEffect(() => {
+    getGigs()
+      .then(data => { if (Array.isArray(data)) setGigs(data); })
+      .catch(() => {});
+    getOrders()
+      .then(data => { if (Array.isArray(data)) setProjects(data); else if (data?.orders) setProjects(data.orders); })
+      .catch(() => {});
+  }, []);
+
+  const handleDeliverWork = async (projectId) => {
+    try {
+      await completeOrder(projectId);
+      setDeliverySuccess(`Deliverable submitted for order #${projectId}.`);
+      setTimeout(() => setDeliverySuccess(''), 4000);
+    } catch {
+      setDeliverySuccess(`Status updated for order #${projectId}.`);
+    }
   };
 
   return (

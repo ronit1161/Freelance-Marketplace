@@ -1,18 +1,47 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import GigCard from '../components/GigCard';
-import { gigsApi } from '../../../Services/api';
+import { getGigs } from '../../../services/gigApi';
 
 export default function GigMarketplacePage() {
   const navigate = useNavigate();
-  const [gigs] = useState(gigsApi.getGigs());
+  const [gigs, setGigs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
+  useEffect(() => {
+    getGigs()
+      .then((data) => {
+        if (Array.isArray(data)) setGigs(data);
+      })
+      .catch(() => {
+        setGigs([
+          {
+            id: 'GIG-702',
+            title: 'Senior 3D Abstract Data Visualizer',
+            freelancer: 'Elena Rostova',
+            rate: '$85/hr',
+            rating: '4.9 (124 reviews)',
+            tags: ['Cinema4D', 'Data Art', 'Abstract'],
+            description: 'Specializing in converting complex corporate reports and metric arrays into breathtaking 3D graphical art packages.'
+          },
+          {
+            id: 'GIG-511',
+            title: 'Brand Identity & Accessibility Designer',
+            freelancer: 'Marcus Chen',
+            rate: '$95/hr',
+            rating: '5.0 (82 reviews)',
+            tags: ['WCAG Guidelines', 'Typography', 'Figma'],
+            description: 'Expert design layouts focused on modern typographic structures and comprehensive design system documentation.'
+          }
+        ]);
+      });
+  }, []);
+
   const filteredGigs = gigs.filter(gig => 
-    gig.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    gig.freelancer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    gig.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+    (gig.title || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (gig.freelancer || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (gig.tags || []).some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (

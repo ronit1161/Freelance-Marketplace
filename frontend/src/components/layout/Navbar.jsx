@@ -1,16 +1,17 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Bell, LogOut, RefreshCw } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const { user, logout, switchRole } = useAuth();
+  const { user, logout } = useAuth();
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
 
+  const userRole = user?.role?.toUpperCase();
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
@@ -19,11 +20,11 @@ const Navbar = () => {
         {/* Logo & Role indicator */}
         <div className="flex items-center space-x-3">
           <Link to="/" className="text-2xl font-bold text-[#0058be]">
-            FreelanceHub
+            FreelanceMarketplace
           </Link>
           {user && (
             <span className="text-[10px] font-extrabold uppercase bg-blue-50 text-blue-600 px-2 py-0.5 rounded">
-              {user.role}
+              {userRole}
             </span>
           )}
         </div>
@@ -43,13 +44,13 @@ const Navbar = () => {
           )}
 
           {/* Client Navbar */}
-          {user && user.role === 'client' && (
+          {user && userRole === 'CLIENT' && (
             <>
               <Link to="/client" className="text-gray-700 hover:text-[#0058be] transition">
                 Dashboard
               </Link>
-              <Link to="/client/projects" className="text-gray-700 hover:text-[#0058be] transition">
-                Projects
+              <Link to="/client/orders" className="text-gray-700 hover:text-[#0058be] transition">
+                Orders
               </Link>
               <Link to="/client/wallet" className="text-gray-700 hover:text-[#0058be] transition">
                 Wallet
@@ -61,7 +62,7 @@ const Navbar = () => {
           )}
 
           {/* Freelancer Navbar */}
-          {user && user.role === 'freelancer' && (
+          {user && userRole === 'FREELANCER' && (
             <>
               <Link to="/freelancer" className="text-gray-700 hover:text-[#0058be] transition">
                 Dashboard
@@ -79,7 +80,7 @@ const Navbar = () => {
           )}
 
           {/* Admin Navbar */}
-          {user && user.role === 'admin' && (
+          {user && userRole === 'ADMIN' && (
             <>
               <Link to="/admin" className="text-gray-700 hover:text-[#0058be] transition">
                 Admin Console
@@ -92,19 +93,14 @@ const Navbar = () => {
         <div className="flex items-center gap-4">
           {user ? (
             <div className="flex items-center gap-3">
-              {/* Notification icon for logged in users */}
-              <button className="text-gray-400 hover:text-gray-600 relative transition">
-                <Bell size={20} />
-                <span className="absolute top-0 right-0 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
-              </button>
 
               {/* User Avatar */}
               <Link
-                to={user.role === 'client' ? "/client/profile" : "/freelancer/profile"}
+                to={userRole === 'CLIENT' ? "/client/profile" : "/freelancer/profile"}
                 className="w-9 h-9 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm border hover:border-blue-500 transition"
                 title="View Profile"
               >
-                <span>{user.name ? user.name[0].toUpperCase() : 'U'}</span>
+                <span>{user.name ? user.name[0].toUpperCase() : (user.fullName ? user.fullName[0].toUpperCase() : 'U')}</span>
               </Link>
 
               {/* Logout Button */}

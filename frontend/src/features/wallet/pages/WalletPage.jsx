@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { addMoneyToWallet } from "../../../Services/walletapi";
 import WalletCard from "../components/WalletCard";
-import ClientNavBar from "../../Client/Components/ClientNavBar";
+import ClientNavBar from "../../dashboard/components/ClientNavBar";
 import { PlusCircle, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { addMoneyToWallet } from "../../../services/walletApi";
+
 
 export default function WalletPage({ userId }) {
     const [isPending, setIsPending] = useState(false);

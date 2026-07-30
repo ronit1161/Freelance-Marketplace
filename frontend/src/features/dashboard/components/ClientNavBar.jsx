@@ -1,12 +1,11 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, ShoppingBag, Wallet, BarChart3 } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, Wallet } from "lucide-react";
 
 export default function ClientNavBar() {
     const navItems = [
         { to: "/client", label: "Dashboard", icon: LayoutDashboard, end: true },
         { to: "/client/orders", label: "Orders", icon: ShoppingBag },
         { to: "/client/wallet", label: "Wallet", icon: Wallet },
-        { to: "/client/analytics", label: "Analytics", icon: BarChart3 },
     ];
 
     return (

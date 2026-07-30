@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import CreateProjectModal from "../Components/CreateProjectModal";
-import ClientNavBar from "../Components/ClientNavBar";
-import { useOrders } from "../../Hooks/useOrder";
+import CreateProjectModal from "../components/CreateProjectModal";
+import ClientNavBar from "../components/ClientNavBar";
+import { useOrders } from "../../../hooks/useOrder";
 import OrdersList from "../../orders/components/OrderList";
 import WalletCard from "../../wallet/components/WalletCard";
-import { PlusCircle, Search, ArrowRight, Sparkles } from "lucide-react";
+import { PlusCircle, Search, ArrowRight } from "lucide-react";
 
-export default function ClientDashboard() {
+export default function ClientDashboardPage() {
     const navigate = useNavigate();
-    const { orders, isLoading, error } = useOrders({ userId: 42, limit: 3, page: 1 });
+    const { orders, isLoading, error } = useOrders({ userId: null, limit: 3, page: 1 });
     const [isOpenCreateProjectModal, setIsOpenCreateProjectModal] = useState(false);
 
     return (
