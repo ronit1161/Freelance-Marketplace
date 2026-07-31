@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.freelancemarketplace.common.record.ApiResponse;
 import com.freelancemarketplace.modules.wallet.record.AddMoneyRecord;
 import com.freelancemarketplace.modules.wallet.record.WalletResponseRecord;
-import com.freelancemarketplace.modules.wallet.record.WalletTransactionResponse;
 import com.freelancemarketplace.modules.wallet.service.WalletService;
+import com.freelancemarketplace.modules.walletTransactions.record.WalletTransactionResponseRecord;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -36,9 +36,9 @@ public class WalletController {
     
     // GET /wallet/transactions?userId=1
     @GetMapping("/transactions")
-    public ResponseEntity<ApiResponse<List<WalletTransactionResponse>>> getWalletTransactions(
+    public ResponseEntity<ApiResponse<List<WalletTransactionResponseRecord>>> getWalletTransactions(
             @RequestParam Long userId) {
-        List<WalletTransactionResponse> transactions = walletService.getWalletTransactions(userId);
+        List<WalletTransactionResponseRecord> transactions = walletService.getWalletTransactions(userId);
         return ResponseEntity.ok(ApiResponse.success(transactions));
     }
     

@@ -1,8 +1,6 @@
 package com.freelancemarketplace.modules.wallet.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,11 +8,11 @@ import com.freelancemarketplace.modules.user.entity.User;
 import com.freelancemarketplace.modules.user.repository.UserRepository;
 import com.freelancemarketplace.modules.wallet.entity.Wallet;
 import com.freelancemarketplace.modules.wallet.mapper.WalletMapper;
-import com.freelancemarketplace.modules.wallet.mapper.WalletTransactionmapper;
 import com.freelancemarketplace.modules.wallet.record.AddMoneyRecord;
 import com.freelancemarketplace.modules.wallet.record.WalletResponseRecord;
-import com.freelancemarketplace.modules.wallet.record.WalletTransactionResponse;
 import com.freelancemarketplace.modules.wallet.repository.WalletRepository;
+import com.freelancemarketplace.modules.walletTransactions.mapper.WalletTransactionmapper;
+import com.freelancemarketplace.modules.walletTransactions.record.WalletTransactionResponseRecord;
 import com.freelancemarketplace.modules.walletTransactions.repository.WalletTransactionRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -27,8 +25,7 @@ public class WalletServiceImpl implements WalletService {
     private final WalletTransactionRepository walletTransactionRepository;
     private final UserRepository userRepository;
     private final WalletMapper walletMapper;
-    private final WalletTransactionmapper walletTransactionMapper;
-    
+    private final WalletTransactionmapper walletTransactionmapper;    
     @Override
     public WalletResponseRecord getWalletByUserId(Long userId) {
         Wallet wallet = walletRepository.findByUserId(userId)
@@ -48,14 +45,15 @@ public class WalletServiceImpl implements WalletService {
     }
     
     @Override
-    public List<WalletTransactionResponse> getWalletTransactions(Long userId) {
+    public List<WalletTransactionResponseRecord> getWalletTransactions(Long userId) {
         Wallet wallet = walletRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Wallet not found"));
-        return walletTransactionRepository
-                .findByClientWalletIdOrFreelancerWalletId(wallet.getId(), wallet.getId())
-                .stream()
-                .map(walletTransactionMapper::toDto)
-                .collect(Collectors.toList());
+//        return walletTransactionRepository
+//                .findByClientWalletIdOrFreelancerWalletId(wallet.getId(), wallet.getId())
+//                .stream()
+//                .map(walletTransactionMapper::toDto)
+//                .collect(Collectors.toList());
+        return null;
     }
     
     private Wallet createInitialWallet(Long userId) {

@@ -16,7 +16,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails {
 
-    private final User user;
+    private static final long serialVersionUID = 3414696922681358197L;
+	private final User user;
 
     public Long getId() {
         return user.getId();
