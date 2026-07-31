@@ -1,7 +1,6 @@
 package com.freelancemarketplace.modules.admin.record;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 public record GigSummaryRecord(
 		Long id,

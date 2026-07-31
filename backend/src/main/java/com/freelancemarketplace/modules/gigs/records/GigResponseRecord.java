@@ -1,31 +1,26 @@
 package com.freelancemarketplace.modules.gigs.records;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-
-
-import java.math.BigDecimal;
 
 public record GigResponseRecord(
 
-        Long id,
+                Long id,
 
-        String title,
+                String title,
 
-        String description,
+                String description,
 
-        BigDecimal price,
+                BigDecimal price,
 
-        Integer deliveryDays,
+                Integer deliveryDays,
 
-        String thumbnailUrl,
+                String thumbnailUrl,
 
-        Integer totalOrders,
+                Integer totalOrders,
 
-        Long freelancerId,
+                Long freelancerId,
 
-        Long categoryId
+                Long categoryId
 
-) {}
+) {
+}
