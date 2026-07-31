@@ -5,12 +5,12 @@ import com.freelancemarketplace.common.entity.BaseEntity;
 import com.freelancemarketplace.modules.transactions.entity.Transaction;
 import com.freelancemarketplace.modules.wallet.entity.Wallet;
 
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,19 +21,17 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @Table(name="wallet_transactions")
+@AttributeOverride(name="id",column = @Column(name="wallet_transaction_id"))
 public class WalletTransaction extends BaseEntity{
 	
-	@MapsId()
-	@OneToOne(fetch = FetchType.LAZY,optional =false )
+	@ManyToOne(fetch = FetchType.LAZY,optional =false )
 	@JoinColumn(name = "transaction_id")
 	private Transaction transaction;
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "client_wallet_id", nullable = false)
-    private Wallet clientWallet;
+    @JoinColumn(name = "destination_wallet_id", nullable = true)
+    private Wallet destinationWallet;
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "freelancer_wallet_id", nullable = false)
-    private Wallet freelancerWallet;
-	
-	
+    @JoinColumn(name = "source_wallet_id", nullable = true)
+    private Wallet sourceWallet;
 }
 

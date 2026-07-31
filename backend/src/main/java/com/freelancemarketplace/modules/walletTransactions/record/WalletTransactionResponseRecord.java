@@ -1,14 +1,14 @@
-package com.freelancemarketplace.modules.wallet.record;
+package com.freelancemarketplace.modules.walletTransactions.record;
 
 import java.time.LocalDateTime;
 
 import com.freelancemarketplace.modules.transactions.records.TransactionResponseRecord;
 
-public record WalletTransactionResponse(
+public record WalletTransactionResponseRecord(
 		Long id,
 	    TransactionResponseRecord transaction,
-	    Long clientWalletId,
-	    Long freelancerWalletId,
+	    Long sourceWalletId,
+	    Long destinationWalletId,
 	    LocalDateTime createdOn
 		) 
 {}
