@@ -17,43 +17,52 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-//user entities referencing freelancers,admins  or clients in the marketplace
+// user entities referencing freelancers, admins or clients in the marketplace
 @Entity
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
 @Table(name = "users")
 @AttributeOverride(name = "id", column = @Column(name = "user_id"))
 public class User extends BaseEntity {
 
-	@Column(name = "user_name", length = 30, nullable = false, unique = true)
-	private String userName;
-	@Column(length = 30, nullable = false, unique = true)
-	private String email;
-	@Column(name = "password", length = 30, nullable = false)
-	private String hashedPassword;
-	@Column(name = "full_name", length = 30, nullable = false)
-	private String fullName;
-	@Column(name = "profile_avatar_url")
-	private String profileAvatarURL;
-	@Enumerated(EnumType.STRING)
-	private UserRoles role;
-	@Column(name = "bio_data")
-	private String bioData;
-	@Column(name = "is_active")
-	private boolean isActive = true;
-	@Column(name = "is_deleted", nullable = false)
-	private boolean isDeleted = false;
-	@Column(name = "skills")
-	private String skills;
+    @Column(name = "user_name", length = 30, nullable = false, unique = true)
+    private String userName;
 
-	@Column(name = "experience")
-	private Integer experience;
+    @Column(length = 30, nullable = false, unique = true)
+    private String email;
 
-	@Column(name = "is_blocked")
-	private boolean is_blocked = false;
+    @Column(name = "password", length = 30, nullable = false)
+    private String hashedPassword;
 
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "wallet_id", unique = true, nullable = false)
-	private Wallet wallet;
+    @Column(name = "full_name", length = 30, nullable = false)
+    private String fullName;
+
+    @Column(name = "profile_avatar_url")
+    private String profileAvatarURL;
+
+    @Enumerated(EnumType.STRING)
+    private UserRoles role;
+
+    @Column(name = "bio_data")
+    private String bioData;
+
+    @Column(name = "is_active")
+    private boolean isActive = true;
+
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
+
+    @Column(name = "skills")
+    private String skills;
+
+    @Column(name = "experience")
+    private Integer experience;
+
+    @Column(name = "is_blocked")
+    private boolean is_blocked = false;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "wallet_id", unique = true, nullable = false)
+    private Wallet wallet;
 }
