@@ -1,5 +1,5 @@
 
-package com.freelancemarketplace.modules.Order.entity;
+package com.freelancemarketplace.modules.order.entity;
 import java.math.BigDecimal;
 
 import com.freelancemarketplace.common.entity.BaseEntity;
@@ -10,6 +10,8 @@ import com.freelancemarketplace.modules.user.entity.User;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -32,8 +34,9 @@ public class Order extends BaseEntity {
 		@Column(name = "agreed_price")
 		private BigDecimal agreedPrice ;
 		
-		@Column(name = "status ")
-		private OrderStatus status ; 
+		@Enumerated(EnumType.STRING)
+		@Column(name = "status")
+		private OrderStatus status = OrderStatus.PENDING;
 
 		@ManyToOne(fetch = FetchType.LAZY,optional = false)
 		@JoinColumn(name = "client_id",nullable = false)

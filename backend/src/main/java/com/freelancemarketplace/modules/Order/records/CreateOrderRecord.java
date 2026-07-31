@@ -1,4 +1,4 @@
-package com.freelancemarketplace.modules.Order.records;
+package com.freelancemarketplace.modules.order.records;
 
 import java.math.BigDecimal;
 
@@ -13,22 +13,28 @@ import jakarta.validation.constraints.NotBlank;
 
 public record CreateOrderRecord(
 		
-		@NotBlank String requirements ,
+		@NotBlank 
+		String requirements ,
 		
 		
-		@NotBlank BigDecimal agreedPrice ,
+		@NotBlank 
+		BigDecimal agreedPrice ,
 		
 		
-		@NotBlank OrderStatus status ,
+		@NotBlank 
+		OrderStatus status ,
 
 		
-		@NotBlank  User client,
+		@NotBlank  
+		User client,
 		
 		
-		@NotBlank User freelancer,
+		@NotBlank 
+		User freelancer,
 		
 		
-		@NotBlank Gigs gig 
+		@NotBlank 
+		Gigs gig 
 		) 
 
 

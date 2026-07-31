@@ -1,7 +1,7 @@
 package com.freelancemarketplace.modules.review.entity;
 
 import com.freelancemarketplace.common.entity.BaseEntity;
-import com.freelancemarketplace.modules.Order.entity.Order;
+import com.freelancemarketplace.modules.order.entity.Order;
 import com.freelancemarketplace.modules.user.entity.User;
 
 import jakarta.persistence.AttributeOverride;

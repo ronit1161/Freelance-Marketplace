@@ -29,22 +29,31 @@ public class User extends BaseEntity{
 	
 	@Column(name="user_name",length = 30,nullable = false,unique = true)
 	private String userName;
+
 	@Column(length = 30,nullable = false,unique = true)
 	private String email;
+
 	@Column(name="password",length = 30,nullable = false)
 	private String hashedPassword;
+
 	@Column(name="full_name",length = 30,nullable = false)
 	private String fullName;
+
 	@Column(name="profile_avatar_url")
 	private String profileAvatarURL;
+
 	@Enumerated(EnumType.STRING)
 	private UserRoles role;
+
 	@Column(name="bio_data")
 	private String bioData;
+
 	@Column(name="is_active")
 	private boolean isActive=true;
+
 	@Column(name="is_deleted")
 	private boolean isDeleted=false;
+	
 	@Column (name = "skills")
 	private String skills ; 
 	
