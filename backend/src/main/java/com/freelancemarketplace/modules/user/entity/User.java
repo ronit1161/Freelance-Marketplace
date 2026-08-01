@@ -1,6 +1,5 @@
 package com.freelancemarketplace.modules.user.entity;
 
-
 import com.freelancemarketplace.common.entity.BaseEntity;
 import com.freelancemarketplace.enums.UserRoles;
 import com.freelancemarketplace.modules.wallet.entity.Wallet;
@@ -23,47 +22,47 @@ import lombok.Setter;
 @Setter
 @Getter
 @NoArgsConstructor
-@Table(name="users")
-@AttributeOverride(name="id",column = @Column(name="user_id"))
-public class User extends BaseEntity{
-	
-	@Column(name="user_name",length = 30,nullable = false,unique = true)
+@Table(name = "users")
+@AttributeOverride(name = "id", column = @Column(name = "user_id"))
+public class User extends BaseEntity {
+
+	@Column(name = "user_name", length = 30, nullable = false, unique = true)
 	private String userName;
 
-	@Column(length = 30,nullable = false,unique = true)
+	@Column(length = 30, nullable = false, unique = true)
 	private String email;
 
-	@Column(name="password",length = 30,nullable = false)
+	@Column(name = "password", length = 30, nullable = false)
 	private String hashedPassword;
 
-	@Column(name="full_name",length = 30,nullable = false)
+	@Column(name = "full_name", length = 30, nullable = false)
 	private String fullName;
 
-	@Column(name="profile_avatar_url")
+	@Column(name = "profile_avatar_url")
 	private String profileAvatarURL;
 
 	@Enumerated(EnumType.STRING)
 	private UserRoles role;
 
-	@Column(name="bio_data")
+	@Column(name = "bio_data")
 	private String bioData;
 
-	@Column(name="is_active")
-	private boolean isActive=true;
+	@Column(name = "is_active")
+	private boolean isActive = true;
 
-	@Column(name="is_deleted")
-	private boolean isDeleted=false;
-	
-	@Column (name = "skills")
-	private String skills ; 
-	
+	@Column(name = "is_deleted")
+	private boolean isDeleted = false;
+
+	@Column(name = "skills")
+	private String skills;
+
 	@Column(name = "experience")
-	private Integer experience ;
-	
-	@Column(name="is_blocked")
-	private boolean is_blocked=false;
-	
+	private Integer experience;
+
+	@Column(name = "is_blocked")
+	private boolean is_blocked = false;
+
 	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "wallet_id",unique = true,nullable = false)
+	@JoinColumn(name = "wallet_id", unique = true, nullable = false)
 	private Wallet wallet;
 }
