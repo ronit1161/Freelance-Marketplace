@@ -1,7 +1,7 @@
 package com.freelancemarketplace.modules.review.entity;
 
 import com.freelancemarketplace.common.entity.BaseEntity;
-import com.freelancemarketplace.modules.Order.entity.Order;
+import com.freelancemarketplace.modules.order.entity.Order;
 import com.freelancemarketplace.modules.user.entity.User;
 
 import jakarta.persistence.AttributeOverride;
@@ -29,7 +29,7 @@ public class Review extends BaseEntity {
 	@JoinColumn(name = "freelancer_id")
 	private User freelancer;
 	@OneToOne
-	@JoinColumn(name="order_id")
+	@JoinColumn(name="order_id" , unique = true)
 	private Order order;
 	private Integer rating;
 	private String comment;

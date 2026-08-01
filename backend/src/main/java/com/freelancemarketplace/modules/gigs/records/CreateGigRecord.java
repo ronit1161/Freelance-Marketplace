@@ -9,17 +9,26 @@ import jakarta.validation.constraints.Positive;
 
 public record CreateGigRecord( 
 
-	    @NotBlank String title,
+	    @NotBlank 
+		String title,
 
-	    @NotBlank String description,
+	    @NotBlank 
+		String description,
 
-	    @NotNull @Positive BigDecimal price,
+	    @NotNull 
+		@Positive 
+		BigDecimal price,
 
-	    @NotNull @Positive Integer deliveryDays,
+	    @NotNull 
+		@Positive 
+		Integer deliveryDays,
 
-	    @NotBlank String thumbnailUrl,
+	    @NotBlank 
+		String thumbnailUrl,
 
-	    @NotNull Long freelancerId,
+	    @NotNull 
+		Long freelancerId,
 
-	    @NotNull Long categoryId
+	    @NotNull 
+		Long categoryId
 	) {}

@@ -1,503 +1,157 @@
-# Database Design
-## Freelance Marketplace
+# Database Design Specification
 
-**Version:** 1.0  
-**Database:** MySQL  
-**Backend:** Java Spring Boot + Spring Data JPA + Hibernate
+**Database Engine**: MySQL 8.0  
+**ORM Framework**: Spring Data JPA + Hibernate  
 
 ---
 
-# Overview
+## 1. Overview
 
-This document describes the complete database design for the **Freelance Marketplace** project.
-
-The project is intentionally designed as a **simple college-level application**. The database follows normalization principles while avoiding unnecessary complexity.
-
-The design focuses on:
-
-- Authentication
-- Gig Management
-- Orders
-- Wallet & Escrow
-- Reviews
-- Admin Operations
+This document details the relational database design for the **Freelance Marketplace** project. The schema enforces normalization, data integrity, foreign key constraints, and performance index optimizations across all domain entities.
 
 ---
 
-# Database Design Principles
+## 2. Entity Summaries
 
-- Use UUID as Primary Key for every entity.
-- Every table extends a common `BaseEntity`.
-- Use proper Foreign Key constraints.
-- Use JPA relationships.
-- Store passwords in encrypted form.
-- Keep schema simple but scalable.
-- Design should support future migration to Microservices.
-
----
-
-# Entity List
-
-1. User
-2. Wallet
-3. Category
-4. Gig
-5. Order
-6. Transaction
-7. Review
+1. **`User`**: Stores system accounts (`CLIENT`, `FREELANCER`, `ADMIN`) and profile data.
+2. **`Category`**: Organizes service listings into distinct categories.
+3. **`Gig`**: Represents freelance service listings with pricing, delivery timeline, and thumbnails.
+4. **`Order`**: Tracks service orders between clients and freelancers with lifecycle states.
+5. **`Wallet`**: Manages digital balances (`availableBalance`, `heldBalance`, `totalBalance`).
+6. **`WalletTransaction`**: Maintains immutable transaction history ledger entries.
+7. **`Review`**: Stores ratings (1-5 stars) and feedback comments for completed orders.
 
 ---
 
-# Entity Details
+## 3. Entity Details & Schema Definitions
+
+### 3.1 `users` Table
+| Column Name | Data Type | Constraints | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `BIGINT` | `PRIMARY KEY`, `AUTO_INCREMENT` | Unique User ID |
+| `full_name` | `VARCHAR(100)` | `NOT NULL` | Full Name |
+| `email` | `VARCHAR(100)` | `NOT NULL`, `UNIQUE` | User Email |
+| `password` | `VARCHAR(255)` | `NOT NULL` | Encrypted Password (BCrypt) |
+| `role` | `VARCHAR(20)` | `NOT NULL` | `CLIENT`, `FREELANCER`, or `ADMIN` |
+| `bio_data` | `TEXT` | `NULLABLE` | Professional Biography |
+| `skills` | `VARCHAR(255)` | `NULLABLE` | Comma-separated Skills |
+| `experience` | `INT` | `NULLABLE` | Years of Experience |
+| `profile_image_url` | `VARCHAR(500)` | `NULLABLE` | Profile Avatar URL |
+| `is_active` | `BOOLEAN` | `DEFAULT TRUE` | Active Status Flag |
+| `is_blocked` | `BOOLEAN` | `DEFAULT FALSE` | Account Blocked Flag |
+| `created_on` | `DATETIME` | `NOT NULL` | Registration Timestamp |
+| `last_updated` | `DATETIME` | `NULLABLE` | Profile Update Timestamp |
 
 ---
 
-# 1. User
-
-## Purpose
-
-Stores information about every user in the application.
-
-A user can be:
-
-- CLIENT
-- FREELANCER
-- ADMIN
+### 3.2 `categories` Table
+| Column Name | Data Type | Constraints | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `BIGINT` | `PRIMARY KEY`, `AUTO_INCREMENT` | Category ID |
+| `category_name` | `VARCHAR(100)` | `NOT NULL`, `UNIQUE` | Category Name |
+| `description` | `TEXT` | `NULLABLE` | Category Description |
+| `is_deleted` | `BOOLEAN` | `DEFAULT FALSE` | Soft-delete Flag |
 
 ---
 
-## Attributes
-
-| Field | Type | Required | Unique |
-|--------|------|----------|--------|
-| user_id | UUID | Yes | Yes |
-| full_name | String | Yes | No |
-| email | String | Yes | Yes |
-| password | String | Yes | No |
-| role | Enum | Yes | No |
-| bio | Text | No | No |
-| skills | String | No | No |
-| experience | Integer | No | No |
-| profile_image_url | String | No | No |
-| is_active | Boolean | Yes | No |
-| is_blocked | Boolean | Yes | No |
-| created_on | Timestamp | Yes | No |
-| last_updated | Timestamp | Yes | No |
+### 3.3 `gigs` Table
+| Column Name | Data Type | Constraints | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `BIGINT` | `PRIMARY KEY`, `AUTO_INCREMENT` | Gig ID |
+| `title` | `VARCHAR(255)` | `NOT NULL` | Service Title |
+| `description` | `TEXT` | `NOT NULL` | Service Description |
+| `price` | `DECIMAL(10,2)` | `NOT NULL` | Service Base Price (₹) |
+| `delivery_days` | `INT` | `NOT NULL` | Delivery Timeframe in Days |
+| `thumbnail_url` | `VARCHAR(500)` | `NULLABLE` | Showcase Image URL |
+| `freelancer_id` | `BIGINT` | `FOREIGN KEY (users.id)` | Freelancer Owner ID |
+| `category_id` | `BIGINT` | `FOREIGN KEY (categories.id)` | Associated Category ID |
+| `is_deleted` | `BOOLEAN` | `DEFAULT FALSE` | Soft-delete Flag |
+| `created_on` | `DATETIME` | `NOT NULL` | Listing Creation Timestamp |
 
 ---
 
-## Relationships
-
-- One User has One Wallet
-- One Freelancer has Many Gigs
-- One Client places Many Orders
-- One Freelancer receives Many Orders
-- One Client writes Many Reviews
-
----
-
-## Constraints
-
-- Email must be unique.
-- Password must be encrypted.
-- Role cannot be null.
+### 3.4 `orders` Table
+| Column Name | Data Type | Constraints | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `BIGINT` | `PRIMARY KEY`, `AUTO_INCREMENT` | Order ID |
+| `client_id` | `BIGINT` | `FOREIGN KEY (users.id)` | Purchasing Client ID |
+| `freelancer_id` | `BIGINT` | `FOREIGN KEY (users.id)` | Assigned Freelancer ID |
+| `gig_id` | `BIGINT` | `FOREIGN KEY (gigs.id)` | Purchased Gig ID |
+| `requirements` | `TEXT` | `NOT NULL` | Mandatory Project Instructions |
+| `agreed_price` | `DECIMAL(10,2)` | `NOT NULL` | Agreed Purchase Price (₹) |
+| `status` | `VARCHAR(30)` | `NOT NULL` | `PENDING`, `ACCEPTED`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED` |
+| `created_on` | `DATETIME` | `NOT NULL` | Order Placement Timestamp |
+| `completed_date` | `DATETIME` | `NULLABLE` | Completion Timestamp |
 
 ---
 
-# 2. Wallet
-
-## Purpose
-
-Stores virtual wallet information.
-
-Supports Escrow implementation.
-
----
-
-## Attributes
-
-| Field | Type |
-|--------|------|
-| wallet_id | UUID |
-| available_balance | Decimal |
-| held_balance | Decimal |
-| total_balance | Decimal |
+### 3.5 `wallets` Table
+| Column Name | Data Type | Constraints | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `BIGINT` | `PRIMARY KEY`, `AUTO_INCREMENT` | Wallet ID |
+| `user_id` | `BIGINT` | `FOREIGN KEY (users.id)`, `UNIQUE` | Account Owner User ID |
+| `available_balance` | `DECIMAL(10,2)` | `DEFAULT 0.00` | Liquid Funds Available |
+| `held_balance` | `DECIMAL(10,2)` | `DEFAULT 0.00` | Funds Locked in Escrow |
+| `total_balance` | `DECIMAL(10,2)` | `DEFAULT 0.00` | Sum of Available + Held |
 
 ---
 
-## Relationships
-
-- One Wallet belongs to One User.
-- One Wallet contains Many Transactions.
-
----
-
-## Business Rules
-
-- Every new user receives demo coins.
-- Total Balance = Available Balance + Held Balance.
-- Wallet balance cannot become negative.
-
----
-
-# 3. Category
-
-## Purpose
-
-Organizes gigs.
+### 3.6 `wallet_transactions` Table
+| Column Name | Data Type | Constraints | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `BIGINT` | `PRIMARY KEY`, `AUTO_INCREMENT` | Transaction ID |
+| `wallet_id` | `BIGINT` | `FOREIGN KEY (wallets.id)` | Associated Wallet ID |
+| `order_id` | `BIGINT` | `FOREIGN KEY (orders.id)` | Associated Order ID (Optional) |
+| `amount` | `DECIMAL(10,2)` | `NOT NULL` | Monetary Amount (₹) |
+| `transaction_type` | `VARCHAR(30)` | `NOT NULL` | `DEPOSIT`, `ESCROW_HOLD`, `RELEASE`, `REFUND` |
+| `transaction_status` | `VARCHAR(20)` | `NOT NULL` | `COMPLETED`, `PENDING`, `FAILED` |
+| `description` | `VARCHAR(255)` | `NOT NULL` | Ledger Description Note |
+| `created_on` | `DATETIME` | `NOT NULL` | Transaction Timestamp |
 
 ---
 
-## Attributes
-
-| Field | Type |
-|--------|------|
-| category_id | UUID |
-| category_name | String |
-| description | String |
-
----
-
-## Relationships
-
-- One Category has Many Gigs.
+### 3.7 `reviews` Table
+| Column Name | Data Type | Constraints | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `BIGINT` | `PRIMARY KEY`, `AUTO_INCREMENT` | Review ID |
+| `order_id` | `BIGINT` | `FOREIGN KEY (orders.id)`, `UNIQUE` | Reviewed Order ID |
+| `client_id` | `BIGINT` | `FOREIGN KEY (users.id)` | Author Client ID |
+| `freelancer_id` | `BIGINT` | `FOREIGN KEY (users.id)` | Target Freelancer ID |
+| `gig_id` | `BIGINT` | `FOREIGN KEY (gigs.id)` | Target Gig ID |
+| `rating` | `INT` | `CHECK (rating BETWEEN 1 AND 5)` | Rating Stars (1 to 5) |
+| `comment` | `TEXT` | `NOT NULL` | Feedback Text |
+| `created_on` | `DATETIME` | `NOT NULL` | Submission Timestamp |
 
 ---
 
-## Business Rules
-
-- No Subcategories.
-- Category name must be unique.
-
----
-
-# 4. Gig
-
-## Purpose
-
-Represents services offered by freelancers.
-
----
-
-## Attributes
-
-| Field | Type |
-|--------|------|
-| gig_id | UUID |
-| title | String |
-| description | Text |
-| price | Decimal |
-| delivery_days | Integer |
-| thumbnail_url | String |
-| total_orders | Integer |
-| is_deleted | Boolean |
-
----
-
-## Relationships
-
-- Many Gigs belong to One Freelancer.
-- Many Gigs belong to One Category.
-- One Gig has Many Orders.
-
----
-
-## Business Rules
-
-- Only one thumbnail image.
-- Only one price.
-- Freelancer can edit gig.
-- Freelancer can delete gig.
-
----
-
-# 5. Order
-
-## Purpose
-
-Represents a purchase between Client and Freelancer.
-
----
-
-## Attributes
-
-| Field | Type |
-|--------|------|
-| order_id | UUID |
-| requirements | Text |
-| agreed_price | Decimal |
-| status | Enum |
-| completed_date | Timestamp |
-
----
-
-## Relationships
-
-- Many Orders belong to One Client.
-- Many Orders belong to One Freelancer.
-- Many Orders belong to One Gig.
-- One Order has One Review.
-- One Order has Many Transactions.
-
----
-
-## Order Status
-
-- PENDING
-- ACCEPTED
-- IN_PROGRESS
-- COMPLETED
-- CANCELLED
-
----
-
-## Business Rules
-
-- Client can place multiple orders.
-- Freelancer cannot reject an order.
-- Client can cancel only before work starts.
-- No revisions.
-- One order can have only one review.
-
----
-
-# 6. Transaction
-
-## Purpose
-
-Maintains wallet transaction history.
-
----
-
-## Attributes
-
-| Field | Type |
-|--------|------|
-| transaction_id | UUID |
-| amount | Decimal |
-| transaction_type | Enum |
-| transaction_status | Enum |
-| description | String |
-| reference | String |
-
----
-
-## Relationships
-
-- Many Transactions belong to One Wallet.
-- Many Transactions may belong to One Order.
-
----
-
-## Transaction Types
-
-- INITIAL_BALANCE
-- HOLD
-- RELEASE
-- REFUND
-
----
-
-## Transaction Status
-
-- PENDING
-- SUCCESS
-- FAILED
-
----
-
-## Business Rules
-
-Every financial activity generates one transaction.
-
-Examples:
-
-- Initial Wallet Balance
-- Hold Coins
-- Release Coins
-- Refund Coins
-
----
-
-# 7. Review
-
-## Purpose
-
-Stores client feedback after order completion.
-
----
-
-## Attributes
-
-| Field | Type |
-|--------|------|
-| review_id | UUID |
-| rating | Integer |
-| comment | Text |
-
----
-
-## Relationships
-
-- One Review belongs to One Order.
-- Many Reviews belong to One Client.
-- Many Reviews belong to One Freelancer.
-
----
-
-## Business Rules
-
-- Only Client can review.
-- Rating between 1–5.
-- One Review per Order.
-- Review cannot be edited.
-- Review cannot be deleted.
-
----
-
-# Relationship Summary
-
-## User
+## 4. Entity Relationship Diagram (ERD)
 
 ```
-User
-│
-├── 1 : 1 Wallet
-├── 1 : N Gig
-├── 1 : N Order (Client)
-├── 1 : N Order (Freelancer)
-└── 1 : N Review
+       +------------------+                    +------------------+
+       |    categories    |                    |      users       |
+       +------------------+                    +------------------+
+       | id (PK)          |                    | id (PK)          |
+       | category_name    |                    | email            |
+       +------------------+                    | role             |
+                | 1                            +------------------+
+                |                               /    |          \
+                | N                            /     | 1         \ 1
+       +------------------+                   /      v            v
+       |       gigs       |                  /  +---------+   +----------+
+       +------------------+                 /   | wallets |   |  reviews |
+       | id (PK)          |                /    +---------+   +----------+
+       | freelancer_id(FK)|<--------------+          | 1           | N
+       | category_id (FK) |                          |             |
+       +------------------+                          | N           v
+                | 1                             +-----------------------+
+                |                               |  wallet_transactions  |
+                | N                             +-----------------------+
+       +------------------+
+       |      orders      |
+       +------------------+
+       | id (PK)          |
+       | client_id (FK)   |
+       | freelancer_id(FK)|
+       | gig_id (FK)      |
+       +------------------+
 ```
-
----
-
-## Category
-
-```
-Category
-│
-└── 1 : N Gig
-```
-
----
-
-## Gig
-
-```
-Gig
-│
-└── 1 : N Order
-```
-
----
-
-## Order
-
-```
-Order
-│
-├── 1 : 1 Review
-└── 1 : N Transaction
-```
-
----
-
-## Wallet
-
-```
-Wallet
-│
-└── 1 : N Transaction
-```
-
----
-
-# Entity Relationship Diagram (Conceptual)
-
-```
-                      +-------------+
-                      |  Category   |
-                      +-------------+
-                             |
-                           1 | 
-                             | N
-                      +-------------+
-                      |     Gig     |
-                      +-------------+
-                             |
-                   +---------+---------+
-                   |                   |
-                   | N               1 |
-                   |                   |
-            +-------------+     +-------------+
-            | Freelancer  |     |    Order    |
-            |    User     |     +-------------+
-            +-------------+            |
-                   ^                   |
-                   |                   |
-                   |                   |
-            +-------------+            |
-            |   Client    |------------+
-            |    User     |
-            +-------------+
-                   |
-                   |
-              1    |    1
-                   |
-             +-------------+
-             |   Wallet    |
-             +-------------+
-                   |
-                1  |
-                   | N
-             +-------------+
-             | Transaction |
-             +-------------+
-
-Order
-  |
-1 |
-  | 1
-Review
-```
-
----
-
-# Index Recommendations
-
-Create indexes on:
-
-- email
-- role
-- category_name
-- title
-- price
-- order_status
-- transaction_type
-
----
-
-# Future Scope
-
-The current schema is designed for a monolithic application.
-
-In the future it can be separated into microservices:
-
-- Authentication Service
-- Gig Service
-- Order Service
-- Wallet Service
-- Review Service
-
-without major database redesign.
-
----
-
-# Notes
-
-- Passwords must always be stored in encrypted form.
-- UUIDs should be generated by Hibernate.
-- All relationships should use JPA annotations.
-- Use Lazy Fetch wherever appropriate.
-- Use DTOs for API communication instead of exposing entities directly.
-- Use Global Exception Handling and Validation for all database operations.

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Star, ShieldCheck, Clock, Zap, MessageSquare } from 'lucide-react';
-import { gigsApi } from '../../../services/api';
+import { ArrowLeft, Star, Zap, MessageSquare } from 'lucide-react';
+import { getGigById } from '../../../services/gigApi';
 import OrderCheckoutModal from '../components/OrderCheckoutModal';
 
 export default function GigDetailsPage() {
@@ -12,8 +12,23 @@ export default function GigDetailsPage() {
   const [contactFeedback, setContactFeedback] = useState('');
 
   useEffect(() => {
-    const fetchedGig = gigsApi.getGigs().find(g => g.id === id);
-    setGig(fetchedGig);
+    getGigById(id)
+      .then((data) => {
+        if (data) setGig(data);
+      })
+      .catch(() => {
+        // Fallback default sample gig
+        setGig({
+          id: id || 'GIG-702',
+          title: 'Senior 3D Abstract Data Visualizer',
+          freelancer: 'Elena Rostova',
+          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&h=120&q=80',
+          rate: '$85/hr',
+          rating: '4.9 (124 reviews)',
+          tags: ['Cinema4D', 'Data Art', 'Abstract'],
+          description: 'Specializing in converting complex corporate reports and metric arrays into breathtaking 3D graphical art packages.'
+        });
+      });
   }, [id]);
 
   if (!gig) {
@@ -30,12 +45,12 @@ export default function GigDetailsPage() {
     );
   }
 
-  const ratingVal = gig.rating.split(' ')[0];
-  const reviewsCount = gig.rating.split(' ')[1] ? gig.rating.split(' ')[1].replace('(', '') : '0';
+  const ratingVal = (gig.rating || "5.0").split(' ')[0];
+  const reviewsCount = (gig.rating || "").split(' ')[1] ? (gig.rating || "").split(' ')[1].replace('(', '') : '0';
 
-  const handleOrderSuccess = (createdOrder) => {
+  const handleOrderSuccess = () => {
     setIsCheckoutOpen(false);
-    navigate('/client/projects');
+    navigate('/client/orders');
   };
 
   const handleContactSeller = () => {

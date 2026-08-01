@@ -1,112 +1,153 @@
-# Frontend Folder Structure
+# Freelance Marketplace - Project Directory Structure
 
-This document defines how the `src/` folder is organized for the Freelance Marketplace frontend. **Read this before creating any new file.** If you're unsure where something goes, check the "Rule of Thumb" section at the bottom before asking in the group chat.
-
-We use a **feature-based architecture**: code is grouped by what it does (gigs, orders, wallet...), not by what type of file it is (all components in one place, all hooks in another). This keeps each feature self-contained so four people can work in parallel without stepping on each other's files.
+This document outlines the complete directory layout for both the **Frontend** and **Backend** applications.
 
 ---
 
-## Full Structure
+## 1. Root Workspace Layout
 
 ```
-src/
+Freelance-Marketplace/
+├── backend/                  # Java Spring Boot 3 Monolith
+├── frontend/                 # React 18 + Vite + Tailwind CSS Single Page Application
+├── docs/                     # Project Specifications & Architecture Documentation
+├── Dockerfile                # Backend Docker Container Definition
+├── docker-compose.yml        # Docker Multi-Container Orchestration (MySQL + Spring Boot + React)
+└── README.md                 # Project Overview & Setup Instructions
+```
+
+---
+
+## 2. Frontend Directory Structure (`frontend/src/`)
+
+```
+frontend/src/
 ├── app/
-│   ├── App.jsx
-│   ├── routes.jsx          # ALL routes defined here. Nowhere else.
-│   └── providers.jsx       # Wraps app in Context providers
+│   ├── App.jsx               # Application Root Component
+│   ├── routes.jsx            # Centralized React Router Configuration
+│   └── providers.jsx         # Context Providers Wrapper
 │
-├── assets/
-│   ├── images/
-│   └── icons/
+├── components/               # Cross-Feature Shared Components
+│   ├── common/               # UI Primitives: Modal, Spinner, Alert, Button
+│   └── layout/               # Navbar, Footer, Page Layout Wrappers
 │
-├── components/              # Global, reusable, feature-agnostic ONLY
-│   ├── common/               # Button, Input, Card, Modal, Badge, Spinner
-│   ├── layout/                # Navbar, Footer, Sidebar, PageLayout
-│   └── ui/                     # Low-level primitives: Dropdown, Tabs, Tooltip
+├── context/
+│   └── AuthContext.jsx       # User Authentication & JWT Context State
 │
-├── features/
+├── services/                 # Centralized HTTP & Feature Service APIs
+│   ├── apiClient.js          # Axios Instance with Request/Response Interceptors
+│   ├── authApi.js            # Registration & Authentication Calls
+│   ├── gigApi.js             # Gig Listing & Management API Calls
+│   ├── orderApi.js           # Order Checkout & Lifecycle Status Transitions
+│   ├── walletapi.js          # Wallet Balances & Top-Up Calls
+│   ├── reviewApi.js          # Freelancer/Gig Reviews API Calls
+│   ├── userApi.js            # User Profile & Admin Management Calls
+│   └── categoryApi.js        # Category CRUD API Calls
+│
+├── features/                 # Modular Feature Modules
 │   ├── auth/
-│   │   ├── pages/              # LoginPage.jsx, RegisterPage.jsx
-│   │   ├── components/         # LoginForm, RegisterForm
-│   │   ├── hooks/              # useAuth.js
-│   │   ├── services/           # authApi.js
-│   │   └── validation/         # authSchema.js
+│   │   ├── pages/            # LoginPage.jsx, RegisterPage.jsx
+│   │   └── components/       # Auth Form Components
 │   │
 │   ├── home/
-│   │   ├── pages/               # HomePage.jsx
-│   │   └── components/          # Hero, SearchBar, PopularCategories, FeaturedGigs, Testimonials
+│   │   ├── pages/            # HomePage.jsx
+│   │   └── components/       # Hero, SearchBar, CategoryGrid, FeaturedGigs
 │   │
 │   ├── gigs/
-│   │   ├── pages/                # GigListPage, GigDetailsPage, CreateGigPage
-│   │   ├── components/           # GigCard, GigFilters, GigGallery
-│   │   ├── hooks/                 # useGigs.js
-│   │   └── services/              # gigApi.js
+│   │   ├── pages/            # GigMarketplacePage.jsx, GigDetailsPage.jsx, CreateGigPage.jsx, MyGigsPage.jsx, AdminGigManagementPage.jsx
+│   │   └── components/       # GigCard, OrderCheckoutModal, GigFilters
 │   │
 │   ├── orders/
-│   │   ├── pages/
-│   │   ├── components/            # OrderCard, OrderStatusTracker
-│   │   ├── hooks/
-│   │   └── services/               # orderApi.js
+│   │   ├── pages/            # OrdersPage.jsx (Client), FreelancerOrdersPage.jsx, AdminOrderManagementPage.jsx
+│   │   └── components/       # OrderTrackerCard, OrderStatusBadge
 │   │
 │   ├── wallet/
-│   │   ├── pages/
-│   │   ├── components/             # WalletBalance, TransactionHistory
-│   │   └── services/                # walletApi.js
-│   │
-│   ├── messages/
-│   │   ├── pages/
-│   │   ├── components/              # ChatWindow, ChatList, MessageBubble
-│   │   └── services/                 # messageApi.js
+│   │   └── pages/            # WalletPage.jsx (Client/Add Funds), FreelancerWalletPage.jsx (Read-Only)
 │   │
 │   ├── reviews/
-│   │   ├── components/                # ReviewCard, ReviewForm, RatingStars
-│   │   └── services/                   # reviewApi.js
+│   │   ├── pages/            # FreelancerReviewsPage.jsx
+│   │   └── components/       # ReviewCard, ReviewRatingStars
 │   │
-│   ├── dashboard/                       # Admin dashboard
-│   │   ├── pages/
-│   │   └── components/                  # UserTable, GigModerationPanel, StatsCards
+│   ├── profile/
+│   │   ├── pages/            # ClientProfilePage.jsx, FreelancerProfilePage.jsx, AdminProfilePage.jsx, EditProfilePage.jsx
+│   │   └── components/       # ProfileHeader, SideBar, AvatarUploader
 │   │
-│   └── profile/
-│       ├── pages/
-│       └── components/                   # ProfileHeader, ProfileEditForm
+│   ├── Client/
+│   │   └── Pages/            # ClientDashboard.jsx
+│   │
+│   ├── dashboard/
+│   │   ├── pages/            # FreelancerDashboardPage.jsx, AdminDashboardPage.jsx
+│   │   └── components/       # FreelancerHeader, QuickAccessBar, FreelancerStatsGrid, RecentOrdersTable
+│   │
+│   └── categories/
+│       └── pages/            # CategoryManagementPage.jsx
 │
-├── hooks/                    # TRULY global hooks only (useDebounce, useLocalStorage)
-├── services/                  # Shared axios instance/interceptors ONLY — not feature APIs
-├── context/                    # AuthContext.jsx, ThemeContext.jsx
-├── utils/                       # formatDate.js, currencyFormatter.js, constants.js
-├── data/                         # Mock data: mockGigs.js, mockUsers.js, mockOrders.js
-└── styles/                        # index.css, Tailwind config companion styles
+└── styles/
+    └── index.css             # Design Tokens, Color System & Global Tailwind Directives
 ```
 
 ---
 
-## Core Rules
+## 3. Backend Directory Structure (`backend/src/main/java/com/freelancemarketplace/`)
 
-1. **One feature, one folder.** Everything auth-related — pages, components, hooks, API calls, validation — lives inside `features/auth/`. Same for gigs, orders, wallet, etc.
-
-2. **Global `components/` is for cross-feature reuse only.** A `Button` or `Modal` used by every feature goes in `components/common/` or `components/ui/`. A `GigCard` used only inside the gigs feature stays in `features/gigs/components/`.
-
-3. **No hardcoded data in components.** All mock data lives in `data/`. When the backend is ready, we swap the data source, not the component.
-
-4. **No direct axios calls in components.** Every API call goes through a service file — either the feature's own `services/xApi.js`, or the shared instance in the root `services/`. Components call service functions, never `axios.get(...)` directly.
-
-5. **Routes only live in `app/routes.jsx`.** Never define a `<Route>` inside a random component.
-
-6. **Keep components dumb.** UI components render props and call callbacks — they don't own business logic. Business logic belongs in hooks or services.
-
----
-
-## Rule of Thumb — "Where does this go?"
-
-Ask: **does more than one feature need this?**
-
-- **No** → it stays inside that feature's own folder.
-- **Yes** → promote it to the global `components/`, `hooks/`, or `utils/`.
-
-If you're building something and it doesn't fit cleanly into any feature (e.g. a generic loading spinner) — it belongs in `components/common/`, not inside a feature folder "just for now."
-
----
-
-## Git Workflow Reminder
-
-Branch from `develop` as `feature/<feature-name>` (e.g. `feature/gig-listing`). Since each feature has its own folder, two people working on different features should rarely touch the same file — if you find yourself editing another feature's folder, that's a signal to check in with whoever owns it first.
+```
+com.freelancemarketplace/
+├── FreelanceMarketplaceApplication.java    # Spring Boot Main Entry Class
+│
+├── config/
+│   ├── SecurityConfig.java                 # Spring Security & Password Encoder Config
+│   ├── JwtAuthenticationFilter.java        # JWT Bearer Token Processing Filter
+│   ├── JwtTokenProvider.java               # JWT Generation & Validation Utility
+│   └── WebConfig.java                      # CORS Configuration
+│
+├── common/
+│   ├── ApiResponse.java                    # Standardized API Response Envelope
+│   └── GlobalExceptionHandler.java         # Controller Advice Error Interceptor
+│
+└── modules/                                # Domain Modules
+    ├── auth/
+    │   ├── controller/AuthController.java
+    │   ├── service/AuthService.java
+    │   └── dto/LoginDTO.java, RegisterDTO.java, AuthResponseDTO.java
+    │
+    ├── user/
+    │   ├── entity/User.java, Role.java
+    │   ├── repository/UserRepository.java
+    │   ├── service/UserService.java
+    │   ├── controller/UserController.java
+    │   └── dto/UserProfileDTO.java, UserUpdateDTO.java
+    │
+    ├── category/
+    │   ├── entity/Category.java
+    │   ├── repository/CategoryRepository.java
+    │   ├── service/CategoryService.java
+    │   └── controller/CategoryController.java
+    │
+    ├── gig/
+    │   ├── entity/Gig.java
+    │   ├── repository/GigRepository.java
+    │   ├── service/GigService.java
+    │   ├── controller/GigController.java
+    │   └── dto/GigDTO.java, CreateGigDTO.java
+    │
+    ├── order/
+    │   ├── entity/Order.java, OrderStatus.java
+    │   ├── repository/OrderRepository.java
+    │   ├── service/OrderService.java
+    │   ├── controller/OrderController.java
+    │   └── dto/OrderDTO.java, CreateOrderDTO.java
+    │
+    ├── wallet/
+    │   ├── entity/Wallet.java, WalletTransaction.java, TransactionType.java, TransactionStatus.java
+    │   ├── repository/WalletRepository.java, WalletTransactionRepository.java
+    │   ├── service/WalletService.java
+    │   ├── controller/WalletController.java, TransactionController.java
+    │   └── dto/WalletDTO.java, WalletTopUpDTO.java, TransactionDTO.java
+    │
+    └── review/
+        ├── entity/Review.java
+        ├── repository/ReviewRepository.java
+        ├── service/ReviewService.java
+        ├── controller/ReviewController.java
+        └── dto/ReviewDTO.java, CreateReviewDTO.java
+```

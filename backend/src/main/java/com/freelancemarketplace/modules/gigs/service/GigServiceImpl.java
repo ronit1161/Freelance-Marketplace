@@ -1,19 +1,21 @@
 package com.freelancemarketplace.modules.gigs.service;
 
+
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import com.freelancemarketplace.modules.category.entity.Category;
-//import com.freelancemarketplace.modules.catagory.repository.CategoryRepository;
+import com.freelancemarketplace.modules.category.repository.CategoryRepository;
 import com.freelancemarketplace.modules.gigs.entity.Gigs;
 import com.freelancemarketplace.modules.gigs.mapper.GigMapper;
 import com.freelancemarketplace.modules.gigs.records.CreateGigRecord;
 import com.freelancemarketplace.modules.gigs.records.GigResponseRecord;
 import com.freelancemarketplace.modules.gigs.repository.GigRepository;
 import com.freelancemarketplace.modules.user.entity.User;
-//import com.freelancemarketplace.modules.user.repository.UserRepository;
+import com.freelancemarketplace.modules.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,8 +24,8 @@ import lombok.RequiredArgsConstructor;
 public class GigServiceImpl implements GigService {
 
     private final GigRepository gigRepository;
-    //private final UserRepository userRepository;
-    //private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
     private final GigMapper gigMapper;
 
     // get all

@@ -1,5 +1,5 @@
 import OrderCard from "./OrderCard";
-import { Loader2, AlertCircle, ShoppingBag } from "lucide-react";
+import { AlertCircle, ShoppingBag } from "lucide-react";
 
 export default function OrdersList({ isLoading, error, orders = [] }) {
     if (isLoading) {

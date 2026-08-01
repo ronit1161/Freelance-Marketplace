@@ -1,8 +1,8 @@
-import { useOrders } from "../../Hooks/useOrder";
+import { useOrders } from "../../../hooks/useOrder";
 import { useSearchParams } from "react-router-dom";
 import OrdersList from "../components/OrderList";
 import { PaginationControls } from "../../../components/common/PaginationControl";
-import ClientNavBar from "../../Client/Components/ClientNavBar";
+import ClientNavBar from "../../dashboard/components/ClientNavBar";
 import { ShoppingBag } from "lucide-react";
 
 export default function OrdersPage() {
