@@ -7,6 +7,7 @@ public record UserDetailsRecord(
 		String userName,
 		String email,
 		String fullName,
+		String profileAvatarURL,
 		UserRoles role,
 		boolean isBlocked
 // wallet id and wallet balance remaining to be added - future scope

@@ -1,6 +1,7 @@
 package com.freelancemarketplace.modules.user.mapper;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -20,4 +21,6 @@ public interface UserMapperAdmin {
 
     @Mapping(target = "isBlocked", source = "_blocked")
     UserDetailsRecord toDetails(User user);
+
+    UserDetailsRecord toDetailRecord(Optional<User> user);
 }
