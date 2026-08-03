@@ -1,14 +1,16 @@
-import { useOrders } from "../../../hooks/useOrder";
+import { useOrders } from "../../Hooks/useOrder";
 import { useSearchParams } from "react-router-dom";
 import OrdersList from "../components/OrderList";
 import { PaginationControls } from "../../../components/common/PaginationControl";
-import ClientNavBar from "../../dashboard/components/ClientNavBar";
+import ClientNavBar from "../../Client/Components/ClientNavBar";
 import { ShoppingBag } from "lucide-react";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function OrdersPage() {
+    const { user } = useAuth();
     const [searchParams, setSearchParams] = useSearchParams();
     const currentPage = Number(searchParams.get("page")) || 1;
-    const { orders, totalPages, isLoading, error } = useOrders({ page: currentPage, limit: 10 });
+    const { orders, totalPages, isLoading, error } = useOrders({ userId: user?.id, page: currentPage, limit: 10 });
     
     const handlePageChange = (newPage) => {
         window.scrollTo({ top: 0, behavior: "smooth" });

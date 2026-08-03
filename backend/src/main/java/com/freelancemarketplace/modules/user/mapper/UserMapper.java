@@ -12,15 +12,14 @@ public interface UserMapper {
 	
 	@Mapping(target = "id", ignore = true) 
     @Mapping(target = "wallet", ignore = true)
-	@Mapping(target = "active", ignore = true)
-    @Mapping(target = "_blocked", ignore = true)
-    @Mapping(target = "createdOn",ignore = true)
-	@Mapping(target = "lastUpdated",ignore = true)
-	@Mapping(target = "deleted",ignore = true)
-	User toEntity(CreateUserRecord dto);
-	
-	@Mapping(target = "isActive", source = "active")
-	@Mapping(target = "walletId", source = "wallet.id")
-	@Mapping(target = "isBlocked",source = "_blocked")
+    @Mapping(target = "active", ignore = true)
+    @Mapping(target = "blocked", ignore = true)
+    @Mapping(target = "createdOn", ignore = true)
+    @Mapping(target = "lastUpdated", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    User toEntity(CreateUserRecord dto);
+    @Mapping(target = "isActive", source = "active")
+    @Mapping(target = "walletId", source = "wallet.id")
+    @Mapping(target = "isBlocked", source = "blocked")
     UserResponseRecord toDto(User entity);
 }

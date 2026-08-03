@@ -1,162 +1,178 @@
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { getDashboardStats } from "../../../services/adminApi";
+import { getAllUsers, toggleBlockUser } from "../../../services/userApi";
 
 const Dashboard = () => {
-  // Revenue Data for Graph
-  const revenueData = [
-    { day: "01", amount: 2400 },
-    { day: "05", amount: 4100 },
-    { day: "10", amount: 7200 },
-    { day: "15", amount: 5400 },
-    { day: "20", amount: 8600 },
-    { day: "25", amount: 6400 },
-    { day: "30", amount: 9800 },
-  ];
+  const [stats, setStats] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    loadAdminData();
+  }, []);
+
+  const loadAdminData = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const [statsData, usersData] = await Promise.all([
+        getDashboardStats(),
+        getAllUsers(),
+      ]);
+      setStats(statsData);
+      setUsers(usersData || []);
+    } catch (err) {
+      console.error("Failed to load admin data", err);
+      setError(err?.message || "Failed to load dashboard data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleToggleBlock = async (userId) => {
+    try {
+      await toggleBlockUser(userId);
+      loadAdminData();
+    } catch (err) {
+      alert(err?.message || "Failed to update block status.");
+    }
+  };
 
   return (
     <div className="max-w-7xl m-auto min-h-screen bg-gray-50 p-10">
       <div className="flex justify-between items-center mb-10">
         <div>
-          <p className="uppercase text-sm text-gray-500">Executive Suite</p>
+          <p className="uppercase text-sm text-gray-500 font-semibold tracking-wider">Executive Suite</p>
+          <h1 className="text-4xl font-bold text-slate-900 mt-2">Platform Overview</h1>
+        </div>
 
-          <h1 className="text-4xl font-bold mt-2">Platform Overview</h1>
+        <div className="flex items-center gap-3">
+          <Link
+            to="/admin/categories"
+            className="px-4 py-2.5 bg-white border border-gray-200 text-slate-700 hover:bg-gray-50 font-semibold rounded-xl text-xs shadow-sm transition"
+          >
+            Categories
+          </Link>
+          <Link
+            to="/admin/gigs"
+            className="px-4 py-2.5 bg-[#0058be] hover:bg-[#004bb0] text-white font-semibold rounded-xl text-xs shadow-sm transition"
+          >
+            Manage Gigs →
+          </Link>
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-6 mb-10">
-        {/* cards */}
-        <div className=" bg-white rounded-3xl p-6 shadow-sm transition-all duration-300 cursor-pointer">
-          <p className="text-gray-500">Total Revenue</p>
-          <h2 className="text-3xl font-bold mt-2">₹1,28,430</h2>
-        </div>
+      {loading && <div className="text-center py-10 text-slate-600 font-medium">Loading Admin Dashboard...</div>}
+      {error && <div className="p-4 mb-6 bg-red-50 text-red-600 rounded-2xl border border-red-200">{error}</div>}
 
-        {/* Users */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm transition-all duration-300 cursor-pointer">
-          <p className="text-gray-500">Total Users</p>
-          <h2 className="text-3xl font-bold mt-2">1,240</h2>
-        </div>
-
-        {/* Gigs */}
-        <div className=" bg-white rounded-3xl p-6 shadow-sm transition-all duration-300 cursor-pointer">
-          <p className="text-gray-500">Active Gigs</p>
-          <h2 className="text-3xl font-bold mt-2">4,892</h2>
-        </div>
-
-        {/* Reports */}
-        <div className=" bg-white rounded-3xl p-6 shadow-sm transition-all duration-300 cursor-pointer">
-          <p className="text-gray-500">Pending Reports</p>
-          <h2 className="text-3xl font-bold mt-2">14</h2>
-        </div>
-      </div>
-
-      <div className=" bg-blue-100 rounded-3xl p-8 shadow-sm mb-10">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h2 className="text-xl font-semibold">Transaction Volume</h2>
-            <p className="text-gray-500 text-sm">Last 30 days performance</p>
-          </div>
-
-          <button className=" bg-blue-100 text-blue-600 px-4 py-2 rounded-xl">
-            Daily
-          </button>
-        </div>
-
-        {/* Graph */}
-
-        <div className="flex items-end gap-4 h-72">
-          {revenueData.map((item, index) => (
-            <div
-              key={index}
-              className="flex flex-col items-center flex-1 group"
-            >
-              {/* Amount shown on hover */}
-
-              <span className=" opacity-100 group-hover:opacity-100 transition-all duration-300 text-xs mb-2 font-semibold">
-                ₹{item.amount}
-              </span>
-
-              {/* Graph Bar */}
-
-              <div
-                className=" bg-[#0058be] w-full rounded-t-xl transition-all duration-300"
-                style={{
-                  height: `${item.amount / 40}px`,
-                }}
-              ></div>
-
-              <span className="text-sm mt-2">{item.day}</span>
+      {!loading && stats && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+          {/* Total Users */}
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+            <p className="text-gray-500 font-medium">Total Users</p>
+            <h2 className="text-3xl font-bold text-slate-900 mt-2">{stats.totalUsers}</h2>
+            <div className="text-xs text-slate-400 mt-1">
+              Clients: {stats.totalClients} | Freelancers: {stats.totalFreelancers}
             </div>
-          ))}
-        </div>
-      </div>
-
-      <div className=" bg-white rounded-3xl p-8 shadow-sm">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h2 className="text-xl font-semibold">User Management</h2>
-            <p className="text-gray-500 text-sm">Overview of platform users</p>
           </div>
 
-          <button className="bg-[#0058be] text-white px-5 py-2 rounded-xl transition-all">
-            Add User
-          </button>
+          {/* Active Gigs */}
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
+            <div>
+              <p className="text-gray-500 font-medium">Active Gigs</p>
+              <h2 className="text-3xl font-bold text-slate-900 mt-2">{stats.totalGigs}</h2>
+            </div>
+            <Link to="/admin/gigs" className="text-xs text-[#0058be] font-bold hover:underline mt-2 inline-block">
+              Manage Gigs →
+            </Link>
+          </div>
+
+          {/* Total Orders */}
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
+            <div>
+              <p className="text-gray-500 font-medium">Total Orders</p>
+              <h2 className="text-3xl font-bold text-slate-900 mt-2">{stats.totalOrders}</h2>
+            </div>
+            <Link to="/admin/orders" className="text-xs text-[#0058be] font-bold hover:underline mt-2 inline-block">
+              Manage Orders →
+            </Link>
+          </div>
+
+          {/* Categories */}
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
+            <div>
+              <p className="text-gray-500 font-medium">Categories</p>
+              <h2 className="text-3xl font-bold text-slate-900 mt-2">{stats.totalCategories}</h2>
+            </div>
+            <Link to="/admin/categories" className="text-xs text-[#0058be] font-bold hover:underline mt-2 inline-block">
+              Manage Categories →
+            </Link>
+          </div>
         </div>
+      )}
 
-        {/* Table */}
+      {!loading && (
+        <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900">User Management</h2>
+              <p className="text-gray-500 text-sm">Overview and blocking controls for platform users</p>
+            </div>
+          </div>
 
-        <table className="w-full">
-          <thead>
-            <tr className="border-b">
-              <th className="text-left py-4">User</th>
-              <th className="text-left py-4">Status</th>
-              <th className="text-left py-4">Wallet</th>
-              <th className="text-left py-4">Role</th>
-            </tr>
-          </thead>
+          {/* Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-100 text-slate-500 text-sm">
+                  <th className="text-left py-4 px-2">ID</th>
+                  <th className="text-left py-4">User</th>
+                  <th className="text-left py-4">Email</th>
+                  <th className="text-left py-4">Role</th>
+                  <th className="text-left py-4">Status</th>
+                  <th className="text-right py-4 px-2">Action</th>
+                </tr>
+              </thead>
 
-          <tbody>
-            <tr className=" border-b transition-all duration-300">
-              <td className="py-4">Adrian Vane</td>
-
-              <td>
-                <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full transition-all inline-block">
-                  Active
-                </span>
-              </td>
-
-              <td>₹4,280</td>
-
-              <td>Freelancer</td>
-            </tr>
-
-            <tr className="border-b transition-all duration-300">
-              <td className="py-4">Sarah Locke</td>
-
-              <td>
-                <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full">
-                  Pending
-                </span>
-              </td>
-
-              <td>₹0</td>
-
-              <td>Client</td>
-            </tr>
-
-            <tr className="transition-all duration-300">
-              <td className="py-4">Marcus Kane</td>
-
-              <td>
-                <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full">
-                  Active
-                </span>
-              </td>
-
-              <td>₹12,450</td>
-
-              <td>Admin</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+              <tbody>
+                {users.map((u) => (
+                  <tr key={u.id} className="border-b border-gray-50 transition-all hover:bg-gray-50/50">
+                    <td className="py-4 px-2 font-mono text-sm text-slate-600">#{u.id}</td>
+                    <td className="py-4 font-semibold text-slate-900">{u.fullName} ({u.userName})</td>
+                    <td className="py-4 text-slate-600 text-sm">{u.email}</td>
+                    <td className="py-4 text-sm font-medium text-slate-700">{u.role}</td>
+                    <td>
+                      <span
+                        className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                          u.isBlocked
+                            ? "bg-red-100 text-red-700"
+                            : "bg-emerald-100 text-emerald-700"
+                        }`}
+                      >
+                        {u.isBlocked ? "Blocked" : "Active"}
+                      </span>
+                    </td>
+                    <td className="text-right py-4 px-2">
+                      <button
+                        onClick={() => handleToggleBlock(u.id)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition ${
+                          u.isBlocked
+                            ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                            : "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
+                        }`}
+                      >
+                        {u.isBlocked ? "Unblock" : "Block User"}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -3,80 +3,86 @@ import { loginUser as apiLoginUser, registerUser as apiRegisterUser } from "../s
 
 const AuthContext = createContext(null);
 
-const SESSION_KEY = "auth_user";
-const TOKEN_KEY = "jwt_token";
+const SESSION_USER_KEY = "auth_user";
+const SESSION_TOKEN_KEY = "jwt_token";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     try {
-      const savedSession = localStorage.getItem(SESSION_KEY);
-      return savedSession ? JSON.parse(savedSession) : null;
+      const savedUser = localStorage.getItem(SESSION_USER_KEY);
+      return savedUser ? JSON.parse(savedUser) : null;
     } catch (e) {
-      console.error("Failed to parse auth session", e);
+      console.error("Failed to parse auth user session", e);
       return null;
     }
   });
 
   const [token, setToken] = useState(() => {
-    return localStorage.getItem(TOKEN_KEY) || localStorage.getItem("token") || null;
+    return localStorage.getItem(SESSION_TOKEN_KEY) || null;
   });
 
   const login = async (credentials) => {
-    const data = await apiLoginUser(credentials);
-    const jwtToken = data?.token || data?.jwt || data?.accessToken;
-    const userData = data?.user || {
-      id: data?.id,
-      email: data?.email || credentials.email,
-      name: data?.fullName || data?.name || "User",
-      role: (data?.role || "CLIENT").toUpperCase(),
-    };
+    // credentials: { userNameOrEmail, password }
+    const responseData = await apiLoginUser(credentials);
+    const jwtToken = responseData.token;
+    const userData = responseData.user;
 
-    if (jwtToken) {
-      setToken(jwtToken);
-      localStorage.setItem(TOKEN_KEY, jwtToken);
-    }
+    setToken(jwtToken);
     setUser(userData);
-    localStorage.setItem(SESSION_KEY, JSON.stringify(userData));
+
+    localStorage.setItem(SESSION_TOKEN_KEY, jwtToken);
+    localStorage.setItem(SESSION_USER_KEY, JSON.stringify(userData));
+
     return userData;
   };
 
   const register = async (formData) => {
-    const data = await apiRegisterUser(formData);
-    const jwtToken = data?.token || data?.jwt || data?.accessToken;
-    const userData = data?.user || {
-      id: data?.id,
-      email: formData.email,
-      name: formData.name || formData.fullName,
-      role: (formData.role || "CLIENT").toUpperCase(),
-    };
-
-    if (jwtToken) {
-      setToken(jwtToken);
-      localStorage.setItem(TOKEN_KEY, jwtToken);
-    }
-    setUser(userData);
-    localStorage.setItem(SESSION_KEY, JSON.stringify(userData));
-    return data;
+    const userData = await apiRegisterUser(formData);
+    
+    // Auto-login after registration
+    return await login({
+      userNameOrEmail: formData.userName || formData.email,
+      password: formData.password,
+    });
   };
 
   const logout = () => {
     setUser(null);
     setToken(null);
-    localStorage.removeItem(SESSION_KEY);
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem("token");
+    localStorage.removeItem(SESSION_USER_KEY);
+    localStorage.removeItem(SESSION_TOKEN_KEY);
   };
 
-  const isAuthenticated = !!(user && (token || localStorage.getItem(TOKEN_KEY) || localStorage.getItem("token")));
+  const isAuthenticated = () => {
+    return !!user && !!localStorage.getItem(SESSION_TOKEN_KEY);
+  };
+
+  const hasRole = (requiredRole) => {
+    if (!user || !user.role) return false;
+    return user.role.toUpperCase() === requiredRole.toUpperCase();
+  };
+
+  const role = user?.role ? user.role.toUpperCase() : null;
 
   return (
-    <AuthContext.Provider value={{ user, token, isAuthenticated, login, register, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        role,
+        isAuthenticated: isAuthenticated(),
+        hasRole,
+        login,
+        register,
+        logout,
+        setUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {

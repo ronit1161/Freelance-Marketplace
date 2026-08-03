@@ -1,3 +1,5 @@
+// components/PaginationControls.jsx
+import React from "react";
 import { generatePaginationRange } from "../../utils/pagination";
 
 /**

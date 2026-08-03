@@ -1,8 +1,19 @@
 import { Star, ArrowRight } from 'lucide-react';
 
 export default function GigCard({ gig, onSelect }) {
+  // Fallback default gig object if none is passed (e.g. on freelancer dashboard)
+  const defaultGig = {
+    id: 'GIG-placeholder',
+    title: 'I will build a premium React Website',
+    freelancer: 'Ronit',
+    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&h=100&q=80',
+    rate: '₹5,000',
+    rating: '4.9 (12 reviews)',
+    tags: ['React', 'Web Dev'],
+    description: 'Expert React developer building fast, responsive, and beautiful SPA websites.'
+  };
 
-  const currentGig = gig ;
+  const currentGig = gig || defaultGig;
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm flex flex-col justify-between transition hover:shadow-md h-full">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getOrders } from "../services/orderApi";
+import { getOrders } from "../Services/orderApi";
 
 export function useOrders({ userId, limit = 10, page = 1 } = {}) {
   const [orders, setOrders] = useState([]);

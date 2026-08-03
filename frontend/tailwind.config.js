@@ -4,10 +4,6 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: {
-          DEFAULT: '#0058be',
-          hover: '#0047a0',
-        },
         brand: {
           blue: '#0058be',
           'blue-hover': '#0047a0',

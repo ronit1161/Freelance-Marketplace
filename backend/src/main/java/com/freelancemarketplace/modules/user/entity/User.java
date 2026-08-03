@@ -26,16 +26,16 @@ import lombok.Setter;
 @AttributeOverride(name = "id", column = @Column(name = "user_id"))
 public class User extends BaseEntity {
 
-	@Column(name = "user_name", length = 30, nullable = false, unique = true)
+	@Column(name = "user_name", length = 100, nullable = false, unique = true)
 	private String userName;
 
-	@Column(length = 30, nullable = false, unique = true)
+	@Column(length = 100, nullable = false, unique = true)
 	private String email;
 
-	@Column(name = "password", length = 30, nullable = false)
+	@Column(name = "password", length = 255, nullable = false)
 	private String hashedPassword;
 
-	@Column(name = "full_name", length = 30, nullable = false)
+	@Column(name = "full_name", length = 100, nullable = false)
 	private String fullName;
 
 	@Column(name = "profile_avatar_url")
@@ -60,7 +60,7 @@ public class User extends BaseEntity {
 	private Integer experience;
 
 	@Column(name = "is_blocked")
-	private boolean is_blocked = false;
+	private boolean isBlocked = false;
 
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "wallet_id", unique = true, nullable = false)

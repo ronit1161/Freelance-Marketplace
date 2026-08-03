@@ -50,12 +50,13 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 // Public Endpoints
-                .requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/api/auth/**", "/auth/**", "/error").permitAll()
+                .requestMatchers("/api/users/register", "/users/register").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
-                .requestMatchers(HttpMethod.GET, "/gigs/**", "/categories/**", "/reviews/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/gigs/**", "/gigs/**", "/api/categories/**", "/categories/**", "/api/reviews/**", "/reviews/**").permitAll()
                 
                 // Admin Endpoints
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/admin/**", "/admin/**").hasRole("ADMIN")
                 
                 // Secured Endpoints
                 .anyRequest().authenticated()

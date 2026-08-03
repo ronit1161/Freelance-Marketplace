@@ -13,6 +13,7 @@ import com.freelancemarketplace.modules.user.entity.User;
 import com.freelancemarketplace.modules.user.mapper.UserMapper;
 import com.freelancemarketplace.modules.user.record.CreateUserRecord;
 import com.freelancemarketplace.modules.user.repository.UserRepository;
+import com.freelancemarketplace.modules.wallet.entity.Wallet;
 import com.freelancemarketplace.security.JwtUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -20,33 +21,42 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
-	
-	private final UserRepository userRepository;
+
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final UserMapper userMapper;
-    
+
     @Override
     @Transactional
     public AuthResponseRecord register(CreateUserRecord dto) {
         if (userRepository.existsByEmail(dto.email())) {
             throw new RuntimeException("Email is already in use");
         }
+
         User user = userMapper.toEntity(dto);
+        if (user.getUserName() == null || user.getUserName().isBlank()) {
+            user.setUserName(dto.email().split("@")[0] + "_" + System.currentTimeMillis() % 10000);
+        }
         user.setHashedPassword(passwordEncoder.encode(dto.hashedPassword()));
+
+        // Initialize Wallet
+        Wallet wallet = new Wallet();
+        user.setWallet(wallet);
+
         User savedUser = userRepository.save(user);
+
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(dto.email(), dto.hashedPassword())
-        );
+                new UsernamePasswordAuthenticationToken(dto.email(), dto.hashedPassword()));
         String token = jwtUtils.generateToken(authentication);
         return new AuthResponseRecord(token, userMapper.toDto(savedUser));
     }
+
     @Override
     public AuthResponseRecord login(AuthRequestRecord dto) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(dto.email(), dto.password())
-        );
+                new UsernamePasswordAuthenticationToken(dto.email(), dto.password()));
         String token = jwtUtils.generateToken(authentication);
         User user = userRepository.findByEmail(dto.email())
                 .orElseThrow(() -> new RuntimeException("User not found"));

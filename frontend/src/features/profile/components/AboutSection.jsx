@@ -1,21 +1,21 @@
+import React from 'react';
+import { useAuth } from '../../../context/AuthContext';
 
 const AboutSection = () => {
-    return (
-        <section className="mt-10 bg-white p-8 rounded-2xl shadow-sm">
+    const { user } = useAuth();
+    const bio = user?.bioData || "No biography provided yet. Edit your profile to tell clients about your background and expertise.";
 
-            <h2 className="text-2xl font-bold mb-4">
+    return (
+        <section className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 space-y-3">
+            <h2 className="text-xl font-bold text-slate-900">
                 About Me
             </h2>
 
-            <p className="text-gray-600 leading-8">
-                Full Stack Developer specializing in
-                React, Next.js, Node.js, Express and MongoDB.
-                I build scalable web applications,
-                dashboards and SaaS products.
+            <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-line">
+                {bio}
             </p>
-
         </section>
-    )
-}
+    );
+};
 
-export default AboutSection
+export default AboutSection;

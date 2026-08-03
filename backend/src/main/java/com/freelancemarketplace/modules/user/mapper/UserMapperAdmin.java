@@ -13,11 +13,11 @@ import com.freelancemarketplace.modules.user.entity.User;
 public interface UserMapperAdmin {
 
     @Mapping(target = "isActive", source = "active")
-    @Mapping(target = "isBlocked", source = "_blocked")
+    @Mapping(target = "isBlocked", source = "blocked")
     UserSummaryRecord toSummary(User user);
 
     List<UserSummaryRecord> toSummaryList(List<User> users);
 
-    @Mapping(target = "isBlocked", source = "_blocked")
+    @Mapping(target = "isBlocked", source = "blocked")
     UserDetailsRecord toDetails(User user);
 }

@@ -1,103 +1,135 @@
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../../../context/AuthContext";
-import HireCard from "../components/HireCard";
-import { Building2, MapPin, Calendar, Star, CheckCircle2, Briefcase } from "lucide-react";
+import { getClientOrders } from "../../../services/orderApi";
+import { getWalletByUserId } from "../../../services/walletApi";
+import { Link } from "react-router-dom";
+import { User, Mail, Wallet, ShoppingBag, Edit3, ArrowRight, ShieldCheck } from "lucide-react";
 
 export default function ClientProfile() {
     const { user } = useAuth();
-    const clientName = user?.name || user?.fullName || "ABC Technologies";
-    const clientEmail = user?.email || "contact@abctech.com";
+    const [orders, setOrders] = useState([]);
+    const [wallet, setWallet] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (user?.id) {
+            Promise.all([
+                getClientOrders(user.id).catch(() => []),
+                getWalletByUserId(user.id).catch(() => null),
+            ])
+                .then(([ordersData, walletData]) => {
+                    setOrders(ordersData || []);
+                    setWallet(walletData);
+                })
+                .finally(() => setLoading(false));
+        } else {
+            setLoading(false);
+        }
+    }, [user?.id]);
+
+    const avatar = user?.profileAvatarURL || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&h=200&q=80";
 
     return (
-        <div className="min-h-screen bg-gray-50/50 pb-12 animate-in fade-in duration-200">
-            {/* Cover Banner */}
-            <div className="h-48 bg-gradient-to-r from-[#0058be] to-blue-700"></div>
+        <div className="min-h-screen bg-gray-50/50 py-10 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-6xl mx-auto space-y-8">
+                {/* Profile Banner Card */}
+                <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 flex flex-col md:flex-row items-center md:items-start gap-8">
+                    <img
+                        src={avatar}
+                        alt={user?.fullName || "Client"}
+                        className="w-32 h-32 rounded-2xl object-cover border-4 border-gray-50 shadow-md"
+                    />
 
-            <div className="max-w-7xl mx-auto px-6">
-                {/* Profile Card Header */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8 -mt-16 relative">
-                    <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
-                        <div className="w-28 h-28 rounded-2xl bg-blue-100 border-4 border-white shadow-md flex items-center justify-center text-[#0058be] font-bold text-3xl shrink-0">
-                            {clientName[0]?.toUpperCase()}
+                    <div className="flex-1 text-center md:text-left space-y-3">
+                        <div className="flex flex-col md:flex-row md:items-center gap-3">
+                            <h1 className="text-3xl font-extrabold text-slate-900">
+                                {user?.fullName || "Client Profile"}
+                            </h1>
+                            <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider self-center md:self-auto border border-emerald-100">
+                                <ShieldCheck size={12} /> {user?.role || "CLIENT"}
+                            </span>
                         </div>
 
-                        <div className="flex-1 text-center md:text-left">
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                <div>
-                                    <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-                                        {clientName}
-                                    </h1>
-                                    <p className="text-gray-500 font-medium text-sm mt-1 flex items-center justify-center md:justify-start gap-1.5">
-                                        <Building2 size={16} /> <span>Enterprise Client & Product Studio</span>
-                                    </p>
-                                </div>
-                                <span className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold px-3 py-1.5 rounded-xl self-center md:self-start flex items-center gap-1">
-                                    <CheckCircle2 size={14} /> Verified Enterprise Account
-                                </span>
-                            </div>
+                        <p className="text-sm font-medium text-slate-500">
+                            @{user?.userName || "client"} • {user?.email}
+                        </p>
 
-                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 mt-6 text-xs font-semibold text-gray-600 border-t pt-4 border-gray-100">
-                                <span className="flex items-center gap-1.5"><Star size={15} className="text-amber-500 fill-amber-500" /> 4.9 Client Rating</span>
-                                <span className="flex items-center gap-1.5"><MapPin size={15} className="text-gray-400" /> Mumbai, India</span>
-                                <span className="flex items-center gap-1.5"><Calendar size={15} className="text-gray-400" /> Member Since 2024</span>
-                                <span className="flex items-center gap-1.5"><Briefcase size={15} className="text-gray-400" /> {clientEmail}</span>
-                            </div>
+                        <p className="text-slate-600 text-sm max-w-2xl">
+                            {user?.bioData || "No company bio specified yet."}
+                        </p>
+
+                        <div className="pt-2">
+                            <Link
+                                to="/freelancer/edit-profile"
+                                className="inline-flex items-center gap-2 bg-[#0058be] hover:bg-[#004bb0] text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition shadow-sm"
+                            >
+                                <Edit3 size={16} />
+                                <span>Edit Profile</span>
+                            </Link>
                         </div>
                     </div>
                 </div>
 
-                {/* Main Content Layout */}
-                <div className="grid lg:grid-cols-3 gap-8 mt-8">
-                    {/* Left Column */}
-                    <div className="lg:col-span-2 space-y-8">
-                        {/* About Section */}
-                        <section className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 space-y-3">
-                            <h2 className="text-lg font-bold text-slate-900">
-                                About Organization
-                            </h2>
-                            <p className="text-gray-600 text-sm leading-relaxed">
-                                We design and build enterprise-grade web and mobile SaaS products. We regularly partner with top freelance full-stack developers, UI/UX architects, and DevOps engineers for both short-term contracts and long-term retainer projects.
-                            </p>
-                        </section>
-
-                        {/* Recent Hires */}
-                        <section className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 space-y-4">
-                            <h2 className="text-lg font-bold text-slate-900">
-                                Recent Freelancer Collaborations
-                            </h2>
-                            <div className="space-y-3">
-                                <HireCard name="Elena Rostova" role="Senior 3D & UI Architect" />
-                                <HireCard name="John Smith" role="Full Stack React Engineer" />
-                                <HireCard name="Sarah Wilson" role="Product Designer" />
+                {/* Metrics & Details Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Wallet Summary */}
+                    <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-4">
+                        <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                            <div className="flex items-center gap-2">
+                                <Wallet className="text-[#0058be]" size={20} />
+                                <h3 className="font-bold text-slate-900 text-base">Wallet Balance</h3>
                             </div>
-                        </section>
+                            <Link to="/client/wallet" className="text-xs font-bold text-[#0058be] hover:underline flex items-center gap-1">
+                                Manage <ArrowRight size={12} />
+                            </Link>
+                        </div>
+                        <div>
+                            <p className="text-xs text-slate-500">Available Coins</p>
+                            <p className="text-2xl font-bold text-slate-900 mt-0.5">
+                                ₹{wallet?.availableBalance ? Number(wallet.availableBalance).toLocaleString("en-IN") : "0"}
+                            </p>
+                        </div>
+                        <div>
+                            <p className="text-xs text-slate-500">Escrow Held</p>
+                            <p className="text-base font-bold text-amber-600 mt-0.5">
+                                ₹{wallet?.heldBalance ? Number(wallet.heldBalance).toLocaleString("en-IN") : "0"}
+                            </p>
+                        </div>
                     </div>
 
-                    {/* Right Column / Sidebar */}
-                    <div className="space-y-6">
-                        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 space-y-4">
-                            <h3 className="font-bold text-base text-slate-900">
-                                Company Snapshot
-                            </h3>
-                            <div className="space-y-3 text-xs font-medium text-gray-600">
-                                <p className="flex items-center gap-2">🏢 Company Size: 50-100 employees</p>
-                                <p className="flex items-center gap-2">🌐 Work Culture: 100% Remote</p>
-                                <p className="flex items-center gap-2">📋 Projects Posted: 24 Gigs Funded</p>
-                                <p className="flex items-center gap-2">✅ Milestone Completion Rate: 98%</p>
+                    {/* Orders Overview */}
+                    <div className="md:col-span-2 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-4">
+                        <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                            <div className="flex items-center gap-2">
+                                <ShoppingBag className="text-[#0058be]" size={20} />
+                                <h3 className="font-bold text-slate-900 text-base">Active Orders</h3>
                             </div>
+                            <Link to="/client/orders" className="text-xs font-bold text-[#0058be] hover:underline flex items-center gap-1">
+                                View All ({orders.length}) <ArrowRight size={12} />
+                            </Link>
                         </div>
 
-                        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 space-y-4">
-                            <h3 className="font-bold text-base text-slate-900">
-                                Core Tech Ecosystem
-                            </h3>
-                            <div className="flex flex-wrap gap-2">
-                                {["React", "Node.js", "TypeScript", "Tailwind CSS", "AWS", "PostgreSQL"].map((tech) => (
-                                    <span key={tech} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-bold">
-                                        {tech}
-                                    </span>
+                        {loading && <div className="text-center py-6 text-slate-500 text-sm">Loading orders...</div>}
+
+                        {!loading && orders.length === 0 && (
+                            <div className="text-center py-6 text-slate-500 text-sm">No active orders placed yet.</div>
+                        )}
+
+                        {!loading && orders.length > 0 && (
+                            <div className="divide-y divide-gray-100">
+                                {orders.slice(0, 3).map(o => (
+                                    <div key={o.id} className="py-3 flex justify-between items-center text-sm">
+                                        <div>
+                                            <p className="font-bold text-slate-900">#{o.id} - {o.gigTitle || "Gig Service"}</p>
+                                            <p className="text-xs text-slate-500">Freelancer: {o.freelancerName || "Freelancer"}</p>
+                                        </div>
+                                        <span className="font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg text-xs">
+                                            {o.status}
+                                        </span>
+                                    </div>
                                 ))}
                             </div>
-                        </div>
+                        )}
                     </div>
                 </div>
             </div>

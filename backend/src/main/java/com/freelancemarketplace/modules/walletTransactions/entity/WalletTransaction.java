@@ -21,7 +21,7 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @Table(name="wallet_transactions")
-@AttributeOverride(name="id",column = @Column(name="wallet_transaction_id"))
+@AttributeOverride(name = "id", column = @Column(name = "wallet_transaction_id"))
 public class WalletTransaction extends BaseEntity{
 	
 	@ManyToOne(fetch = FetchType.LAZY,optional =false )
