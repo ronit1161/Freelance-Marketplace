@@ -7,4 +7,7 @@ import com.freelancemarketplace.modules.admin.record.GigSummaryRecord;
 public interface AdminGigService {
     List<GigSummaryRecord> getAllGigs();
 
+    GigSummaryRecord getGig(Long id);
+
+    GigSummaryRecord deleteGig(Long id);
 }

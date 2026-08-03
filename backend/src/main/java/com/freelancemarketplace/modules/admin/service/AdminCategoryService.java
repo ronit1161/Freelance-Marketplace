@@ -1,11 +1,13 @@
 package com.freelancemarketplace.modules.admin.service;
 
-import org.springframework.stereotype.Service;
+import java.util.List;
 
-import lombok.RequiredArgsConstructor;
+import com.freelancemarketplace.modules.admin.record.CategoryRecord;
+import com.freelancemarketplace.modules.category.records.CreateCategoryRecord;
 
-@Service
-@RequiredArgsConstructor
-public class AdminCategoryService {
+public interface AdminCategoryService {
+    List<CategoryRecord> getAllCategories();
+
+    void createCategory(CreateCategoryRecord record);
 
 }

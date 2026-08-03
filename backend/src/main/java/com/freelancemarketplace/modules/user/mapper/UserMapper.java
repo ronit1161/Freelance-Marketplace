@@ -1,8 +1,13 @@
 package com.freelancemarketplace.modules.user.mapper;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import com.freelancemarketplace.modules.admin.record.UserDetailsRecord;
+import com.freelancemarketplace.modules.admin.record.UserSummaryRecord;
 import com.freelancemarketplace.modules.user.entity.User;
 import com.freelancemarketplace.modules.user.record.CreateUserRecord;
 import com.freelancemarketplace.modules.user.record.UserResponseRecord;
@@ -23,4 +28,17 @@ public interface UserMapper {
 	@Mapping(target = "walletId", source = "wallet.id")
 	@Mapping(target = "isBlocked",source = "_blocked")
     UserResponseRecord toDto(User entity);
+
+    @Mapping(target = "isActive", source = "active")
+    @Mapping(target = "isBlocked", source = "_blocked")
+    UserSummaryRecord toSummary(User user);
+
+    List<UserSummaryRecord> toSummaryList(List<User> users);
+
+    @Mapping(target = "isBlocked", source = "_blocked")
+    UserDetailsRecord toDetails(User user);
+
+    default UserDetailsRecord toDetailRecord(Optional<User> user) {
+        return user.map(this::toDetails).orElse(null);
+    }
 }

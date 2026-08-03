@@ -9,7 +9,7 @@ import com.freelancemarketplace.modules.admin.record.UserDetailsRecord;
 import com.freelancemarketplace.modules.admin.record.UserSummaryRecord;
 import com.freelancemarketplace.modules.admin.service.AdminUserService;
 import com.freelancemarketplace.modules.user.entity.User;
-import com.freelancemarketplace.modules.user.mapper.UserMapperAdmin;
+import com.freelancemarketplace.modules.user.mapper.UserMapper;
 import com.freelancemarketplace.modules.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,12 +20,12 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     private final UserRepository userRepository;
 
-    private final UserMapperAdmin userMapperAdmin;
+    private final UserMapper userMapper;
 
     @Override
     public List<UserSummaryRecord> getAllUsers() {
         List<User> users = userRepository.findAll();
-        return userMapperAdmin.toSummaryList(users);
+        return userMapper.toSummaryList(users);
 
     }
 
@@ -33,7 +33,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     public UserDetailsRecord getUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-        return userMapperAdmin.toDetails(user);
+        return userMapper.toDetails(user);
     }
 
     @Override

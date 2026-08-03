@@ -15,6 +15,8 @@ import com.freelancemarketplace.modules.user.record.CreateUserRecord;
 import com.freelancemarketplace.modules.user.repository.UserRepository;
 import com.freelancemarketplace.security.JwtUtils;
 
+import com.freelancemarketplace.modules.wallet.entity.Wallet;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -35,6 +37,9 @@ public class AuthServiceImpl implements AuthService {
         }
         User user = userMapper.toEntity(dto);
         user.setHashedPassword(passwordEncoder.encode(dto.hashedPassword()));
+        if (user.getWallet() == null) {
+            user.setWallet(new Wallet());
+        }
         User savedUser = userRepository.save(user);
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(dto.email(), dto.hashedPassword())

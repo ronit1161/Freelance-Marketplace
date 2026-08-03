@@ -6,4 +6,6 @@ import com.freelancemarketplace.modules.gigs.entity.Gigs;
 
 public interface GigRepository extends JpaRepository<Gigs, Long> {
 
+    long countByCategoryIdAndIsDeletedFalse(Long categoryId);
+
 }

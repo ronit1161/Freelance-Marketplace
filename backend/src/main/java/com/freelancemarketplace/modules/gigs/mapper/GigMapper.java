@@ -1,8 +1,11 @@
 package com.freelancemarketplace.modules.gigs.mapper;
 
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import com.freelancemarketplace.modules.admin.record.GigSummaryRecord;
 import com.freelancemarketplace.modules.gigs.entity.Gigs;
 import com.freelancemarketplace.modules.gigs.records.CreateGigRecord;
 import com.freelancemarketplace.modules.gigs.records.GigResponseRecord;
@@ -25,5 +28,9 @@ public interface GigMapper {
     @Mapping(target = "freelancerId", source = "freelancer.id")
     @Mapping(target = "categoryId", source = "category.id")
     GigResponseRecord toDto(Gigs entity);
+
+    GigSummaryRecord toSummary(Gigs gig);
+
+    List<GigSummaryRecord> toSummaryList(List<Gigs> gigs);
 
 }

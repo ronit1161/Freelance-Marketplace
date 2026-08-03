@@ -1,7 +1,10 @@
 package com.freelancemarketplace.modules.admin.service;
 
-import com.freelancemarketplace.modules.admin.record.DashboardRecord;
+import java.util.List;
+
+import com.freelancemarketplace.modules.admin.record.Graph;
 
 public interface DashboardService {
-    DashboardRecord getDashboard();
+
+    List<Graph> getRevenueGraph();
 }
