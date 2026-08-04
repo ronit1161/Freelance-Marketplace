@@ -32,7 +32,7 @@ public class User extends BaseEntity {
 	@Column(length = 30, nullable = false, unique = true)
 	private String email;
 
-	@Column(name = "password", length = 30, nullable = false)
+	@Column(name = "password", nullable = false)
 	private String hashedPassword;
 
 	@Column(name = "full_name", length = 30, nullable = false)

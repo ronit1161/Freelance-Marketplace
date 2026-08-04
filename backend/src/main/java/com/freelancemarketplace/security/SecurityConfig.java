@@ -52,7 +52,8 @@ public class SecurityConfig {
                 // Public Endpoints
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
-                .requestMatchers(HttpMethod.GET, "/gigs/**", "/categories/**", "/reviews/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/gigs/**", "/categories/**", "/reviews/**").permitAll().
+                requestMatchers(HttpMethod.POST,"/users").permitAll()
                 
                 // Admin Endpoints
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
