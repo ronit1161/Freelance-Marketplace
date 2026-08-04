@@ -15,6 +15,8 @@ import com.freelancemarketplace.modules.gigs.records.CreateGigRecord;
 import com.freelancemarketplace.modules.gigs.records.GigResponseRecord;
 import com.freelancemarketplace.modules.gigs.repository.GigRepository;
 import com.freelancemarketplace.modules.user.entity.User;
+import com.freelancemarketplace.common.exceptions.ResourceNotFoundException;
+import com.freelancemarketplace.enums.ErrorCode;
 import com.freelancemarketplace.modules.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -31,27 +33,28 @@ public class GigServiceImpl implements GigService {
     // get all
     @Override
     public List<GigResponseRecord> getAllGigs() {
+        return gigRepository.findByIsDeletedFalse()
+                .stream()
+                .map(gigMapper::toDto)
+                .toList();
+    }
 
-        List<Gigs> gigs = gigRepository.findAll();
-        List<GigResponseRecord> responseList = new ArrayList<>();
-        for (Gigs gig : gigs) {
-            if (!gig.isDeleted()) {
-                GigResponseRecord dto = gigMapper.toDto(gig);
-                responseList.add(dto);
-            }
-        }
-
-        return responseList;
+    @Override
+    public List<GigResponseRecord> getGigsByFreelancerId(Long freelancerId) {
+        return gigRepository.findByFreelancerIdAndIsDeletedFalse(freelancerId)
+                .stream()
+                .map(gigMapper::toDto)
+                .toList();
     }
 
     // get by id
     @Override
     public GigResponseRecord getGigById(Long id) {
         Gigs gig = gigRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Gig not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Gig not found with ID: " + id, ErrorCode.GIG_NOT_FOUND));
 
         if (gig.isDeleted()) {
-            throw new RuntimeException("Gig is deleted");
+            throw new ResourceNotFoundException("Gig is deleted with ID: " + id, ErrorCode.GIG_NOT_FOUND);
         }
 
         return gigMapper.toDto(gig);

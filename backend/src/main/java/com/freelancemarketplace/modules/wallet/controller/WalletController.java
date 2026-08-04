@@ -19,6 +19,9 @@ import com.freelancemarketplace.modules.walletTransactions.record.WalletTransact
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.freelancemarketplace.security.CustomUserDetails;
+
 @RestController
 @RequestMapping("/wallet")
 @RequiredArgsConstructor
@@ -26,28 +29,43 @@ public class WalletController {
 	
 	private final WalletService walletService;
 	
+    // GET /wallet/me
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<WalletResponseRecord>> getMyWallet(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        WalletResponseRecord wallet = walletService.getWalletByUserId(userDetails.getId());
+        return ResponseEntity.ok(ApiResponse.success(wallet));
+    }
+
     // GET /wallet?userId=1
     @GetMapping
     public ResponseEntity<ApiResponse<WalletResponseRecord>> getWallet(
-            @RequestParam Long userId) {
-        WalletResponseRecord wallet = walletService.getWalletByUserId(userId);
+            @RequestParam(required = false) Long userId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long effectiveUserId = (userId != null) ? userId : (userDetails != null ? userDetails.getId() : null);
+        WalletResponseRecord wallet = walletService.getWalletByUserId(effectiveUserId);
         return ResponseEntity.ok(ApiResponse.success(wallet));
-    }
-    
-    // GET /wallet/transactions?userId=1
-    @GetMapping("/transactions")
-    public ResponseEntity<ApiResponse<List<WalletTransactionResponseRecord>>> getWalletTransactions(
-            @RequestParam Long userId) {
-        List<WalletTransactionResponseRecord> transactions = walletService.getWalletTransactions(userId);
-        return ResponseEntity.ok(ApiResponse.success(transactions));
     }
     
     // POST /wallet/add
     @PostMapping("/add")
     public ResponseEntity<ApiResponse<WalletResponseRecord>> addMoney(
-            @Valid @RequestBody AddMoneyRecord dto) {
-        WalletResponseRecord updatedWallet = walletService.addMoney(dto);
+            @Valid @RequestBody AddMoneyRecord dto,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long effectiveUserId = (userDetails != null) ? userDetails.getId() : dto.userId();
+        AddMoneyRecord effectiveDto = new AddMoneyRecord(effectiveUserId, dto.amount());
+        WalletResponseRecord updatedWallet = walletService.addMoney(effectiveDto);
         return ResponseEntity.ok(ApiResponse.success(updatedWallet, "Money added successfully"));
     }
 
+    // POST /wallet/withdraw
+    @PostMapping("/withdraw")
+    public ResponseEntity<ApiResponse<WalletResponseRecord>> withdrawMoney(
+            @Valid @RequestBody AddMoneyRecord dto,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long effectiveUserId = (userDetails != null) ? userDetails.getId() : dto.userId();
+        AddMoneyRecord effectiveDto = new AddMoneyRecord(effectiveUserId, dto.amount());
+        WalletResponseRecord updatedWallet = walletService.withdrawMoney(effectiveDto);
+        return ResponseEntity.ok(ApiResponse.success(updatedWallet, "Money withdrawn successfully"));
+    }
 }

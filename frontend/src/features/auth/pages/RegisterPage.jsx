@@ -41,6 +41,7 @@ function RegisterPage() {
       const userRole = user?.role?.toUpperCase() || role.toUpperCase();
       if (userRole === "CLIENT") navigate("/client");
       else if (userRole === "FREELANCER") navigate("/freelancer");
+      else if (userRole === "ADMIN") navigate("/admin");
       else navigate("/");
     } catch (err) {
       setLoading(false);

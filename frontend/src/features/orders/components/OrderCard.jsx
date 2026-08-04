@@ -95,6 +95,49 @@ export default function OrderCard({ order }) {
                 </p>
             </section>
 
+            {/* Action Triggers */}
+            {order.status === "IN_PROGRESS" && (
+                <div className="pt-2">
+                    <button
+                        onClick={async () => {
+                            if (window.confirm(`Accept delivery and release payment for Order #${order.id}?`)) {
+                                try {
+                                    const { completeOrder } = await import("../../../services/orderApi");
+                                    await completeOrder(order.id);
+                                    window.location.reload();
+                                } catch (e) {
+                                    alert(e.message || "Failed to complete order.");
+                                }
+                            }
+                        }}
+                        className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition"
+                    >
+                        Accept Delivery & Release Escrow
+                    </button>
+                </div>
+            )}
+
+            {order.status === "PENDING" && (
+                <div className="pt-2">
+                    <button
+                        onClick={async () => {
+                            if (window.confirm(`Are you sure you want to cancel Order #${order.id}? Funds will be refunded to your wallet.`)) {
+                                try {
+                                    const { cancelOrder } = await import("../../../services/orderApi");
+                                    await cancelOrder(order.id);
+                                    window.location.reload();
+                                } catch (e) {
+                                    alert(e.message || "Failed to cancel order.");
+                                }
+                            }
+                        }}
+                        className="w-full py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-bold text-xs rounded-xl transition"
+                    >
+                        Cancel Order
+                    </button>
+                </div>
+            )}
+
             {/* Timestamps */}
             <footer className="flex flex-wrap items-center justify-between text-[11px] text-gray-400 pt-2 border-t border-gray-100 gap-2">
                 <div>

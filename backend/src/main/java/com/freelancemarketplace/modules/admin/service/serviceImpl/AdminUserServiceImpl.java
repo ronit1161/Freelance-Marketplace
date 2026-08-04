@@ -9,7 +9,6 @@ import com.freelancemarketplace.modules.admin.record.UserSummaryRecord;
 import com.freelancemarketplace.modules.admin.repository.UserRepo;
 import com.freelancemarketplace.modules.admin.service.AdminUserService;
 import com.freelancemarketplace.modules.user.entity.User;
-import com.freelancemarketplace.modules.user.mapper.UserMapper;
 import com.freelancemarketplace.modules.user.mapper.UserMapperAdmin;
 
 import lombok.RequiredArgsConstructor;

@@ -9,6 +9,8 @@ public interface GigService {
 
     List<GigResponseRecord> getAllGigs();
 
+    List<GigResponseRecord> getGigsByFreelancerId(Long freelancerId);
+
     GigResponseRecord getGigById(Long id);
 
     GigResponseRecord createGig(CreateGigRecord dto);

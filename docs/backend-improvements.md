@@ -11,10 +11,10 @@ This report presents a thorough, line-by-line audit of the entire backend codeba
 ### ✅ Implemented APIs
 * `POST /auth/register` — Registers a new user and generates an initial JWT token (`AuthController.register()`).
 * `POST /auth/login` — Authenticates user via email and password, returning JWT token + user details (`AuthController.login()`).
+* `GET /users/me` — Fetches current authenticated user profile (`UserController.getMyProfile()`).
 
 ### ❌ Missing APIs
-* `GET /auth/me` or `GET /users/me` — Endpoint to fetch the profile of the currently authenticated user based on JWT context.
-* `POST /auth/logout` — Server-side token invalidation / blacklist endpoint (currently handled client-side by clearing `localStorage`).
+* `POST /auth/logout` — Server-side token invalidation / blacklist endpoint (handled client-side by clearing `localStorage`).
 
 ### ⚠ Incorrect or Incomplete APIs
 * **Registration Fallback Logic**: In `AuthServiceImpl.register()`, `userName` auto-generation defaults to `email.split("@")[0] + "_" + timestamp`. If a `userName` is provided, it is not checked for uniqueness before saving, which can throw an unhandled database `DataIntegrityViolationException`.

@@ -18,9 +18,11 @@ public record GigResponseRecord(
 
     Integer totalOrders,
 
+    Double averageRating,
+
+    Integer totalReviews,
+
     Long freelancerId,
 
     Long categoryId
-
-) {
-}
+) {}

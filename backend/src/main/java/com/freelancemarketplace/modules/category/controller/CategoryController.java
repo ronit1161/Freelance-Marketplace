@@ -15,85 +15,49 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 
+import org.springframework.security.access.prepost.PreAuthorize;
+import com.freelancemarketplace.common.record.ApiResponse;
+
 @RestController
 @RequestMapping("/categories")
 @RequiredArgsConstructor
 public class CategoryController {
 
-
     private final CategoryService categoryService;
-
-
 
     // GET all
     @GetMapping
-    public ResponseEntity<List<CategoryResponseRecord>> getAllCategories(){
-
-        return ResponseEntity.ok(
-                categoryService.getAllCategories()
-        );
+    public ResponseEntity<ApiResponse<List<CategoryResponseRecord>>> getAllCategories() {
+        return ResponseEntity.ok(ApiResponse.success(categoryService.getAllCategories()));
     }
-
-
 
     // GET by id
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryResponseRecord> getCategoryById(
-            @PathVariable Long id){
-
-        return ResponseEntity.ok(
-                categoryService.getCategoryById(id)
-        );
+    public ResponseEntity<ApiResponse<CategoryResponseRecord>> getCategoryById(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.success(categoryService.getCategoryById(id)));
     }
-
-
 
     // CREATE category
     @PostMapping
-    public ResponseEntity<CategoryResponseRecord> createCategory(
-            @Valid @RequestBody CreateCategoryRecord dto){
-
-
-        CategoryResponseRecord response =
-                categoryService.createCategory(dto);
-
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(response);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<CategoryResponseRecord>> createCategory(@Valid @RequestBody CreateCategoryRecord dto) {
+        CategoryResponseRecord response = categoryService.createCategory(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(response, "Category created successfully"));
     }
-
-
-
 
     // UPDATE category
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponseRecord> updateCategory(
-            @PathVariable Long id,
-            @Valid @RequestBody CreateCategoryRecord dto){
-
-
-        CategoryResponseRecord response =
-                categoryService.updateCategory(id, dto);
-
-
-        return ResponseEntity.ok(response);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<CategoryResponseRecord>> updateCategory(@PathVariable Long id, @Valid @RequestBody CreateCategoryRecord dto) {
+        CategoryResponseRecord response = categoryService.updateCategory(id, dto);
+        return ResponseEntity.ok(ApiResponse.success(response, "Category updated successfully"));
     }
-
-
-
-
 
     // DELETE
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(
-            @PathVariable Long id){
-
-
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
-
-
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponse.success(null, "Category deleted successfully"));
     }
-
 }

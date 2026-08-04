@@ -38,7 +38,9 @@ export default function OrderCheckoutModal({ gig, isOpen, onClose, onOrderSucces
       const createdOrder = await apiCreateOrder({
         clientId: user.id,
         gigId: numericGigId,
+        freelancerId: gig.freelancerId || gig.freelancer?.id || 1,
         requirements: brief.trim(),
+        agreedPrice: price,
       });
 
       setIsSubmitting(false);

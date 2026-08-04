@@ -15,6 +15,10 @@ import com.freelancemarketplace.modules.user.repository.UserRepository;
 import com.freelancemarketplace.modules.order.entity.Order;
 import com.freelancemarketplace.modules.order.repository.OrderRepository;
 
+import com.freelancemarketplace.modules.gigs.entity.Gigs;
+import com.freelancemarketplace.modules.gigs.repository.GigRepository;
+import org.springframework.transaction.annotation.Transactional;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -26,9 +30,11 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
+    private final GigRepository gigRepository;
 
     // POST create review
     @Override
+    @Transactional
     public ReviewResponseRecord createReview(CreateReviewRecord request) {
 
         User client = userRepository.findById(request.clientId())
@@ -40,6 +46,10 @@ public class ReviewServiceImpl implements ReviewService {
         Order order = orderRepository.findById(request.orderId())
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
+        if (order.getStatus() != com.freelancemarketplace.enums.OrderStatus.COMPLETED) {
+            throw new IllegalStateException("Reviews can only be submitted for completed orders. Current order status: " + order.getStatus());
+        }
+
         Review review = new Review();
 
         review.setClient(client);
@@ -49,6 +59,21 @@ public class ReviewServiceImpl implements ReviewService {
         review.setComment(request.comment());
 
         Review savedReview = reviewRepository.save(review);
+
+        // Update Gig average rating & total review count
+        Gigs gig = order.getGig();
+        if (gig != null) {
+            List<Review> gigReviews = reviewRepository.findByGigId(gig.getId());
+            int totalReviews = gigReviews.size();
+            double avgRating = gigReviews.stream()
+                    .mapToInt(Review::getRating)
+                    .average()
+                    .orElse(request.rating().doubleValue());
+
+            gig.setTotalReviews(totalReviews);
+            gig.setAverageRating(Math.round(avgRating * 10.0) / 10.0);
+            gigRepository.save(gig);
+        }
 
         return reviewMapper.toDto(savedReview);
     }

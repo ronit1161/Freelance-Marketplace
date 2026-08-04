@@ -1,16 +1,19 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Bell, LogOut, RefreshCw } from 'lucide-react';
+import { LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const { user, logout, switchRole } = useAuth();
+  const { user, logout } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
 
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
@@ -28,7 +31,7 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Navigation Links */}
+        {/* Navigation Links (Desktop) */}
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
           {/* Guest Navbar */}
           {!user && (
@@ -145,8 +148,59 @@ const Navbar = () => {
               </Link>
             </div>
           )}
+
+          {/* Mobile Hamburger Toggle Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden text-gray-600 hover:text-slate-900 p-1.5 rounded-lg transition"
+            aria-label="Toggle menu"
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Drawer Overlay Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-white border-b border-gray-200 px-6 py-4 space-y-3 shadow-lg animate-in slide-in-from-top-2">
+          {!user && (
+            <div className="flex flex-col gap-3 font-semibold text-sm">
+              <Link to="/" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Home</Link>
+              <Link to="/gigs" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Browse Gigs</Link>
+            </div>
+          )}
+
+          {user && user.role?.toLowerCase() === 'client' && (
+            <div className="flex flex-col gap-3 font-semibold text-sm">
+              <Link to="/client" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Dashboard</Link>
+              <Link to="/client/orders" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Orders</Link>
+              <Link to="/client/wallet" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Wallet</Link>
+              <Link to="/gigs" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Browse Gigs</Link>
+            </div>
+          )}
+
+          {user && user.role?.toLowerCase() === 'freelancer' && (
+            <div className="flex flex-col gap-3 font-semibold text-sm">
+              <Link to="/freelancer" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Dashboard</Link>
+              <Link to="/freelancer/gigs" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">My Gigs</Link>
+              <Link to="/freelancer/orders" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Orders</Link>
+              <Link to="/freelancer/wallet" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Wallet</Link>
+              <Link to="/freelancer/reviews" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Reviews</Link>
+              <Link to="/freelancer/create-gig" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Create Gig</Link>
+              <Link to="/freelancer/profile" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Profile</Link>
+            </div>
+          )}
+
+          {user && user.role?.toLowerCase() === 'admin' && (
+            <div className="flex flex-col gap-3 font-semibold text-sm">
+              <Link to="/admin" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Admin Overview</Link>
+              <Link to="/admin/categories" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Categories</Link>
+              <Link to="/admin/gigs" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Gigs</Link>
+              <Link to="/admin/orders" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Order Management</Link>
+            </div>
+          )}
+        </div>
+      )}
     </header>
   );
 };

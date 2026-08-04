@@ -48,10 +48,10 @@ public class User extends BaseEntity {
 	private String bioData;
 
 	@Column(name = "is_active")
-	private boolean isActive = true;
+	private Boolean isActive = true;
 
 	@Column(name = "is_deleted")
-	private boolean isDeleted = false;
+	private Boolean isDeleted = false;
 
 	@Column(name = "skills")
 	private String skills;
@@ -60,7 +60,31 @@ public class User extends BaseEntity {
 	private Integer experience;
 
 	@Column(name = "is_blocked")
-	private boolean isBlocked = false;
+	private Boolean isBlocked = false;
+
+	public boolean isActive() {
+		return Boolean.TRUE.equals(isActive);
+	}
+
+	public void setActive(Boolean active) {
+		this.isActive = active;
+	}
+
+	public boolean isDeleted() {
+		return Boolean.TRUE.equals(isDeleted);
+	}
+
+	public void setDeleted(Boolean deleted) {
+		this.isDeleted = deleted;
+	}
+
+	public boolean isBlocked() {
+		return Boolean.TRUE.equals(isBlocked);
+	}
+
+	public void setBlocked(Boolean blocked) {
+		this.isBlocked = blocked;
+	}
 
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "wallet_id", unique = true, nullable = false)

@@ -34,6 +34,8 @@ import AdminOrderManagementPage from "../features/orders/pages/AdminOrderManagem
 import AdminProfilePage from "../features/profile/pages/AdminProfilePage";
 
 
+import ProtectedRoute from "../components/auth/ProtectedRoute";
+
 export default function AppRoutes() {
   return (
     <Routes>
@@ -50,7 +52,7 @@ export default function AppRoutes() {
         <Route path="gigs/:id" element={<GigDetailsPage />} />
 
         {/* Freelancer Console */}
-        <Route path="freelancer">
+        <Route path="freelancer" element={<ProtectedRoute allowedRoles={["FREELANCER"]} />}>
           <Route index element={<FreelancerDashboard />} />
           <Route path="gigs" element={<MyGigsPage />} />
           <Route path="my-gigs" element={<MyGigsPage />} />
@@ -63,7 +65,7 @@ export default function AppRoutes() {
         </Route>
 
         {/* Client Console */}
-        <Route path="client">
+        <Route path="client" element={<ProtectedRoute allowedRoles={["CLIENT"]} />}>
           <Route index element={<ClientDashboard />} />
           <Route path="wallet" element={<WalletPage />} />
           <Route path="profile" element={<ClientProfile />} />
@@ -72,7 +74,7 @@ export default function AppRoutes() {
         </Route>
 
         {/* Admin Console */}
-        <Route path="admin">
+        <Route path="admin" element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
           <Route index element={<Dashboard />} />
           <Route path="categories" element={<CategoryManagementPage />} />
           <Route path="gigs" element={<AdminGigManagementPage />} />

@@ -10,6 +10,7 @@ public interface WalletService {
 
 	WalletResponseRecord getWalletByUserId(Long userId);
     WalletResponseRecord addMoney(AddMoneyRecord dto);
+    WalletResponseRecord withdrawMoney(AddMoneyRecord dto);
     List<WalletTransactionResponseRecord> getWalletTransactions(Long userId);
 	
 }

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
-import { getWalletByUserId, topUpWallet } from "../../../services/walletapi";
-import apiClient from "../../../services/apiClient";
+import { getWalletByUserId, topUpWallet, getWalletTransactions } from "../../../services/walletapi";
 import {
   Wallet,
   Lock,
@@ -42,13 +41,13 @@ export default function WalletPage() {
     setLoading(true);
     setError("");
     try {
-      const [walletData, txnsResponse] = await Promise.all([
+      const [walletData, txnsData] = await Promise.all([
         getWalletByUserId(user.id).catch(() => null),
-        apiClient.get("/api/transactions").catch(() => ({ data: { data: [] } })),
+        getWalletTransactions(user.id).catch(() => []),
       ]);
 
       setWallet(walletData);
-      setTransactions(txnsResponse?.data?.data || []);
+      setTransactions(Array.isArray(txnsData) ? txnsData : (txnsData?.content || []));
     } catch (err) {
       console.error("Failed to load wallet data:", err);
       setError(err?.message || "Failed to load wallet transaction details.");

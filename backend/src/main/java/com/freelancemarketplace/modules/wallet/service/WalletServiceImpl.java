@@ -43,17 +43,31 @@ public class WalletServiceImpl implements WalletService {
         Wallet updatedWallet = walletRepository.save(wallet);
         return walletMapper.toDto(updatedWallet);
     }
+
+    @Override
+    @Transactional
+    public WalletResponseRecord withdrawMoney(AddMoneyRecord dto) {
+        Wallet wallet = walletRepository.findByUserId(dto.userId())
+                .orElseGet(() -> createInitialWallet(dto.userId()));
+
+        if (wallet.getAvailableBalance().compareTo(dto.amount()) < 0) {
+            throw new IllegalArgumentException("Insufficient available balance for withdrawal");
+        }
+
+        wallet.setAvailableBalance(wallet.getAvailableBalance().subtract(dto.amount()));
+        wallet.setTotalBalance(wallet.getTotalBalance().subtract(dto.amount()));
+        Wallet updatedWallet = walletRepository.save(wallet);
+        return walletMapper.toDto(updatedWallet);
+    }
     
     @Override
     public List<WalletTransactionResponseRecord> getWalletTransactions(Long userId) {
         Wallet wallet = walletRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Wallet not found"));
-//        return walletTransactionRepository
-//                .findByClientWalletIdOrFreelancerWalletId(wallet.getId(), wallet.getId())
-//                .stream()
-//                .map(walletTransactionMapper::toDto)
-//                .collect(Collectors.toList());
-        return null;
+        return walletTransactionRepository.getAllWalletTransactionsById(wallet.getId())
+                .stream()
+                .map(walletTransactionmapper::toDto)
+                .toList();
     }
     
     private Wallet createInitialWallet(Long userId) {

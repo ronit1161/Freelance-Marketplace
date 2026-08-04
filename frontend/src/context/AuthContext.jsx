@@ -1,5 +1,6 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { loginUser as apiLoginUser, registerUser as apiRegisterUser } from "../services/authApi";
+import apiClient from "../services/apiClient";
 
 const AuthContext = createContext(null);
 
@@ -21,11 +22,28 @@ export function AuthProvider({ children }) {
     return localStorage.getItem(SESSION_TOKEN_KEY) || null;
   });
 
+  useEffect(() => {
+    if (token) {
+      apiClient
+        .get("/users/me")
+        .then((res) => {
+          const freshUser = res.data?.data || res.data;
+          if (freshUser && freshUser.id) {
+            setUser(freshUser);
+            localStorage.setItem(SESSION_USER_KEY, JSON.stringify(freshUser));
+          }
+        })
+        .catch((err) => {
+          console.warn("Failed to re-validate user session on mount", err);
+        });
+    }
+  }, [token]);
+
   const login = async (credentials) => {
-    // credentials: { userNameOrEmail, password }
+    // credentials: { userNameOrEmail, email, password }
     const responseData = await apiLoginUser(credentials);
-    const jwtToken = responseData.token;
-    const userData = responseData.user;
+    const jwtToken = responseData.data?.token || responseData.token;
+    const userData = responseData.data?.user || responseData.user;
 
     setToken(jwtToken);
     setUser(userData);
@@ -37,11 +55,20 @@ export function AuthProvider({ children }) {
   };
 
   const register = async (formData) => {
-    const userData = await apiRegisterUser(formData);
-    
-    // Auto-login after registration
+    const responseData = await apiRegisterUser(formData);
+    const authData = responseData.data || responseData;
+
+    if (authData?.token && authData?.user) {
+      setToken(authData.token);
+      setUser(authData.user);
+      localStorage.setItem(SESSION_TOKEN_KEY, authData.token);
+      localStorage.setItem(SESSION_USER_KEY, JSON.stringify(authData.user));
+      return authData.user;
+    }
+
+    // Auto-login fallback after registration using email
     return await login({
-      userNameOrEmail: formData.userName || formData.email,
+      email: formData.email,
       password: formData.password,
     });
   };
