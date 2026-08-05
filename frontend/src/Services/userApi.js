@@ -18,14 +18,24 @@ export const updateUserProfile = async (id, updateDTO) => {
       bioData: updateDTO.bioData || updateDTO.bio || "",
       skills: updateDTO.skills || "",
       experience: updateDTO.experience ? parseInt(updateDTO.experience, 10) : 0,
-      email: updateDTO.email || "user@example.com",
-      role: (updateDTO.role || "CLIENT").toUpperCase(),
-      userName: updateDTO.userName || (updateDTO.email ? updateDTO.email.split("@")[0] : "user"),
+      email: updateDTO.email || "",
+      userName: updateDTO.userName || "",
     };
-    const response = await apiClient.put(`/users/${id}`, payload);
-    return response.data.data || response.data;
+
+    // Try dedicated profile update endpoint first
+    try {
+      const response = await apiClient.put(`/users/${id}/profile`, payload);
+      return response.data.data || response.data;
+    } catch (err) {
+      // Fallback to /users/{id}
+      const response = await apiClient.put(`/users/${id}`, payload);
+      return response.data.data || response.data;
+    }
   } catch (error) {
-    const errorMessage = error.response?.data?.message || "Failed to update user profile.";
+    const errorMessage =
+      error.response?.data?.message ||
+      (typeof error.response?.data === "string" ? error.response.data : null) ||
+      "Failed to update user profile.";
     throw new Error(errorMessage);
   }
 };

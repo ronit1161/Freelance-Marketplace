@@ -53,7 +53,7 @@ public class UserController {
 	
 	@PutMapping("/{userId}")
 	@PreAuthorize("#userId == principal.id or hasRole('ADMIN')")
-	public ResponseEntity<ApiResponse<UserResponseRecord>> updateUserDetails(@PathVariable Long userId, @Valid @RequestBody CreateUserRecord user){
+	public ResponseEntity<ApiResponse<UserResponseRecord>> updateUserDetails(@PathVariable Long userId, @RequestBody CreateUserRecord user){
 		UserResponseRecord userResponseRecord = userServiceImplementation.updateUserDetails(userId, user);
 		return ResponseEntity.ok(ApiResponse.success(userResponseRecord));
 	}

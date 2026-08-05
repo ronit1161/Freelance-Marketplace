@@ -1,13 +1,14 @@
+import React, { useState } from "react";
 import { getStatusBadgeColor } from "../../../utils/statusUtils";
+import WriteReviewModal from "../../reviews/components/WriteReviewModal";
+import RatingStars from "../../reviews/components/RatingStars";
+import { completeOrder, cancelOrder } from "../../../services/orderApi";
 
-// ----------------------------------------------------------------------
-// Sub-component for dynamic status timestamp (Kept in same file)
-// ----------------------------------------------------------------------
 function OrderStatusTimestamp({ status, completedAt, cancelledAt, formatDate }) {
     if (status === "COMPLETED" && completedAt) {
         return (
             <div className="completed-timestamp">
-                <span>Completed At:</span>
+                <span>Completed: </span>
                 <time dateTime={completedAt}>{formatDate(completedAt)}</time>
             </div>
         );
@@ -16,7 +17,7 @@ function OrderStatusTimestamp({ status, completedAt, cancelledAt, formatDate }) 
     if (status === "CANCELLED" && cancelledAt) {
         return (
             <div className="cancelled-timestamp">
-                <span>Cancelled At:</span>
+                <span>Cancelled: </span>
                 <time dateTime={cancelledAt}>{formatDate(cancelledAt)}</time>
             </div>
         );
@@ -25,10 +26,10 @@ function OrderStatusTimestamp({ status, completedAt, cancelledAt, formatDate }) 
     return null;
 }
 
-// ----------------------------------------------------------------------
-// Main Order Component
-// ----------------------------------------------------------------------
-export default function OrderCard({ order }) {
+export default function OrderCard({ order, clientReview, onOrderUpdated }) {
+    const [isReviewOpen, setIsReviewOpen] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
+
     if (!order) return null;
 
     const statusBadgeClass = getStatusBadgeColor(order.status);
@@ -52,8 +53,36 @@ export default function OrderCard({ order }) {
     const gigInfo = order.gigTitle || (order.gigId ? `#${order.gigId}` : (order.gig_id ? `#${order.gig_id}` : "N/A"));
     const createdDate = order.createdOn || order.created_at || order.createdAt;
 
+    const handleAcceptDelivery = async () => {
+        if (window.confirm(`Accept delivery and release escrow payment for Order #${order.id}?`)) {
+            setIsProcessing(true);
+            try {
+                await completeOrder(order.id);
+                if (onOrderUpdated) onOrderUpdated();
+            } catch (e) {
+                alert(e.message || "Failed to complete order.");
+            } finally {
+                setIsProcessing(false);
+            }
+        }
+    };
+
+    const handleCancelOrder = async () => {
+        if (window.confirm(`Are you sure you want to cancel Order #${order.id}? Funds will be refunded to your wallet.`)) {
+            setIsProcessing(true);
+            try {
+                await cancelOrder(order.id);
+                if (onOrderUpdated) onOrderUpdated();
+            } catch (e) {
+                alert(e.message || "Failed to cancel order.");
+            } finally {
+                setIsProcessing(false);
+            }
+        }
+    };
+
     return (
-        <article className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between gap-4">
+        <article className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between gap-4">
             {/* Header */}
             <header className="flex items-center justify-between border-b border-gray-100 pb-3">
                 <div>
@@ -99,20 +128,11 @@ export default function OrderCard({ order }) {
             {order.status === "IN_PROGRESS" && (
                 <div className="pt-2">
                     <button
-                        onClick={async () => {
-                            if (window.confirm(`Accept delivery and release payment for Order #${order.id}?`)) {
-                                try {
-                                    const { completeOrder } = await import("../../../services/orderApi");
-                                    await completeOrder(order.id);
-                                    window.location.reload();
-                                } catch (e) {
-                                    alert(e.message || "Failed to complete order.");
-                                }
-                            }
-                        }}
-                        className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition"
+                        disabled={isProcessing}
+                        onClick={handleAcceptDelivery}
+                        className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition disabled:opacity-50"
                     >
-                        Accept Delivery & Release Escrow
+                        {isProcessing ? "Processing..." : "Accept Delivery & Release Escrow"}
                     </button>
                 </div>
             )}
@@ -120,21 +140,30 @@ export default function OrderCard({ order }) {
             {order.status === "PENDING" && (
                 <div className="pt-2">
                     <button
-                        onClick={async () => {
-                            if (window.confirm(`Are you sure you want to cancel Order #${order.id}? Funds will be refunded to your wallet.`)) {
-                                try {
-                                    const { cancelOrder } = await import("../../../services/orderApi");
-                                    await cancelOrder(order.id);
-                                    window.location.reload();
-                                } catch (e) {
-                                    alert(e.message || "Failed to cancel order.");
-                                }
-                            }
-                        }}
-                        className="w-full py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-bold text-xs rounded-xl transition"
+                        disabled={isProcessing}
+                        onClick={handleCancelOrder}
+                        className="w-full py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-bold text-xs rounded-xl transition disabled:opacity-50"
                     >
-                        Cancel Order
+                        {isProcessing ? "Processing..." : "Cancel Order"}
                     </button>
+                </div>
+            )}
+
+            {order.status === "COMPLETED" && (
+                <div className="pt-2">
+                    {clientReview ? (
+                        <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-xl">
+                            <span className="text-xs font-bold text-emerald-800">✓ Reviewed</span>
+                            <RatingStars rating={clientReview.rating} size={14} />
+                        </div>
+                    ) : (
+                        <button
+                            onClick={() => setIsReviewOpen(true)}
+                            className="w-full py-2 bg-blue-50 hover:bg-blue-100 text-[#0058be] border border-blue-200 font-bold text-xs rounded-xl transition"
+                        >
+                            Leave Review for Freelancer
+                        </button>
+                    )}
                 </div>
             )}
 
@@ -152,6 +181,16 @@ export default function OrderCard({ order }) {
                     formatDate={formatDate}
                 />
             </footer>
+
+            {/* Write Review Modal */}
+            <WriteReviewModal
+                order={order}
+                isOpen={isReviewOpen}
+                onClose={() => setIsReviewOpen(false)}
+                onReviewSubmitted={() => {
+                    if (onOrderUpdated) onOrderUpdated();
+                }}
+            />
         </article>
     );
 }

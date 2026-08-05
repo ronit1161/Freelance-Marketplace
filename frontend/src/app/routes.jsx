@@ -33,7 +33,6 @@ import AdminGigManagementPage from "../features/gigs/pages/AdminGigManagementPag
 import AdminOrderManagementPage from "../features/orders/pages/AdminOrderManagementPage";
 import AdminProfilePage from "../features/profile/pages/AdminProfilePage";
 
-
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 
 export default function AppRoutes() {

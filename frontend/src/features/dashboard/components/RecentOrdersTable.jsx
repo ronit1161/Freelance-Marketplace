@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function RecentOrdersTable({
   orders,
@@ -7,54 +8,56 @@ export default function RecentOrdersTable({
   onDeliverWork,
 }) {
   return (
-    <div id="my-orders" className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100 space-y-6">
-      <div className="flex justify-between items-center">
+    <div id="my-orders" className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200 space-y-6">
+      <div className="flex justify-between items-center border-b border-gray-100 pb-4">
         <div>
           <h2 className="text-xl font-bold text-slate-900">Recent Client Orders</h2>
           <p className="text-xs text-gray-500 mt-0.5">
             Review and manage incoming orders from marketplace clients
           </p>
         </div>
-        <span className="text-xs font-semibold text-gray-400">Total: {orders.length}</span>
+        <Link to="/freelancer/orders" className="text-xs font-bold text-[#0058be] hover:underline">
+          View All ({orders.length}) →
+        </Link>
       </div>
 
       {orders.length === 0 ? (
-        <div className="text-center py-10 bg-gray-50 rounded-2xl border border-gray-100 text-gray-400 text-xs font-medium">
+        <div className="text-center py-10 bg-gray-50 rounded-xl border border-gray-200 text-gray-400 text-xs font-medium">
           No incoming client orders found.
         </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-gray-100 text-slate-500 text-xs font-bold uppercase tracking-wider">
-                <th className="py-4 px-3">Order ID</th>
-                <th className="py-4">Gig Title</th>
-                <th className="py-4">Client Name</th>
-                <th className="py-4">Amount</th>
-                <th className="py-4">Status</th>
-                <th className="py-4 text-right px-3">Actions</th>
+              <tr className="border-b border-gray-200 text-slate-500 text-xs font-bold uppercase tracking-wider">
+                <th className="py-3.5 px-3">Order ID</th>
+                <th className="py-3.5">Gig Title</th>
+                <th className="py-3.5">Client Name</th>
+                <th className="py-3.5">Amount</th>
+                <th className="py-3.5">Status</th>
+                <th className="py-3.5 text-right px-3">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50 text-sm">
+            <tbody className="divide-y divide-gray-100 text-sm">
               {orders.slice(0, 5).map((ord) => {
                 const st = (ord.status || "").toUpperCase();
                 return (
                   <tr key={ord.id} className="hover:bg-gray-50/50 transition">
-                    <td className="py-4 px-3 font-mono text-xs font-bold text-slate-700">
+                    <td className="py-3.5 px-3 font-mono text-xs font-bold text-slate-600">
                       #{ord.id}
                     </td>
-                    <td className="py-4 font-bold text-slate-900 max-w-xs truncate">
+                    <td className="py-3.5 font-bold text-slate-900 max-w-xs truncate">
                       {ord.gigTitle || `Gig #${ord.gigId}`}
                     </td>
-                    <td className="py-4 text-slate-600 text-xs font-medium">
+                    <td className="py-3.5 text-slate-600 text-xs font-medium">
                       {ord.clientName || `Client #${ord.clientId}`}
                     </td>
-                    <td className="py-4 font-bold text-blue-600 text-xs">
+                    <td className="py-3.5 font-bold text-blue-600 text-xs">
                       ₹{ord.agreedPrice}
                     </td>
-                    <td className="py-4">
+                    <td className="py-3.5">
                       <span
-                        className={`px-3 py-1 text-xs font-semibold rounded-full border ${
+                        className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${
                           st === "PENDING"
                             ? "bg-amber-100 text-amber-800 border-amber-200"
                             : st === "ACCEPTED"
@@ -69,7 +72,7 @@ export default function RecentOrdersTable({
                         {ord.status}
                       </span>
                     </td>
-                    <td className="py-4 text-right px-3">
+                    <td className="py-3.5 text-right px-3">
                       {st === "PENDING" && (
                         <button
                           onClick={() => onAcceptOrder(ord.id)}
@@ -95,7 +98,7 @@ export default function RecentOrdersTable({
                         </button>
                       )}
                       {st === "COMPLETED" && (
-                        <span className="text-xs text-gray-400 font-semibold">
+                        <span className="text-xs text-emerald-600 font-bold bg-emerald-50 px-2.5 py-1 rounded-lg">
                           Completed
                         </span>
                       )}

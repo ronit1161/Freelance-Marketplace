@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getOrders } from "../Services/orderApi";
+import { getOrder } from "../services/orderApi";
 
 export function useOrders({ userId, limit = 10, page = 1 } = {}) {
   const [orders, setOrders] = useState([]);
@@ -10,7 +10,12 @@ export function useOrders({ userId, limit = 10, page = 1 } = {}) {
   useEffect(() => {
     let isMounted = true;
 
-    getOrders({ userId, limit, page })
+    if (!userId) {
+      setIsLoading(false);
+      return;
+    }
+
+    getOrder({ userId, limit, page })
       .then((data) => {
         if (isMounted) {
           if (Array.isArray(data)) {

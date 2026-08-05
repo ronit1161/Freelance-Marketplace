@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import { getClientOrders } from "../../../services/orderApi";
-import { getWalletByUserId } from "../../../services/walletApi";
+import { getWalletByUserId } from "../../../services/walletapi";
 import { Link } from "react-router-dom";
-import { User, Mail, Wallet, ShoppingBag, Edit3, ArrowRight, ShieldCheck } from "lucide-react";
+import { Wallet, ShoppingBag, ArrowRight, ShieldCheck } from "lucide-react";
 
 export default function ClientProfile() {
     const { user } = useAuth();
@@ -30,14 +30,14 @@ export default function ClientProfile() {
     const avatar = user?.profileAvatarURL || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&h=200&q=80";
 
     return (
-        <div className="min-h-screen bg-gray-50/50 py-10 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-6xl mx-auto space-y-8">
+        <div className="min-h-screen bg-gray-50/50 py-8 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto space-y-6">
                 {/* Profile Banner Card */}
-                <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 flex flex-col md:flex-row items-center md:items-start gap-8">
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 flex flex-col md:flex-row items-center md:items-start gap-8">
                     <img
                         src={avatar}
                         alt={user?.fullName || "Client"}
-                        className="w-32 h-32 rounded-2xl object-cover border-4 border-gray-50 shadow-md"
+                        className="w-32 h-32 rounded-2xl object-cover border-4 border-gray-50 shadow-sm"
                     />
 
                     <div className="flex-1 text-center md:text-left space-y-3">
@@ -57,23 +57,13 @@ export default function ClientProfile() {
                         <p className="text-slate-600 text-sm max-w-2xl">
                             {user?.bioData || "No company bio specified yet."}
                         </p>
-
-                        <div className="pt-2">
-                            <Link
-                                to="/freelancer/edit-profile"
-                                className="inline-flex items-center gap-2 bg-[#0058be] hover:bg-[#004bb0] text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition shadow-sm"
-                            >
-                                <Edit3 size={16} />
-                                <span>Edit Profile</span>
-                            </Link>
-                        </div>
                     </div>
                 </div>
 
                 {/* Metrics & Details Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Wallet Summary */}
-                    <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-4">
+                    <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
                         <div className="flex items-center justify-between border-b border-gray-100 pb-3">
                             <div className="flex items-center gap-2">
                                 <Wallet className="text-[#0058be]" size={20} />
@@ -84,7 +74,7 @@ export default function ClientProfile() {
                             </Link>
                         </div>
                         <div>
-                            <p className="text-xs text-slate-500">Available Coins</p>
+                            <p className="text-xs text-slate-500">Available Balance</p>
                             <p className="text-2xl font-bold text-slate-900 mt-0.5">
                                 ₹{wallet?.availableBalance ? Number(wallet.availableBalance).toLocaleString("en-IN") : "0"}
                             </p>
@@ -98,11 +88,11 @@ export default function ClientProfile() {
                     </div>
 
                     {/* Orders Overview */}
-                    <div className="md:col-span-2 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-4">
+                    <div className="md:col-span-2 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
                         <div className="flex items-center justify-between border-b border-gray-100 pb-3">
                             <div className="flex items-center gap-2">
                                 <ShoppingBag className="text-[#0058be]" size={20} />
-                                <h3 className="font-bold text-slate-900 text-base">Active Orders</h3>
+                                <h3 className="font-bold text-slate-900 text-base">Recent Orders</h3>
                             </div>
                             <Link to="/client/orders" className="text-xs font-bold text-[#0058be] hover:underline flex items-center gap-1">
                                 View All ({orders.length}) <ArrowRight size={12} />

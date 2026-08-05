@@ -1,7 +1,13 @@
 import OrderCard from "./OrderCard";
-import { Loader2, AlertCircle, ShoppingBag } from "lucide-react";
+import { AlertCircle, ShoppingBag } from "lucide-react";
 
-export default function OrdersList({ isLoading, error, orders = [] }) {
+export default function OrdersList({
+    isLoading,
+    error,
+    orders = [],
+    clientReviewsMap = {},
+    onOrderUpdated,
+}) {
     if (isLoading) {
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -40,7 +46,7 @@ export default function OrdersList({ isLoading, error, orders = [] }) {
                 </div>
                 <h3 className="text-base font-bold text-gray-900">No orders found</h3>
                 <p className="text-xs text-gray-500 max-w-sm mx-auto">
-                    You haven't placed any order yet or no matching orders were found.
+                    You haven't placed any orders yet or no matching orders were found.
                 </p>
             </div>
         );
@@ -49,12 +55,15 @@ export default function OrdersList({ isLoading, error, orders = [] }) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {orders.map((order) => (
-                <OrderCard key={order.id} order={order} />
+                <OrderCard
+                    key={order.id}
+                    order={order}
+                    clientReview={clientReviewsMap[order.id]}
+                    onOrderUpdated={onOrderUpdated}
+                />
             ))}
         </div>
     );
 }
 
 export { OrdersList };
-
-

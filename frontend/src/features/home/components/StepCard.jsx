@@ -1,23 +1,21 @@
-export default function StepCard({
-  number,
-  title,
-  description,
-}) {
+import React from "react";
+
+export default function StepCard({ number, title, description }) {
   return (
-    <div className="bg-gray-50 p-8 rounded-2xl shadow-sm hover:shadow-lg transition duration-300">
+    <div className="bg-white p-8 rounded-xl border border-gray-200 h-full flex flex-col justify-between">
+      <div>
+        <div className="text-4xl font-bold text-blue-600 mb-4">
+          {number}
+        </div>
 
-      <div className="text-5xl font-bold text-blue-600 mb-4">
-        {number}
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          {title}
+        </h3>
+
+        <p className="text-gray-600 text-sm leading-relaxed">
+          {description}
+        </p>
       </div>
-
-      <h3 className="text-xl font-semibold mb-3">
-        {title}
-      </h3>
-
-      <p className="text-gray-600 leading-relaxed">
-        {description}
-      </p>
-
     </div>
   );
 }

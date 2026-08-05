@@ -94,3 +94,9 @@ export const getAllOrders = async () => {
     throw new Error(errorMessage);
   }
 };
+
+export const getOrder = async ({ userId, limit = 10, page = 1 }) => {
+  const ordersData = await getClientOrders(userId);
+  const totalPages = Math.max(1, Math.ceil((ordersData?.length || 0) / limit));
+  return { orders: ordersData || [], totalPages };
+};

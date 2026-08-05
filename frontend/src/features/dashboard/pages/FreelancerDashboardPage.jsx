@@ -10,7 +10,6 @@ import { getGigsByFreelancer } from "../../../services/gigApi";
 import { getWalletByUserId } from "../../../services/walletapi";
 import { getReviewsForFreelancer } from "../../../services/reviewApi";
 import FreelancerHeader from "../components/FreelancerHeader";
-import QuickAccessBar from "../components/QuickAccessBar";
 import FreelancerStatsGrid from "../components/FreelancerStatsGrid";
 import RecentOrdersTable from "../components/RecentOrdersTable";
 
@@ -111,7 +110,7 @@ export default function FreelancerDashboard() {
     : "0.00";
 
   return (
-    <div className="max-w-7xl m-auto min-h-screen bg-gray-50/50 p-6 sm:p-10 space-y-8">
+    <div className="max-w-7xl mx-auto min-h-screen bg-gray-50/50 p-6 sm:p-10 space-y-6">
       {/* Header Banner Component */}
       <FreelancerHeader
         userName={user?.fullName || user?.userName}
@@ -121,20 +120,17 @@ export default function FreelancerDashboard() {
 
       {/* Notification Banner */}
       {notification && (
-        <div className="p-4 bg-emerald-50 text-emerald-800 rounded-2xl border border-emerald-200 text-xs font-semibold">
+        <div className="p-4 bg-emerald-50 text-emerald-800 rounded-xl border border-emerald-200 text-xs font-semibold">
           {notification}
         </div>
       )}
 
       {/* Error Message Banner */}
       {error && (
-        <div className="p-4 bg-red-50 text-red-600 rounded-2xl border border-red-200 text-xs font-semibold">
+        <div className="p-4 bg-red-50 text-red-600 rounded-xl border border-red-200 text-xs font-semibold">
           {error}
         </div>
       )}
-
-      {/* Quick Access Bar Component */}
-      <QuickAccessBar />
 
       {/* Statistics Grid Component */}
       <FreelancerStatsGrid
