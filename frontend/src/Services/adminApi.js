@@ -29,3 +29,24 @@ export const deleteGigByAdmin = async (gigId) => {
   const response = await apiClient.delete(`/api/admin/gigs/${gigId}`);
   return response.data;
 };
+
+export const getAdminCategories = async () => {
+  const response = await apiClient.get("/api/admin/categories");
+  return response.data;
+};
+
+export const createAdminCategory = async (categoryData) => {
+  const response = await apiClient.post("/api/admin/categories", categoryData);
+  return response.data;
+};
+
+export const deleteAdminCategory = async (categoryId) => {
+  const response = await apiClient.delete(`/categories/${categoryId}`);
+  return response.data;
+};
+
+export const getRevenueGraph = async () => {
+  const response = await apiClient.get("/api/admin/dashboard/revenue");
+  return response.data;
+};
+

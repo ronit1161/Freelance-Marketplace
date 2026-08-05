@@ -5,22 +5,21 @@ Admin
 │     └── Monthly Revenue Graph
 │
 ├── User Management
-│     ├── View All Users
-│     ├── View User Details
-│     ├── Block User
-│     ├── Unblock User
-│     └── Soft Delete User
+│     ├── View All Users - done 
+│     ├── View User Details - done
+│     ├── Block User - done
+│     ├── Unblock User - done
+│     └── Soft Delete User - done
 │
 ├── Category Management
 │     ├── Create
 │     ├── View
-│     ├── Update
 │     └── Delete
 │
 ├── Gig Management
-│     ├── View All Gigs
-│     ├── View Gig
-│     └── Delete Gig
+│     ├── View All Gigs - done
+│     ├── View Gig - done
+│     └── Delete Gig 
 │
 ├── Order Management
 │     ├── View All Orders

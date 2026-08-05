@@ -15,7 +15,6 @@ function RegisterPage() {
   const isFormValid =
     role &&
     name.trim() !== "" &&
-    email.includes("@") &&
     password.length >= 4 &&
     accepted;
 
@@ -50,22 +49,20 @@ function RegisterPage() {
               <button
                 type="button"
                 onClick={() => setRole("client")}
-                className={`flex-1 py-2.5 px-4 rounded-xl border text-sm font-semibold transition ${
-                  role === "client"
+                className={`flex-1 py-2.5 px-4 rounded-xl border text-sm font-semibold transition ${role === "client"
                     ? "bg-blue-50 border-blue-600 text-blue-600"
                     : "border-gray-200 text-gray-600 hover:bg-gray-50"
-                }`}
+                  }`}
               >
                 Hire Talent (Client)
               </button>
               <button
                 type="button"
                 onClick={() => setRole("freelancer")}
-                className={`flex-1 py-2.5 px-4 rounded-xl border text-sm font-semibold transition ${
-                  role === "freelancer"
+                className={`flex-1 py-2.5 px-4 rounded-xl border text-sm font-semibold transition ${role === "freelancer"
                     ? "bg-blue-50 border-blue-600 text-blue-600"
                     : "border-gray-200 text-gray-600 hover:bg-gray-50"
-                }`}
+                  }`}
               >
                 Work & Earn (Freelancer)
               </button>
@@ -126,11 +123,10 @@ function RegisterPage() {
           <button
             type="submit"
             disabled={!isFormValid}
-            className={`p-3 rounded-xl font-semibold transition mt-2 shadow-sm ${
-              isFormValid
+            className={`p-3 rounded-xl font-semibold transition mt-2 shadow-sm ${isFormValid
                 ? "bg-[#0058be] hover:bg-[#004bb0] text-white"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+              }`}
           >
             Create Account
           </button>

@@ -45,28 +45,28 @@ export default function AppRoutes() {
 
         {/* Protected Freelancer Console */}
         {/* <Route element={<ProtectedRoute allowedRoles={["FREELANCER"]} />}> */}
-          <Route path="freelancer">
-            <Route index element={<FreelancerDashboard />} />
-            <Route path="create-gig" element={<CreateGig />} />
-            <Route path="edit-profile" element={<EditProfile />} />
-            <Route path="profile" element={<FreelancerProfile />} />
-          </Route>
+        <Route path="freelancer">
+          <Route index element={<FreelancerDashboard />} />
+          <Route path="create-gig" element={<CreateGig />} />
+          <Route path="edit-profile" element={<EditProfile />} />
+          <Route path="profile" element={<FreelancerProfile />} />
+        </Route>
         {/* </Route> */}
 
         {/* Protected Client Console */}
         {/* <Route element={<ProtectedRoute allowedRoles={["CLIENT"]} />}> */}
-          <Route path="client">
-            <Route index element={<ClientDashboardPage />} />
-            <Route path="wallet" element={<WalletPage />} />
-            <Route path="profile" element={<ClientProfile />} />
-            <Route path="orders" element={<OrdersPage />} />
-          </Route>
+        <Route path="client">
+          <Route index element={<ClientDashboardPage />} />
+          <Route path="wallet" element={<WalletPage />} />
+          <Route path="profile" element={<ClientProfile />} />
+          <Route path="orders" element={<OrdersPage />} />
+        </Route>
         {/* </Route> */}
 
         {/* Protected Admin Console */}
-        <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
+        {/* <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}> */}
           <Route path="admin" element={<Dashboard />} />
-        </Route>
+        {/* </Route> */}
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />

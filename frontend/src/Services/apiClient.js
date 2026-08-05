@@ -29,9 +29,10 @@ apiClient.interceptors.response.use(
       localStorage.removeItem("jwt_token");
       localStorage.removeItem("token");
       localStorage.removeItem("auth_user");
-      if (window.location.pathname !== "/login") {
-        window.location.href = "/login";
-      }
+      // Redirect commented out for development/testing:
+      // if (window.location.pathname !== "/login") {
+      //   window.location.href = "/login";
+      // }
     }
     return Promise.reject(error);
   }

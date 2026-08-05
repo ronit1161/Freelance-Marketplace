@@ -40,7 +40,7 @@ function LoginPage() {
           <div className="flex flex-col gap-1">
             <label className="text-sm italic text-left">Email</label>
             <input
-              type="email"
+      
               placeholder="abc@gmail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
