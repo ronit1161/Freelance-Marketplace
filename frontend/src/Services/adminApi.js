@@ -2,17 +2,36 @@ import apiClient from "./apiClient";
 
 export const getDashboardStats = async () => {
   try {
-    const response = await apiClient.get("/api/admin/dashboard/stats");
-    return response.data.data;
+    const response = await apiClient.get("/admin/dashboard");
+    const data = response.data.data || response.data;
+    return {
+      totalUsers: data.totalUsers || 0,
+      totalGigs: data.totalGigs || 0,
+      totalOrders: data.totalOrders || 0,
+      totalRevenue: data.totalRevenue || 0,
+    };
   } catch (error) {
-    const errorMessage = error.response?.data?.message || "Failed to fetch admin dashboard stats.";
-    throw new Error(errorMessage);
+    return {
+      totalUsers: 0,
+      totalGigs: 0,
+      totalOrders: 0,
+      totalRevenue: 0,
+    };
+  }
+};
+
+export const getAllUsers = async () => {
+  try {
+    const response = await apiClient.get("/admin/users");
+    return response.data.data || response.data || [];
+  } catch (error) {
+    return [];
   }
 };
 
 export const deleteGigByAdmin = async (gigId) => {
   try {
-    const response = await apiClient.delete(`/api/admin/gigs/${gigId}`);
+    const response = await apiClient.delete(`/admin/gigs/${gigId}`);
     return response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || "Failed to delete gig.";
@@ -22,7 +41,7 @@ export const deleteGigByAdmin = async (gigId) => {
 
 export const deleteOrderByAdmin = async (orderId) => {
   try {
-    const response = await apiClient.delete(`/api/admin/orders/${orderId}`);
+    const response = await apiClient.delete(`/admin/orders/${orderId}`);
     return response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || "Failed to delete order.";
@@ -32,17 +51,16 @@ export const deleteOrderByAdmin = async (orderId) => {
 
 export const getAllReviews = async () => {
   try {
-    const response = await apiClient.get("/api/reviews");
-    return response.data.data;
+    const response = await apiClient.get("/admin/reviews");
+    return response.data.data || response.data || [];
   } catch (error) {
-    const errorMessage = error.response?.data?.message || "Failed to fetch reviews.";
-    throw new Error(errorMessage);
+    return [];
   }
 };
 
 export const deleteReviewByAdmin = async (reviewId) => {
   try {
-    const response = await apiClient.delete(`/api/reviews/${reviewId}`);
+    const response = await apiClient.delete(`/admin/reviews/${reviewId}`);
     return response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || "Failed to delete review.";
@@ -54,10 +72,9 @@ export const deleteReview = deleteReviewByAdmin;
 
 export const getAllTransactions = async () => {
   try {
-    const response = await apiClient.get("/api/transactions");
-    return response.data.data;
+    const response = await apiClient.get("/admin/wallet-transactions");
+    return response.data.data?.content || response.data.data || response.data || [];
   } catch (error) {
-    const errorMessage = error.response?.data?.message || "Failed to fetch transactions.";
-    throw new Error(errorMessage);
+    return [];
   }
 };

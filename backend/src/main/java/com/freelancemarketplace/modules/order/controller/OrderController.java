@@ -22,6 +22,11 @@ import com.freelancemarketplace.modules.order.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.freelancemarketplace.security.CustomUserDetails;
+import com.freelancemarketplace.modules.user.record.UserResponseRecord;
+import com.freelancemarketplace.modules.user.entity.User;
+
 @RestController
 @RequestMapping("/orders")
 @RequiredArgsConstructor
@@ -31,8 +36,26 @@ public class OrderController {
 	
 	// POST /orders
 	@PostMapping
-	public ResponseEntity<ApiResponse<OrderResponseRecord>> createOrder(@Valid @RequestBody CreateOrderRecord dto){
-		OrderResponseRecord response = orderService.createOrder(dto);
+	public ResponseEntity<ApiResponse<OrderResponseRecord>> createOrder(
+			@Valid @RequestBody CreateOrderRecord dto,
+			@AuthenticationPrincipal CustomUserDetails userDetails){
+		
+		// If authenticated, ensure client ID matches JWT
+		CreateOrderRecord effectiveDto = dto;
+		if (userDetails != null && dto.client() != null) {
+			User clientUser = new User();
+			clientUser.setId(userDetails.getId());
+			effectiveDto = new CreateOrderRecord(
+				dto.requirements(),
+				dto.agreedPrice(),
+				dto.status(),
+				clientUser,
+				dto.freelancer(),
+				dto.gig()
+			);
+		}
+		
+		OrderResponseRecord response = orderService.createOrder(effectiveDto);
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.body(ApiResponse.success(response, "Order created successfully"));
 	}
@@ -41,9 +64,11 @@ public class OrderController {
 	@GetMapping
 	public ResponseEntity<ApiResponse<List<OrderResponseRecord>>> getOrders(
 				@RequestParam(required = false) Long userId,
-				@RequestParam(required = false) String role
+				@RequestParam(required = false) String role,
+				@AuthenticationPrincipal CustomUserDetails userDetails
 			){
-		List<OrderResponseRecord> orders = orderService.getOrders(userId, role);
+		Long effectiveUserId = (userId != null) ? userId : (userDetails != null ? userDetails.getId() : null);
+		List<OrderResponseRecord> orders = orderService.getOrders(effectiveUserId, role);
 		return ResponseEntity.ok(ApiResponse.success(orders));
 	}
 	
@@ -70,6 +95,14 @@ public class OrderController {
         OrderResponseRecord updated = orderService.acceptOrder(orderId);
         return ResponseEntity.ok(ApiResponse.success(updated, "Order accepted"));
     }
+
+	// PUT /orders/{orderId}/reject
+    @PutMapping("/{orderId}/reject")
+    public ResponseEntity<ApiResponse<OrderResponseRecord>> rejectOrder(
+            @PathVariable Long orderId) {
+        OrderResponseRecord cancelled = orderService.cancelOrder(orderId);
+        return ResponseEntity.ok(ApiResponse.success(cancelled, "Order rejected"));
+    }
     
     // DELETE /orders/{orderId}
     @DeleteMapping("/{orderId}")
@@ -77,9 +110,5 @@ public class OrderController {
             @PathVariable Long orderId) {
         OrderResponseRecord cancelled = orderService.cancelOrder(orderId);
         return ResponseEntity.ok(ApiResponse.success(cancelled, "Order cancelled"));
-        
     }
-    
-    
-
 }

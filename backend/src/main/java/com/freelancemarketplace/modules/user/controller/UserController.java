@@ -22,6 +22,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.freelancemarketplace.security.CustomUserDetails;
+import com.freelancemarketplace.modules.user.record.UpdateProfileRecord;
+
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -29,27 +34,41 @@ public class UserController {
 	private final UserServiceImplementation userServiceImplementation;
 	
 	@PostMapping
-	public ResponseEntity<?> createUser(@Valid @RequestBody CreateUserRecord user){
-		UserResponseRecord userResponseRecord=userServiceImplementation.createUser(user);
+	public ResponseEntity<ApiResponse<UserResponseRecord>> createUser(@Valid @RequestBody CreateUserRecord user){
+		UserResponseRecord userResponseRecord = userServiceImplementation.createUser(user);
 		return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(userResponseRecord));
 	}
-	
-	@GetMapping("{userId}")
-	public ResponseEntity<?> getUserDetails(@PathVariable Long userId) {
-		UserResponseRecord userResponseRecord=userServiceImplementation.findUserById(userId);
-		return ResponseEntity.status(HttpStatus.FOUND).body(ApiResponse.success(userResponseRecord));
-	}
-	
-	@PutMapping("{userId}")
-	public ResponseEntity<?> updateUserDetails(@PathVariable Long userId,@Valid @RequestBody CreateUserRecord user){
-		UserResponseRecord userResponseRecord=userServiceImplementation.updateUserDetails(userId,user);
-		return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(userResponseRecord));
 
-	}
-	@DeleteMapping("{userid}")
-	public ResponseEntity<?> deleteUser(@PathVariable Long userId){
-		userServiceImplementation.deleteUser(userId);
-		return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(null));
+	@GetMapping("/me")
+	public ResponseEntity<ApiResponse<UserResponseRecord>> getMyProfile(@AuthenticationPrincipal CustomUserDetails userDetails) {
+		UserResponseRecord userResponseRecord = userServiceImplementation.findUserById(userDetails.getId());
+		return ResponseEntity.ok(ApiResponse.success(userResponseRecord));
 	}
 	
+	@GetMapping("/{userId}")
+	public ResponseEntity<ApiResponse<UserResponseRecord>> getUserDetails(@PathVariable Long userId) {
+		UserResponseRecord userResponseRecord = userServiceImplementation.findUserById(userId);
+		return ResponseEntity.ok(ApiResponse.success(userResponseRecord));
+	}
+	
+	@PutMapping("/{userId}")
+	@PreAuthorize("#userId == principal.id or hasRole('ADMIN')")
+	public ResponseEntity<ApiResponse<UserResponseRecord>> updateUserDetails(@PathVariable Long userId, @Valid @RequestBody CreateUserRecord user){
+		UserResponseRecord userResponseRecord = userServiceImplementation.updateUserDetails(userId, user);
+		return ResponseEntity.ok(ApiResponse.success(userResponseRecord));
+	}
+
+	@PutMapping("/{userId}/profile")
+	@PreAuthorize("#userId == principal.id or hasRole('ADMIN')")
+	public ResponseEntity<ApiResponse<UserResponseRecord>> updateProfile(@PathVariable Long userId, @Valid @RequestBody UpdateProfileRecord profileRecord){
+		UserResponseRecord userResponseRecord = userServiceImplementation.updateProfile(userId, profileRecord);
+		return ResponseEntity.ok(ApiResponse.success(userResponseRecord));
+	}
+
+	@DeleteMapping("/{userId}")
+	@PreAuthorize("#userId == principal.id or hasRole('ADMIN')")
+	public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long userId){
+		userServiceImplementation.deleteUser(userId);
+		return ResponseEntity.ok(ApiResponse.success(null, "User deleted successfully"));
+	}
 }

@@ -1,61 +1,60 @@
 import apiClient from "./apiClient";
 
-export const createOrder = async ({ clientId, gigId, requirements }) => {
+export const createOrder = async (orderData) => {
   try {
-    const response = await apiClient.post("/api/orders", {
-      clientId,
-      gigId,
+    const clientId = orderData.clientId || orderData.userId || orderData.client?.id;
+    const gigId = orderData.gigId || orderData.gig?.id;
+    const freelancerId = orderData.freelancerId || orderData.freelancer?.id || 1;
+    const agreedPrice = Math.max(1, Number(orderData.agreedPrice || orderData.price || 1));
+    const requirements = (orderData.requirements || orderData.brief || "").trim();
+
+    const response = await apiClient.post("/orders", {
       requirements,
+      agreedPrice,
+      status: "PENDING",
+      client: { id: Number(clientId) },
+      freelancer: { id: Number(freelancerId) },
+      gig: { id: Number(gigId) },
     });
-    return response.data.data;
+    return response.data.data || response.data;
   } catch (error) {
-    const errorMessage = error.response?.data?.message || "Failed to place order. Check wallet balance.";
+    const errorMessage =
+      error.response?.data?.message ||
+      (typeof error.response?.data === 'string' ? error.response.data : null) ||
+      error.message ||
+      "Failed to place order.";
     throw new Error(errorMessage);
   }
 };
 
-export const acceptOrder = async (orderId, freelancerId) => {
+export const acceptOrder = async (orderId) => {
   try {
-    const response = await apiClient.patch(`/api/orders/${orderId}/accept`, null, {
-      params: { freelancerId },
-    });
-    return response.data.data;
+    const response = await apiClient.put(`/orders/${orderId}/accept`);
+    return response.data.data || response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || "Failed to accept order.";
     throw new Error(errorMessage);
   }
 };
 
-export const startOrder = async (orderId, freelancerId) => {
-  try {
-    const response = await apiClient.patch(`/api/orders/${orderId}/start`, null, {
-      params: { freelancerId },
-    });
-    return response.data.data;
-  } catch (error) {
-    const errorMessage = error.response?.data?.message || "Failed to start order.";
-    throw new Error(errorMessage);
-  }
+export const startOrder = async (orderId) => {
+  return await acceptOrder(orderId);
 };
 
-export const completeOrder = async (orderId, freelancerId) => {
+export const completeOrder = async (orderId) => {
   try {
-    const response = await apiClient.patch(`/api/orders/${orderId}/complete`, null, {
-      params: { freelancerId },
-    });
-    return response.data.data;
+    const response = await apiClient.put(`/orders/${orderId}/complete`);
+    return response.data.data || response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || "Failed to complete order.";
     throw new Error(errorMessage);
   }
 };
 
-export const cancelOrder = async (orderId, userId) => {
+export const cancelOrder = async (orderId) => {
   try {
-    const response = await apiClient.patch(`/api/orders/${orderId}/cancel`, null, {
-      params: { userId },
-    });
-    return response.data.data;
+    const response = await apiClient.delete(`/orders/${orderId}`);
+    return response.data.data || response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || "Failed to cancel order.";
     throw new Error(errorMessage);
@@ -64,8 +63,10 @@ export const cancelOrder = async (orderId, userId) => {
 
 export const getClientOrders = async (clientId) => {
   try {
-    const response = await apiClient.get(`/api/orders/client/${clientId}`);
-    return response.data.data;
+    const response = await apiClient.get("/orders", {
+      params: { userId: clientId, role: "CLIENT" },
+    });
+    return response.data.data || response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || "Failed to fetch client orders.";
     throw new Error(errorMessage);
@@ -74,8 +75,10 @@ export const getClientOrders = async (clientId) => {
 
 export const getFreelancerOrders = async (freelancerId) => {
   try {
-    const response = await apiClient.get(`/api/orders/freelancer/${freelancerId}`);
-    return response.data.data;
+    const response = await apiClient.get("/orders", {
+      params: { userId: freelancerId, role: "FREELANCER" },
+    });
+    return response.data.data || response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || "Failed to fetch freelancer orders.";
     throw new Error(errorMessage);
@@ -84,8 +87,8 @@ export const getFreelancerOrders = async (freelancerId) => {
 
 export const getAllOrders = async () => {
   try {
-    const response = await apiClient.get("/api/orders");
-    return response.data.data;
+    const response = await apiClient.get("/orders");
+    return response.data.data || response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || "Failed to fetch orders.";
     throw new Error(errorMessage);

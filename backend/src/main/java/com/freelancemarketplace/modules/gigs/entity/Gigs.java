@@ -30,36 +30,46 @@ import lombok.Setter;
 public class Gigs extends BaseEntity
 {
 	
-	@Column(name =  "title")
-	private String title ;
+	@Column(name = "title")
+	private String title;
 	
-	@Column(name =  "discription")
-	private String description ;
+	@Column(name = "description", columnDefinition = "TEXT")
+	private String description;
 	
-	@Column(name =  "price")
-	private BigDecimal price ;
+	@Column(name = "price")
+	private BigDecimal price;
 	
-	@Column(name =  "delivery_days")
-	private Integer deliveryDays ;
+	@Column(name = "delivery_days")
+	private Integer deliveryDays;
 	
-	@Column(name =  "thumbnail_url")
-	private String thumbnailUrl ;
+	@Column(name = "thumbnail_url")
+	private String thumbnailUrl;
 	
-	@Column(name =  "total_orders")
+	@Column(name = "total_orders")
 	private Integer totalOrders = 0;
 	
-	@Column(name =  "is_deleted" )
-	private boolean isDeleted = false;
+	@Column(name = "average_rating")
+	private Double averageRating = 0.0;
+	
+	@Column(name = "total_reviews")
+	private Integer totalReviews = 0;
+	
+	@Column(name = "is_deleted")
+	private Boolean isDeleted = false;
+
+	public boolean isDeleted() {
+		return Boolean.TRUE.equals(isDeleted);
+	}
+
+	public void setDeleted(Boolean deleted) {
+		this.isDeleted = deleted;
+	}
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "freelancer_id" , nullable =  false)
-	private User freelancer ;
+	@JoinColumn(name = "freelancer_id", nullable = false)
+	private User freelancer;
 	
-	@ManyToOne(fetch = FetchType.LAZY , optional =  false)
-	@JoinColumn(name = "catagory_id" , nullable =  false)
-	private Category category ;
-	
-	
-	
-	
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "category_id", nullable = false)
+	private Category category;
 }

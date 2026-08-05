@@ -45,6 +45,28 @@ public class GlobalExceptionHandler {
         return problemDetail;
     }
 
+    // Handling Unauthorized / Access Denied Exception
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ProblemDetail handleUnauthorizedAccess(UnauthorizedAccessException ex, WebRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                ex.getHttpStatus(),
+                ex.getMessage());
+        problemDetail.setTitle("Access Denied");
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("errorCode", ex.getErrorCode().toString());
+        return problemDetail;
+    }
+
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ProblemDetail handleAccessDenied(org.springframework.security.access.AccessDeniedException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.FORBIDDEN,
+                "Access Denied: You do not have permission to perform this action");
+        problemDetail.setTitle("Access Denied");
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
     @ExceptionHandler({ BadCredentialsException.class, UsernameNotFoundException.class })
     public ProblemDetail handleAuthenticationException(Exception ex) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(

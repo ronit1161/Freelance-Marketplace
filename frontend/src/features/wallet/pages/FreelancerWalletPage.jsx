@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
-import { getWalletByUserId } from "../../../services/walletapi";
+import { getWalletByUserId, getWalletTransactions } from "../../../services/walletapi";
 import apiClient from "../../../services/apiClient";
 import {
   Wallet,
@@ -37,13 +37,13 @@ export default function FreelancerWalletPage() {
     setLoading(true);
     setError("");
     try {
-      const [walletData, txnsResponse] = await Promise.all([
+      const [walletData, txnsData] = await Promise.all([
         getWalletByUserId(user.id).catch(() => null),
-        apiClient.get("/api/transactions").catch(() => ({ data: { data: [] } })),
+        getWalletTransactions(user.id).catch(() => []),
       ]);
 
       setWallet(walletData);
-      setTransactions(txnsResponse?.data?.data || []);
+      setTransactions(Array.isArray(txnsData) ? txnsData : (txnsData?.content || []));
     } catch (err) {
       console.error("Failed to load freelancer wallet:", err);
       setError(err?.message || "Failed to fetch wallet and transaction history.");

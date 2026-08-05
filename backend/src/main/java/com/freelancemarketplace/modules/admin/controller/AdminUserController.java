@@ -13,7 +13,7 @@ import com.freelancemarketplace.modules.admin.service.AdminUserService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/admin/users")
+@RequestMapping("/admin/users")
 @RequiredArgsConstructor
 public class AdminUserController {
     private final AdminUserService adminUserService;

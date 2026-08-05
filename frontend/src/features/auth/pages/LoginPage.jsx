@@ -43,10 +43,10 @@ function LoginPage() {
           {error && <p className="text-sm text-red-600 bg-red-50 p-2 rounded border border-red-200">{error}</p>}
 
           <div className="flex flex-col gap-1">
-            <label className="text-sm italic text-left">Username or Email</label>
+            <label className="text-sm italic text-left">Email Address</label>
             <input
-              type="text"
-              placeholder="Username or email"
+              type="email"
+              placeholder="user@example.com"
               value={userNameOrEmail}
               onChange={(e) => setUserNameOrEmail(e.target.value)}
               className="border p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"

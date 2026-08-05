@@ -22,6 +22,13 @@ public class AdminGigServiceImpl implements AdminGigService {
     public List<GigSummaryRecord> getAllGigs() {
         List<Gigs> gigs = gigRepo.findAll();
         return gigMapperAdmin.toSummaryList(gigs);
+    }
 
+    @Override
+    public void deleteGig(Long id) {
+        Gigs gig = gigRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Gig not found with id: " + id));
+        gig.setDeleted(true);
+        gigRepo.save(gig);
     }
 }

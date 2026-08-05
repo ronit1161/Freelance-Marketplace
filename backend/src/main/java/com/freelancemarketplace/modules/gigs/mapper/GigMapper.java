@@ -15,6 +15,8 @@ public interface GigMapper {
     @Mapping(target = "createdOn", ignore = true)
     @Mapping(target = "lastUpdated", ignore = true)
     @Mapping(target = "totalOrders", ignore = true)
+    @Mapping(target = "averageRating", ignore = true)
+    @Mapping(target = "totalReviews", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "freelancer", ignore = true)
     @Mapping(target = "category", ignore = true)

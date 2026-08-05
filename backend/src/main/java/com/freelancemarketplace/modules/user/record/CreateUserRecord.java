@@ -19,7 +19,7 @@ public record CreateUserRecord(
         @JsonProperty(value = "password", access = JsonProperty.Access.WRITE_ONLY) 
         String hashedPassword,
 
-        @JsonProperty("name")
+        @com.fasterxml.jackson.annotation.JsonAlias({"name", "fullName"})
         @NotBlank(message = "Full name cannot be blank") 
         @Size(min = 2, max = 50, message = "Full name must be between 2 and 50 characters") 
         String fullName,

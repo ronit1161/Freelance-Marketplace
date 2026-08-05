@@ -24,14 +24,16 @@ import lombok.Setter;
 @AttributeOverride(name = "id", column = @Column(name = "wallet_transaction_id"))
 public class WalletTransaction extends BaseEntity{
 	
-	@ManyToOne(fetch = FetchType.LAZY,optional =false )
+	@ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = jakarta.persistence.CascadeType.ALL)
 	@JoinColumn(name = "transaction_id")
 	private Transaction transaction;
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "destination_wallet_id", nullable = true)
-    private Wallet destinationWallet;
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "source_wallet_id", nullable = true)
-    private Wallet sourceWallet;
+
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@JoinColumn(name = "destination_wallet_id", nullable = true)
+	private Wallet destinationWallet;
+
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@JoinColumn(name = "source_wallet_id", nullable = true)
+	private Wallet sourceWallet;
 }
 

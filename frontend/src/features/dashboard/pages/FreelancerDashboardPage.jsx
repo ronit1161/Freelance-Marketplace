@@ -106,7 +106,9 @@ export default function FreelancerDashboard() {
       ? (reviews.reduce((sum, r) => sum + (r.rating || 5), 0) / reviews.length).toFixed(1)
       : "5.0";
 
-  const walletBalance = wallet ? wallet.balance : "0.00";
+  const walletBalance = wallet
+    ? (wallet.availableBalance ?? wallet.totalBalance ?? wallet.balance ?? "0.00")
+    : "0.00";
 
   return (
     <div className="max-w-7xl m-auto min-h-screen bg-gray-50/50 p-6 sm:p-10 space-y-8">

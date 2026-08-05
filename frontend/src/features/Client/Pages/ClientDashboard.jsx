@@ -53,7 +53,9 @@ export default function ClientDashboard() {
     (o) => (o.status || "").toUpperCase() === "CANCELLED"
   ).length;
 
-  const walletBalance = wallet ? wallet.balance : "0.00";
+  const walletBalance = wallet
+    ? (wallet.availableBalance ?? wallet.totalBalance ?? wallet.balance ?? "0.00")
+    : "0.00";
 
   const totalSpent = orders
     .filter((o) => (o.status || "").toUpperCase() === "COMPLETED")
