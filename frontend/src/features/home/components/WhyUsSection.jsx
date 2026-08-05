@@ -1,38 +1,38 @@
 import React from "react";
 
 const WhyUsSection = () => {
+  const benefits = [
+    {
+      title: "Verified Freelancers",
+      description: "Work with vetted professionals who have proven skills and real client reviews.",
+    },
+    {
+      title: "Secure Payments",
+      description: "Payments are held securely in escrow and released only when you approve the work.",
+    },
+    {
+      title: "24/7 Support",
+      description: "Our dedicated support team is available around the clock to help resolve any issue.",
+    },
+  ];
+
   return (
-    <>
-      {/* Why Us */}
-      <section className="bg-blue-600 text-white py-20">
-        <div className="max-w-6xl mx-auto px-6 text-center">
-          <h2 className="text-4xl font-bold">Why Choose Our Marketplace?</h2>
+    <section className="bg-blue-600 text-white py-16 md:py-20">
+      <div className="max-w-7xl mx-auto px-6 text-center">
+        <h2 className="text-3xl font-bold">Why Choose Our Marketplace?</h2>
 
-          <div className="grid md:grid-cols-3 gap-10 mt-12">
-            <div>
-              <h3 className="text-xl font-semibold">Verified Freelancers</h3>
-              <p className="mt-3 text-blue-100">
-                Work with trusted professionals.
+        <div className="grid md:grid-cols-3 gap-8 mt-12">
+          {benefits.map((benefit, idx) => (
+            <div key={idx} className="p-6">
+              <h3 className="text-xl font-semibold">{benefit.title}</h3>
+              <p className="mt-3 text-blue-100 text-sm leading-relaxed max-w-xs mx-auto">
+                {benefit.description}
               </p>
             </div>
-
-            <div>
-              <h3 className="text-xl font-semibold">Secure Payments</h3>
-              <p className="mt-3 text-blue-100">
-                Safe and transparent transactions.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold">24/7 Support</h3>
-              <p className="mt-3 text-blue-100">
-                We're here whenever you need help.
-              </p>
-            </div>
-          </div>
+          ))}
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 };
 

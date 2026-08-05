@@ -36,12 +36,13 @@ export const getReviewsForGig = async (gigId) => {
   }
 };
 
-export const getReviewByOrderId = async (orderId) => {
+export const getReviewsForClient = async (clientId) => {
   try {
-    const response = await apiClient.get(`/reviews/gig/${orderId}`);
+    const response = await apiClient.get(`/reviews/client/${clientId}`);
     return response.data.data || response.data;
   } catch (error) {
-    return null;
+    const errorMessage = error.response?.data?.message || "Failed to fetch client reviews.";
+    throw new Error(errorMessage);
   }
 };
 

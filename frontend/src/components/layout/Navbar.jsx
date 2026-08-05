@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -14,6 +14,11 @@ const Navbar = () => {
   };
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
+
+  const navLinkClass = ({ isActive }) =>
+    `transition font-medium py-5 border-b-2 flex items-center ${
+      isActive ? "text-[#0058be] font-bold border-[#0058be]" : "text-gray-700 border-transparent hover:text-[#0058be]"
+    }`;
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
@@ -32,79 +37,76 @@ const Navbar = () => {
         </div>
 
         {/* Navigation Links (Desktop) */}
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
+        <nav className="hidden md:flex items-center gap-8 text-sm font-medium h-full">
           {/* Guest Navbar */}
           {!user && (
             <>
-              <Link to="/" className="text-gray-700 hover:text-[#0058be] transition">
+              <NavLink to="/" end className={navLinkClass}>
                 Home
-              </Link>
-              <Link to="/gigs" className="text-gray-700 hover:text-[#0058be] transition">
+              </NavLink>
+              <NavLink to="/gigs" className={navLinkClass}>
                 Browse Gigs
-              </Link>
+              </NavLink>
             </>
           )}
 
           {/* Client Navbar */}
           {user && user.role?.toLowerCase() === 'client' && (
             <>
-              <Link to="/client" className="text-gray-700 hover:text-[#0058be] transition">
+              <NavLink to="/client" end className={navLinkClass}>
                 Dashboard
-              </Link>
-              <Link to="/client/orders" className="text-gray-700 hover:text-[#0058be] transition">
+              </NavLink>
+              <NavLink to="/client/orders" className={navLinkClass}>
                 Orders
-              </Link>
-              <Link to="/client/wallet" className="text-gray-700 hover:text-[#0058be] transition">
+              </NavLink>
+              <NavLink to="/client/wallet" className={navLinkClass}>
                 Wallet
-              </Link>
-              <Link to="/gigs" className="text-gray-700 hover:text-[#0058be] transition">
+              </NavLink>
+              <NavLink to="/gigs" className={navLinkClass}>
                 Browse Gigs
-              </Link>
+              </NavLink>
             </>
           )}
 
           {/* Freelancer Navbar */}
           {user && user.role?.toLowerCase() === 'freelancer' && (
             <>
-              <Link to="/freelancer" className="text-gray-700 hover:text-[#0058be] transition font-medium">
+              <NavLink to="/freelancer" end className={navLinkClass}>
                 Dashboard
-              </Link>
-              <Link to="/freelancer/gigs" className="text-gray-700 hover:text-[#0058be] transition font-medium">
+              </NavLink>
+              <NavLink to="/freelancer/gigs" className={navLinkClass}>
                 My Gigs
-              </Link>
-              <Link to="/freelancer/orders" className="text-gray-700 hover:text-[#0058be] transition font-medium">
+              </NavLink>
+              <NavLink to="/freelancer/orders" className={navLinkClass}>
                 Orders
-              </Link>
-              <Link to="/freelancer/wallet" className="text-gray-700 hover:text-[#0058be] transition font-medium">
+              </NavLink>
+              <NavLink to="/freelancer/wallet" className={navLinkClass}>
                 Wallet
-              </Link>
-              <Link to="/freelancer/reviews" className="text-gray-700 hover:text-[#0058be] transition font-medium">
+              </NavLink>
+              <NavLink to="/freelancer/reviews" className={navLinkClass}>
                 Reviews
-              </Link>
-              <Link to="/freelancer/create-gig" className="text-gray-700 hover:text-[#0058be] transition font-medium">
+              </NavLink>
+              <NavLink to="/freelancer/create-gig" className={navLinkClass}>
                 Create Gig
-              </Link>
-              <Link to="/freelancer/profile" className="text-gray-700 hover:text-[#0058be] transition font-medium">
-                Profile
-              </Link>
+              </NavLink>
             </>
           )}
 
           {/* Admin Navbar */}
           {user && user.role?.toLowerCase() === 'admin' && (
             <>
-              <Link to="/admin" className="text-gray-700 hover:text-[#0058be] transition font-medium">
+              <NavLink to="/admin" end className={navLinkClass}>
                 Admin Overview
-              </Link>
-              <Link to="/admin/categories" className="text-gray-700 hover:text-[#0058be] transition font-medium">
+              </NavLink>
+              <NavLink to="/admin/categories" className={navLinkClass}>
                 Categories
-              </Link>
-              <Link to="/admin/gigs" className="text-gray-700 hover:text-[#0058be] transition font-medium">
+              </NavLink>
+              <NavLink to="/admin/gigs" className={navLinkClass}>
                 Gigs
-              </Link>
-              <Link to="/admin/orders" className="text-gray-700 hover:text-[#0058be] transition font-medium">
+              </NavLink>
+              <NavLink to="/admin/orders" className={navLinkClass}>
                 Order Management
-              </Link>
+              </NavLink>
             </>
           )}
         </nav>
@@ -115,7 +117,7 @@ const Navbar = () => {
             <div className="flex items-center gap-3">
 
               {/* User Avatar */}
-              <Link
+              <NavLink
                 to={
                   user.role?.toLowerCase() === 'admin'
                     ? "/admin/profile"
@@ -123,11 +125,17 @@ const Navbar = () => {
                       ? "/client/profile"
                       : "/freelancer/profile"
                 }
-                className="w-9 h-9 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm border hover:border-blue-500 transition"
+                className={({ isActive }) =>
+                  `w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm border transition ${
+                    isActive
+                      ? "bg-[#0058be] text-white border-[#0058be]"
+                      : "bg-blue-100 text-blue-600 border-transparent hover:border-blue-500"
+                  }`
+                }
                 title="View Profile"
               >
                 <span>{(user.fullName || user.userName || user.name || 'U')[0].toUpperCase()}</span>
-              </Link>
+              </NavLink>
 
               {/* Logout Button */}
               <button
@@ -162,41 +170,43 @@ const Navbar = () => {
 
       {/* Mobile Drawer Overlay Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-gray-200 px-6 py-4 space-y-3 shadow-lg animate-in slide-in-from-top-2">
+        <div className="md:hidden bg-white border-b border-gray-200 px-6 py-4 space-y-3 shadow-lg">
           {!user && (
             <div className="flex flex-col gap-3 font-semibold text-sm">
-              <Link to="/" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Home</Link>
-              <Link to="/gigs" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Browse Gigs</Link>
+              <NavLink to="/" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Home</NavLink>
+              <NavLink to="/gigs" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Browse Gigs</NavLink>
             </div>
           )}
 
           {user && user.role?.toLowerCase() === 'client' && (
             <div className="flex flex-col gap-3 font-semibold text-sm">
-              <Link to="/client" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Dashboard</Link>
-              <Link to="/client/orders" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Orders</Link>
-              <Link to="/client/wallet" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Wallet</Link>
-              <Link to="/gigs" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Browse Gigs</Link>
+              <NavLink to="/client" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Dashboard</NavLink>
+              <NavLink to="/client/orders" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Orders</NavLink>
+              <NavLink to="/client/wallet" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Wallet</NavLink>
+              <NavLink to="/gigs" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Browse Gigs</NavLink>
+              <NavLink to="/client/profile" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">My Profile</NavLink>
             </div>
           )}
 
           {user && user.role?.toLowerCase() === 'freelancer' && (
             <div className="flex flex-col gap-3 font-semibold text-sm">
-              <Link to="/freelancer" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Dashboard</Link>
-              <Link to="/freelancer/gigs" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">My Gigs</Link>
-              <Link to="/freelancer/orders" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Orders</Link>
-              <Link to="/freelancer/wallet" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Wallet</Link>
-              <Link to="/freelancer/reviews" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Reviews</Link>
-              <Link to="/freelancer/create-gig" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Create Gig</Link>
-              <Link to="/freelancer/profile" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Profile</Link>
+              <NavLink to="/freelancer" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Dashboard</NavLink>
+              <NavLink to="/freelancer/gigs" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">My Gigs</NavLink>
+              <NavLink to="/freelancer/orders" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Orders</NavLink>
+              <NavLink to="/freelancer/wallet" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Wallet</NavLink>
+              <NavLink to="/freelancer/reviews" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Reviews</NavLink>
+              <NavLink to="/freelancer/create-gig" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Create Gig</NavLink>
+              <NavLink to="/freelancer/profile" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Profile</NavLink>
             </div>
           )}
 
           {user && user.role?.toLowerCase() === 'admin' && (
             <div className="flex flex-col gap-3 font-semibold text-sm">
-              <Link to="/admin" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Admin Overview</Link>
-              <Link to="/admin/categories" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Categories</Link>
-              <Link to="/admin/gigs" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Gigs</Link>
-              <Link to="/admin/orders" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Order Management</Link>
+              <NavLink to="/admin" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Admin Overview</NavLink>
+              <NavLink to="/admin/categories" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Categories</NavLink>
+              <NavLink to="/admin/gigs" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Gigs</NavLink>
+              <NavLink to="/admin/orders" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Order Management</NavLink>
+              <NavLink to="/admin/profile" onClick={closeMobileMenu} className="text-gray-700 hover:text-[#0058be]">Admin Profile</NavLink>
             </div>
           )}
         </div>

@@ -13,12 +13,8 @@ import {
   CheckCircle2,
   RefreshCw,
   X,
-  Filter,
   User,
   FolderTree,
-  Clock,
-  DollarSign,
-  Layers,
 } from "lucide-react";
 
 export default function AdminGigManagementPage() {

@@ -1,14 +1,25 @@
-import { useState } from 'react';
-import { X, CheckCircle2, AlertCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { X, CheckCircle2, AlertCircle, Wallet } from 'lucide-react';
 import { createOrder as apiCreateOrder } from '../../../services/orderApi';
+import { getWalletByUserId } from '../../../services/walletapi';
 import { useAuth } from '../../../context/AuthContext';
 
 export default function OrderCheckoutModal({ gig, isOpen, onClose, onOrderSuccess }) {
   const { user } = useAuth();
   const [brief, setBrief] = useState('');
+  const [wallet, setWallet] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (user?.id && isOpen) {
+      getWalletByUserId(user.id)
+        .then(setWallet)
+        .catch(() => setWallet(null));
+    }
+  }, [user?.id, isOpen]);
 
   if (!isOpen || !gig) return null;
 
@@ -16,6 +27,10 @@ export default function OrderCheckoutModal({ gig, isOpen, onClose, onOrderSucces
   const freelancerName = gig.freelancerName || gig.freelancer || "Freelancer";
   const thumbnail = gig.thumbnailUrl || gig.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&h=100&q=80";
   const deliveryDays = gig.deliveryDays || 3;
+
+  const availableBalance = wallet?.availableBalance ?? wallet?.balance ?? 0;
+  const remainingBalance = availableBalance - Number(price);
+  const hasInsufficientFunds = availableBalance < Number(price);
 
   const handleCheckoutSubmit = async (e) => {
     e.preventDefault();
@@ -28,6 +43,11 @@ export default function OrderCheckoutModal({ gig, isOpen, onClose, onOrderSucces
 
     if (!brief.trim()) {
       setError('Project requirements are mandatory.');
+      return;
+    }
+
+    if (hasInsufficientFunds) {
+      setError('Insufficient wallet balance. Please top up your wallet before placing this order.');
       return;
     }
 
@@ -57,7 +77,7 @@ export default function OrderCheckoutModal({ gig, isOpen, onClose, onOrderSucces
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-gray-100">
+      <div className="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-gray-200">
         
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
@@ -74,7 +94,7 @@ export default function OrderCheckoutModal({ gig, isOpen, onClose, onOrderSucces
 
         {orderComplete ? (
           <div className="p-8 text-center space-y-4">
-            <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto animate-bounce">
+            <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
               <CheckCircle2 size={36} />
             </div>
             <h3 className="text-2xl font-extrabold text-slate-900">Order Placed Successfully!</h3>
@@ -86,14 +106,14 @@ export default function OrderCheckoutModal({ gig, isOpen, onClose, onOrderSucces
         ) : (
           <form onSubmit={handleCheckoutSubmit} className="p-6 space-y-6">
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm flex items-center gap-2">
+              <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
                 <span>{error}</span>
               </div>
             )}
 
             {/* Gig Info Display */}
-            <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 flex gap-4 items-start">
+            <div className="bg-slate-50 rounded-xl p-4 border border-slate-200 flex gap-4 items-start">
               <img 
                 src={thumbnail} 
                 alt={gig.title}
@@ -107,7 +127,7 @@ export default function OrderCheckoutModal({ gig, isOpen, onClose, onOrderSucces
                 <h4 className="font-bold text-slate-900 text-sm truncate">{gig.title}</h4>
                 <p className="text-xs text-gray-500 mt-0.5">By {freelancerName}</p>
                 <div className="mt-2 text-xs font-semibold text-slate-700">
-                  <span>Delivery: {deliveryDays} Days</span>
+                  <span>Turnaround: {deliveryDays} Days</span>
                 </div>
               </div>
             </div>
@@ -127,16 +147,31 @@ export default function OrderCheckoutModal({ gig, isOpen, onClose, onOrderSucces
               />
             </div>
 
-            {/* Pricing Summary */}
-            <div className="border-t border-b border-gray-100 py-3 space-y-2 text-sm">
+            {/* Financial Balance Summary */}
+            <div className="border-t border-b border-gray-100 py-3 space-y-2 text-xs">
               <div className="flex justify-between text-slate-600">
-                <span>Service Price</span>
-                <span className="font-semibold text-slate-900">₹{Number(price).toFixed(2)}</span>
+                <span className="flex items-center gap-1"><Wallet size={13} /> Current Wallet Balance</span>
+                <span className="font-semibold text-slate-900">₹{Number(availableBalance).toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-base font-extrabold text-slate-950 pt-2 border-t border-dashed">
-                <span>Total Amount</span>
-                <span className="text-blue-600">₹{Number(price).toFixed(2)}</span>
+
+              <div className="flex justify-between text-slate-600">
+                <span>Order Total (Escrow)</span>
+                <span className="font-bold text-slate-900">₹{Number(price).toFixed(2)}</span>
               </div>
+
+              <div className="flex justify-between text-sm font-bold text-slate-950 pt-2 border-t border-dashed">
+                <span>Remaining Balance</span>
+                <span className={hasInsufficientFunds ? "text-red-600" : "text-emerald-600"}>
+                  ₹{Number(remainingBalance).toFixed(2)}
+                </span>
+              </div>
+
+              {hasInsufficientFunds && (
+                <div className="p-2.5 bg-red-50 text-red-700 rounded-lg text-xs font-medium flex items-center justify-between mt-2">
+                  <span>Insufficient funds. Top up your wallet to proceed.</span>
+                  <Link to="/client/wallet" className="font-bold underline text-[#0058be]">Top Up</Link>
+                </div>
+              )}
             </div>
 
             {/* Action Buttons */}
@@ -144,19 +179,19 @@ export default function OrderCheckoutModal({ gig, isOpen, onClose, onOrderSucces
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 py-3 border border-gray-200 text-slate-700 rounded-xl font-semibold hover:bg-gray-50 transition text-sm"
+                className="flex-1 py-3 border border-gray-200 text-slate-700 rounded-xl font-semibold hover:bg-gray-50 transition text-xs"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="flex-1 py-3 bg-[#0058be] hover:bg-[#004bb0] text-white rounded-xl font-bold text-sm transition flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+                disabled={isSubmitting || hasInsufficientFunds}
+                className="flex-1 py-3 bg-[#0058be] hover:bg-[#004bb0] text-white rounded-xl font-bold text-xs transition flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <span>Processing...</span>
                 ) : (
-                  <span>Place Order</span>
+                  <span>Confirm & Place Order</span>
                 )}
               </button>
             </div>

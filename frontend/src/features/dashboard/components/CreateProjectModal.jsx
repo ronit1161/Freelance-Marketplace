@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createOrder } from "../../../Services/orderApi";
+import { createOrder } from "../../../services/orderApi";
 import { X, FolderPlus, Loader2, AlertCircle } from "lucide-react";
 
 export default function CreateProjectModal({ isOpen, onClose }) {

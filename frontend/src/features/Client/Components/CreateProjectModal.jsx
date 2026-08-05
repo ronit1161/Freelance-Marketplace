@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createOrder } from "../../../Services/ordersApi";
+import { createOrder } from "../../../services/orderApi";
 import { X, FolderPlus, Loader2, AlertCircle } from "lucide-react";
 
 export default function CreateProjectModal({ isOpen, onClose }) {
@@ -15,7 +15,7 @@ export default function CreateProjectModal({ isOpen, onClose }) {
         try {
             await createOrder(payload);
             // On success, clear the stored inputs
-            setState({ error: null, success: true, values: { freelancerId: "", gigId: "", requirements: "" } });
+            setState({ error: null, success: false, values: { freelancerId: "", gigId: "", requirements: "" } });
             e.target.reset(); // Reset the DOM form
             onClose();
         } catch (err) {
