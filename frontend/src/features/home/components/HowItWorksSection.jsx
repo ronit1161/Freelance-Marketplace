@@ -1,3 +1,4 @@
+import React from "react";
 import StepCard from "./StepCard";
 
 const HowItWorksSection = () => {

@@ -1,176 +1,141 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
+import { getUserById, updateUserProfile } from "../../../services/userApi";
+
 export default function EditProfile() {
+  const { user, setUser } = useAuth();
+  const navigate = useNavigate();
+
+  const [fullName, setFullName] = useState(user?.fullName || "");
+  const [profileAvatarURL, setProfileAvatarURL] = useState(user?.profileAvatarURL || "");
+  const [bioData, setBioData] = useState(user?.bioData || "");
+  const [skills, setSkills] = useState(user?.skills || "");
+  const [experience, setExperience] = useState(user?.experience || 0);
+
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (user?.id) {
+      setLoading(true);
+      getUserById(user.id)
+        .then((data) => {
+          setFullName(data.fullName || "");
+          setProfileAvatarURL(data.profileAvatarURL || "");
+          setBioData(data.bioData || "");
+          setSkills(data.skills || "");
+          setExperience(data.experience || 0);
+        })
+        .catch((err) => console.error("Failed to load user profile", err))
+        .finally(() => setLoading(false));
+    }
+  }, [user?.id]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setMessage("");
+    setLoading(true);
+
+    try {
+      const updatedUser = await updateUserProfile(user.id, {
+        fullName,
+        profileAvatarURL,
+        bioData,
+        skills,
+        experience,
+      });
+
+      setUser(updatedUser);
+      localStorage.setItem("auth_user", JSON.stringify(updatedUser));
+      setMessage("Profile updated successfully!");
+      setLoading(false);
+    } catch (err) {
+      setLoading(false);
+      setError(err?.message || "Failed to update profile.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-10">
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-sm p-8">
+        <h1 className="text-3xl font-bold mb-8">Edit Profile</h1>
 
-        <h1 className="text-3xl font-bold mb-8">
-          Edit Profile
-        </h1>
+        {error && <p className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg border border-red-200">{error}</p>}
+        {message && <p className="mb-4 p-3 bg-emerald-50 text-emerald-600 rounded-lg border border-emerald-200">{message}</p>}
 
-        <form className="space-y-8">
-
-          {/* Profile Image */}
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Avatar URL */}
           <div>
-            <label className="block font-medium mb-2">
-              Profile Picture
-            </label>
-
-            <input
-              type="file"
-              className="w-full border rounded-lg p-3"
-            />
-          </div>
-
-          {/* Name */}
-          <div>
-            <label className="block font-medium mb-2">
-              Full Name
-            </label>
-
+            <label className="block font-medium mb-2">Profile Avatar URL</label>
             <input
               type="text"
-              placeholder="Ronit Tambe"
+              placeholder="https://avatar.com/image.jpg"
+              value={profileAvatarURL}
+              onChange={(e) => setProfileAvatarURL(e.target.value)}
               className="w-full border rounded-lg p-3"
             />
           </div>
 
-          {/* Title */}
+          {/* Full Name */}
           <div>
-            <label className="block font-medium mb-2">
-              Professional Title
-            </label>
-
+            <label className="block font-medium mb-2">Full Name</label>
             <input
               type="text"
-              placeholder="Full Stack Developer"
+              placeholder="Full Name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
               className="w-full border rounded-lg p-3"
+              required
             />
           </div>
 
-          {/* Location */}
+          {/* Bio Data */}
           <div>
-            <label className="block font-medium mb-2">
-              Location
-            </label>
-
-            <input
-              type="text"
-              placeholder="Mumbai, India"
-              className="w-full border rounded-lg p-3"
-            />
-          </div>
-
-          {/* Bio */}
-          <div>
-            <label className="block font-medium mb-2">
-              About Me
-            </label>
-
+            <label className="block font-medium mb-2">About Me / Bio Data</label>
             <textarea
-              rows="6"
+              rows="4"
               placeholder="Tell clients about yourself..."
+              value={bioData}
+              onChange={(e) => setBioData(e.target.value)}
               className="w-full border rounded-lg p-3 resize-none"
             />
           </div>
 
           {/* Skills */}
           <div>
-            <label className="block font-medium mb-2">
-              Skills
-            </label>
-
+            <label className="block font-medium mb-2">Skills (Comma-separated)</label>
             <input
               type="text"
-              placeholder="React, Node.js, MongoDB"
+              placeholder="React, Spring Boot, Java, MySQL"
+              value={skills}
+              onChange={(e) => setSkills(e.target.value)}
               className="w-full border rounded-lg p-3"
-            />
-          </div>
-
-          {/* Languages */}
-          <div>
-            <label className="block font-medium mb-2">
-              Languages
-            </label>
-
-            <input
-              type="text"
-              placeholder="English, Hindi"
-              className="w-full border rounded-lg p-3"
-            />
-          </div>
-
-          {/* Education */}
-          <div>
-            <label className="block font-medium mb-2">
-              Education
-            </label>
-
-            <textarea
-              rows="3"
-              placeholder="Bachelor of Engineering..."
-              className="w-full border rounded-lg p-3 resize-none"
             />
           </div>
 
           {/* Experience */}
           <div>
-            <label className="block font-medium mb-2">
-              Experience
-            </label>
-
-            <textarea
-              rows="4"
-              placeholder="Describe your professional experience..."
-              className="w-full border rounded-lg p-3 resize-none"
-            />
-          </div>
-
-          {/* Portfolio */}
-          <div>
-            <label className="block font-medium mb-2">
-              Portfolio Website
-            </label>
-
+            <label className="block font-medium mb-2">Years of Experience</label>
             <input
-              type="url"
-              placeholder="https://yourportfolio.com"
-              className="w-full border rounded-lg p-3"
-            />
-          </div>
-
-          {/* Github */}
-          <div>
-            <label className="block font-medium mb-2">
-              GitHub Profile
-            </label>
-
-            <input
-              type="url"
-              placeholder="https://github.com/username"
-              className="w-full border rounded-lg p-3"
-            />
-          </div>
-
-          {/* LinkedIn */}
-          <div>
-            <label className="block font-medium mb-2">
-              LinkedIn Profile
-            </label>
-
-            <input
-              type="url"
-              placeholder="https://linkedin.com/in/username"
+              type="number"
+              min="0"
+              placeholder="3"
+              value={experience}
+              onChange={(e) => setExperience(e.target.value)}
               className="w-full border rounded-lg p-3"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:bg-blue-300"
           >
-            Save Changes
+            {loading ? "Saving Changes..." : "Save Changes"}
           </button>
-
         </form>
       </div>
     </div>

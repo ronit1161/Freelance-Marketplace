@@ -1,4 +1,4 @@
-import { useWallet } from '../../../hooks/useWallet';
+import { useWallet } from '../../Hooks/useWallet';
 import { Wallet, Lock, Coins, AlertCircle, Loader2 } from 'lucide-react';
 
 export default function WalletCard({ userId }) {

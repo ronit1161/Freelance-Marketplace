@@ -3,42 +3,33 @@ package com.freelancemarketplace.modules.user.record;
 import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import com.freelancemarketplace.enums.UserRoles;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record CreateUserRecord(
-		@NotBlank(message = "user name cannot be blank") 
-		@Size(min = 3, max = 20) 
-		String userName,
+        String userName,
 
-		@NotBlank(message = "email cannot be blank") 
-		@Size(min = 3, max = 20) 
-		@Email 
-		String email,
+        @NotBlank(message = "Email cannot be blank") 
+        @Email(message = "Invalid email format")
+        @Size(max = 100, message = "Email cannot exceed 100 characters")
+        String email,
 
-		@NotBlank(message = "password cannot be blank") 
-		@Size(min = 8, max = 30) 
-		@JsonProperty(access = JsonProperty.Access.WRITE_ONLY) 
-		String hashedPassword,
+        @NotBlank(message = "Password cannot be blank") 
+        @Size(min = 6, max = 100, message = "Password must be between 6 and 100 characters") 
+        @JsonProperty(value = "password", access = JsonProperty.Access.WRITE_ONLY) 
+        String hashedPassword,
 
-		@NotBlank(message = "full name cannot be blank") 
-		@Size(min = 3, max = 20) 
-		String fullName,
+        @JsonProperty("name")
+        @NotBlank(message = "Full name cannot be blank") 
+        @Size(min = 2, max = 50, message = "Full name must be between 2 and 50 characters") 
+        String fullName,
 
-		@NotBlank(message = "full name cannot be blank") 
-		String profileAvatarURL,
+        String profileAvatarURL,
 
-		@NotNull(message = "Role cannot be blank") 
-		UserRoles role,
+        @NotNull(message = "Role cannot be null") 
+        UserRoles role,
 
-		@NotBlank(message = "bio data cannot be blank") 
-		String bioData,
-
-		@NotBlank(message = "skills cannot be blank") 
-		String skills,
-
-		@NotNull(message = "experience cannot be blank") 
-		@Max(value = 75, message = "experience cannot be more than 75") 
-		Integer experience) {
-}
+        String bioData,
+        String skills,
+        Integer experience
+) {}

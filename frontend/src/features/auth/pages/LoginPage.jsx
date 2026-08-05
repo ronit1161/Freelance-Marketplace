@@ -3,26 +3,31 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 
 function LoginPage() {
-  const [email, setEmail] = useState("");
+  const [userNameOrEmail, setUserNameOrEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const { login } = useAuth();
 
   async function handleLogin(e) {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     try {
-      const res = await login({ email, password });
-      const role = (res?.role || "").toUpperCase();
+      const user = await login({ userNameOrEmail, password });
+      setLoading(false);
 
+      const role = user.role?.toUpperCase();
       if (role === "CLIENT") navigate("/client");
       else if (role === "FREELANCER") navigate("/freelancer");
       else if (role === "ADMIN") navigate("/admin");
       else navigate("/");
     } catch (err) {
-      setError(err?.message || "Login failed");
+      setLoading(false);
+      setError(err?.message || "Login failed. Invalid credentials.");
       console.error("Login Error:", err);
     }
   }
@@ -35,16 +40,17 @@ function LoginPage() {
         </h2>
 
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-red-600 bg-red-50 p-2 rounded border border-red-200">{error}</p>}
 
           <div className="flex flex-col gap-1">
-            <label className="text-sm italic text-left">Email</label>
+            <label className="text-sm italic text-left">Username or Email</label>
             <input
-              type="email"
-              placeholder="abc@gmail.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              placeholder="Username or email"
+              value={userNameOrEmail}
+              onChange={(e) => setUserNameOrEmail(e.target.value)}
               className="border p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              required
             />
           </div>
 
@@ -52,23 +58,25 @@ function LoginPage() {
             <label className="text-sm italic text-left">Password</label>
             <input
               type="password"
-              placeholder="xxxx"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="border p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              required
             />
           </div>
 
           <button
             type="submit"
-            className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
+            disabled={loading}
+            className="bg-[#0058be] hover:bg-[#004bb0] text-white p-2.5 rounded-xl font-semibold transition disabled:opacity-50 shadow-sm"
           >
-            Sign in
+            {loading ? "Signing in..." : "Sign in"}
           </button>
 
-          <p className="text-sm text-center">
+          <p className="text-sm text-center pt-2">
             Don't have an account?{" "}
-            <Link to="/signup" className="text-blue-500 hover:underline">
+            <Link to="/signup" className="text-[#0058be] hover:underline font-semibold">
               Sign up
             </Link>
           </p>

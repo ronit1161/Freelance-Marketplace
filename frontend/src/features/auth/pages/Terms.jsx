@@ -1,3 +1,5 @@
+// src/components/common/TermsAndConditions.jsx
+import React from 'react';
 
 const TermsAndConditions = () => {
   const sections = [

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getWallet } from "../services/walletApi";
+import { getWallet } from "../Services/walletapi";
 
 export const useWallet = (userId) => {
   const [wallet, setWallet] = useState(null);

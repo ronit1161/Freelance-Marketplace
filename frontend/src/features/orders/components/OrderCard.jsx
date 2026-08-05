@@ -39,10 +39,18 @@ export default function OrderCard({ order }) {
         return isNaN(date.getTime()) ? "N/A" : date.toLocaleString();
     };
 
-    // Displays direct Rupee amount safely
-    const displayPrice = typeof order.price_snapshot === "number"
-        ? `₹${order.price_snapshot.toLocaleString("en-IN")}`
-        : "₹0";
+    const numericPrice = order.agreedPrice !== undefined
+        ? order.agreedPrice
+        : (order.price_snapshot !== undefined ? order.price_snapshot : (order.amount || 0));
+
+    const displayPrice = typeof numericPrice === "number"
+        ? `₹${numericPrice.toLocaleString("en-IN")}`
+        : `₹${numericPrice}`;
+
+    const clientId = order.clientId || order.client_id || (order.client?.id) || "N/A";
+    const freelancerId = order.freelancerId || order.freelancer_id || order.freelancerName || "N/A";
+    const gigInfo = order.gigTitle || (order.gigId ? `#${order.gigId}` : (order.gig_id ? `#${order.gig_id}` : "N/A"));
+    const createdDate = order.createdOn || order.created_at || order.createdAt;
 
     return (
         <article className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between gap-4">
@@ -58,36 +66,32 @@ export default function OrderCard({ order }) {
             </header>
 
             {/* Order Details Grid */}
-            <dl className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-gray-50/70 p-3 rounded-xl border border-gray-100 text-xs">
+            <dl className="grid grid-cols-3 gap-3 bg-gray-50/70 p-3 rounded-xl border border-gray-100 text-xs">
                 <div>
-                    <dt className="text-gray-400 font-medium">Client ID</dt>
-                    <dd className="font-semibold text-gray-800 mt-0.5">{order.client_id ?? "N/A"}</dd>
+                    <dt className="text-gray-400 font-medium">Client</dt>
+                    <dd className="font-semibold text-gray-800 mt-0.5 truncate">{clientId}</dd>
                 </div>
                 <div>
-                    <dt className="text-gray-400 font-medium">Freelancer ID</dt>
-                    <dd className="font-semibold text-gray-800 mt-0.5">{order.freelancer_id ?? "N/A"}</dd>
+                    <dt className="text-gray-400 font-medium">Freelancer</dt>
+                    <dd className="font-semibold text-gray-800 mt-0.5 truncate">{freelancerId}</dd>
                 </div>
                 <div>
-                    <dt className="text-gray-400 font-medium">Gig ID</dt>
-                    <dd className="font-semibold text-gray-800 mt-0.5">{order.gig_id ?? "N/A"}</dd>
-                </div>
-                <div>
-                    <dt className="text-gray-400 font-medium">Package ID</dt>
-                    <dd className="font-semibold text-gray-800 mt-0.5">{order.package_id ?? "N/A"}</dd>
+                    <dt className="text-gray-400 font-medium">Gig Service</dt>
+                    <dd className="font-semibold text-gray-800 mt-0.5 truncate">{gigInfo}</dd>
                 </div>
             </dl>
 
             {/* Price Snapshot */}
             <section className="flex items-center justify-between bg-blue-50/50 p-3 rounded-xl border border-blue-100/60">
-                <span className="text-xs font-semibold text-blue-900">Price Snapshot</span>
+                <span className="text-xs font-semibold text-blue-900">Order Amount</span>
                 <span className="text-lg font-extrabold text-[#0058be]">{displayPrice}</span>
             </section>
 
             {/* Requirements */}
             <section className="text-xs space-y-1">
-                <span className="font-semibold text-gray-500 uppercase tracking-wider text-[10px]">Requirements</span>
+                <span className="font-semibold text-gray-500 uppercase tracking-wider text-[10px]">Requirements & Brief</span>
                 <p className="text-gray-700 bg-gray-50 p-2.5 rounded-lg border border-gray-100 leading-relaxed">
-                    {order.requirements || "No special requirements provided."}
+                    {order.requirements || order.description || "No special requirements provided."}
                 </p>
             </section>
 
@@ -95,12 +99,12 @@ export default function OrderCard({ order }) {
             <footer className="flex flex-wrap items-center justify-between text-[11px] text-gray-400 pt-2 border-t border-gray-100 gap-2">
                 <div>
                     <span className="font-medium">Created: </span>
-                    <time dateTime={order.created_at} className="font-semibold text-gray-600">{formatDate(order.created_at)}</time>
+                    <time dateTime={createdDate} className="font-semibold text-gray-600">{formatDate(createdDate)}</time>
                 </div>
 
                 <OrderStatusTimestamp
                     status={order.status}
-                    completedAt={order.completed_at}
+                    completedAt={order.completed_at || order.lastUpdated}
                     cancelledAt={order.cancelled_at}
                     formatDate={formatDate}
                 />

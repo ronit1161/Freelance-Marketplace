@@ -6,17 +6,18 @@ import Terms from "../features/auth/pages/Terms";
 import HomePage from "../features/home/pages/HomePage";
 import NotFoundPage from "../components/common/NotFoundPage";
 
-// Protected Route Component
-import ProtectedRoute from "../components/auth/ProtectedRoute";
-
 // Freelancer pages
 import FreelancerDashboard from "../features/dashboard/pages/FreelancerDashboardPage";
 import CreateGig from "../features/gigs/pages/CreateGigPage";
+import MyGigsPage from "../features/gigs/pages/MyGigsPage";
 import EditProfile from "../features/profile/pages/EditProfilePage";
 import FreelancerProfile from "../features/profile/pages/FreelancerProfilePage";
+import FreelancerOrdersPage from "../features/orders/pages/FreelancerOrdersPage";
+import FreelancerReviewsPage from "../features/reviews/pages/FreelancerReviewsPage";
+import FreelancerWalletPage from "../features/wallet/pages/FreelancerWalletPage";
 
 // Client pages
-import ClientDashboardPage from "../features/dashboard/pages/ClientDashboardPage";
+import ClientDashboard from "../features/Client/Pages/ClientDashboard";
 import ClientProfile from "../features/profile/pages/ClientProfilePage";
 import OrdersPage from "../features/orders/pages/OrdersPage";
 import WalletPage from "../features/wallet/pages/WalletPage";
@@ -27,6 +28,11 @@ import GigDetailsPage from "../features/gigs/pages/GigDetailsPage";
 
 // Admin page
 import Dashboard from "../features/dashboard/pages/AdminDashboardPage";
+import CategoryManagementPage from "../features/categories/pages/CategoryManagementPage";
+import AdminGigManagementPage from "../features/gigs/pages/AdminGigManagementPage";
+import AdminOrderManagementPage from "../features/orders/pages/AdminOrderManagementPage";
+import AdminProfilePage from "../features/profile/pages/AdminProfilePage";
+
 
 export default function AppRoutes() {
   return (
@@ -39,33 +45,39 @@ export default function AppRoutes() {
       <Route path="/" element={<RootLayout />}>
         <Route index element={<HomePage />} />
 
-        {/* Public Gig Marketplace */}
+        {/* Gig Marketplace */}
         <Route path="gigs" element={<GigMarketplacePage />} />
         <Route path="gigs/:id" element={<GigDetailsPage />} />
 
-        {/* Protected Freelancer Console */}
-        {/* <Route element={<ProtectedRoute allowedRoles={["FREELANCER"]} />}> */}
-          <Route path="freelancer">
-            <Route index element={<FreelancerDashboard />} />
-            <Route path="create-gig" element={<CreateGig />} />
-            <Route path="edit-profile" element={<EditProfile />} />
-            <Route path="profile" element={<FreelancerProfile />} />
-          </Route>
-        {/* </Route> */}
+        {/* Freelancer Console */}
+        <Route path="freelancer">
+          <Route index element={<FreelancerDashboard />} />
+          <Route path="gigs" element={<MyGigsPage />} />
+          <Route path="my-gigs" element={<MyGigsPage />} />
+          <Route path="orders" element={<FreelancerOrdersPage />} />
+          <Route path="reviews" element={<FreelancerReviewsPage />} />
+          <Route path="wallet" element={<FreelancerWalletPage />} />
+          <Route path="create-gig" element={<CreateGig />} />
+          <Route path="edit-profile" element={<EditProfile />} />
+          <Route path="profile" element={<FreelancerProfile />} />
+        </Route>
 
-        {/* Protected Client Console */}
-        {/* <Route element={<ProtectedRoute allowedRoles={["CLIENT"]} />}> */}
-          <Route path="client">
-            <Route index element={<ClientDashboardPage />} />
-            <Route path="wallet" element={<WalletPage />} />
-            <Route path="profile" element={<ClientProfile />} />
-            <Route path="orders" element={<OrdersPage />} />
-          </Route>
-        {/* </Route> */}
+        {/* Client Console */}
+        <Route path="client">
+          <Route index element={<ClientDashboard />} />
+          <Route path="wallet" element={<WalletPage />} />
+          <Route path="profile" element={<ClientProfile />} />
+          <Route path="orders" element={<OrdersPage />} />
+          <Route path="projects" element={<OrdersPage />} />
+        </Route>
 
-        {/* Protected Admin Console */}
-        <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
-          <Route path="admin" element={<Dashboard />} />
+        {/* Admin Console */}
+        <Route path="admin">
+          <Route index element={<Dashboard />} />
+          <Route path="categories" element={<CategoryManagementPage />} />
+          <Route path="gigs" element={<AdminGigManagementPage />} />
+          <Route path="orders" element={<AdminOrderManagementPage />} />
+          <Route path="profile" element={<AdminProfilePage />} />
         </Route>
       </Route>
 

@@ -9,6 +9,8 @@ function RegisterPage() {
   const [password, setPassword] = useState("");
   const [accepted, setAccepted] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const { register } = useAuth();
 
@@ -16,20 +18,33 @@ function RegisterPage() {
     role &&
     name.trim() !== "" &&
     email.includes("@") &&
-    password.length >= 4 &&
+    password.length >= 6 &&
     accepted;
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     try {
-      await register({ role, name, email, password, accepted });
-      if (role === "client") navigate("/client");
-      else if (role === "freelancer") navigate("/freelancer");
+      const userName = email.split("@")[0].replace(/[^a-zA-Z0-9_]/g, "");
+      const user = await register({
+        userName,
+        email,
+        password,
+        fullName: name,
+        role: role.toUpperCase(),
+      });
+
+      setLoading(false);
+
+      const userRole = user?.role?.toUpperCase() || role.toUpperCase();
+      if (userRole === "CLIENT") navigate("/client");
+      else if (userRole === "FREELANCER") navigate("/freelancer");
       else navigate("/");
     } catch (err) {
-      setError(err?.message || "Registration failed");
+      setLoading(false);
+      setError(err?.message || "Registration failed. Please try again.");
       console.error("Register Error:", err);
     }
   }
@@ -100,7 +115,7 @@ function RegisterPage() {
             <label className="text-sm font-semibold text-slate-700">Password</label>
             <input
               type="password"
-              placeholder="••••••••"
+              placeholder="•••••••• (Min 6 chars)"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="border border-gray-300 p-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition"
@@ -117,22 +132,22 @@ function RegisterPage() {
             />
             <p>
               I agree to the{" "}
-              <a href="/terms" className="text-blue-500 hover:underline">
+              <Link to="/terms" className="text-blue-500 hover:underline">
                 Terms & Conditions
-              </a>
+              </Link>
             </p>
           </div>
 
           <button
             type="submit"
-            disabled={!isFormValid}
+            disabled={!isFormValid || loading}
             className={`p-3 rounded-xl font-semibold transition mt-2 shadow-sm ${
-              isFormValid
+              isFormValid && !loading
                 ? "bg-[#0058be] hover:bg-[#004bb0] text-white"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
             }`}
           >
-            Create Account
+            {loading ? "Creating Account..." : "Create Account"}
           </button>
 
           <p className="text-sm text-center text-slate-600 mt-2">
@@ -148,4 +163,3 @@ function RegisterPage() {
 }
 
 export default RegisterPage;
-

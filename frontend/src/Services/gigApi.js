@@ -1,26 +1,65 @@
 import apiClient from "./apiClient";
 
-export const getGigs = async (params = {}) => {
-  const response = await apiClient.get("/gigs", { params });
-  return response.data;
+export const getAllActiveGigs = async (categoryId = null, search = "") => {
+  try {
+    const params = {};
+    if (categoryId) params.categoryId = categoryId;
+    if (search) params.search = search;
+
+    const response = await apiClient.get("/api/gigs", { params });
+    return response.data.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || "Failed to fetch gigs.";
+    throw new Error(errorMessage);
+  }
 };
 
-export const getGigById = async (gigId) => {
-  const response = await apiClient.get(`/gigs/${gigId}`);
-  return response.data;
+export const getGigById = async (id) => {
+  try {
+    const response = await apiClient.get(`/api/gigs/${id}`);
+    return response.data.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || "Failed to fetch gig details.";
+    throw new Error(errorMessage);
+  }
 };
 
 export const createGig = async (gigData) => {
-  const response = await apiClient.post("/gigs", gigData);
-  return response.data;
+  try {
+    const response = await apiClient.post("/api/gigs", gigData);
+    return response.data.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || "Failed to create gig.";
+    throw new Error(errorMessage);
+  }
 };
 
-export const updateGig = async (gigId, gigData) => {
-  const response = await apiClient.put(`/gigs/${gigId}`, gigData);
-  return response.data;
+export const updateGig = async (id, gigData) => {
+  try {
+    const response = await apiClient.put(`/api/gigs/${id}`, gigData);
+    return response.data.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || "Failed to update gig.";
+    throw new Error(errorMessage);
+  }
 };
 
-export const deleteGig = async (gigId) => {
-  const response = await apiClient.delete(`/gigs/${gigId}`);
-  return response.data;
+export const deleteGig = async (id) => {
+  try {
+    const response = await apiClient.delete(`/api/gigs/${id}`);
+    return response.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || "Failed to delete gig.";
+    throw new Error(errorMessage);
+  }
+};
+
+export const getGigsByFreelancer = async (freelancerId) => {
+  try {
+    const response = await apiClient.get(`/api/gigs/freelancer/${freelancerId}`);
+    return response.data.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || "Failed to fetch freelancer gigs.";
+    throw new Error(errorMessage);
+  }
 };

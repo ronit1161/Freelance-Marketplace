@@ -45,7 +45,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return !user.is_blocked();
+        return !user.isBlocked();
     }
 
     @Override
