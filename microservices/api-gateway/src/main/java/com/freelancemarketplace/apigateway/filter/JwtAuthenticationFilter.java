@@ -54,7 +54,7 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         }
 
         if (HttpMethod.GET.equals(method)) {
-            if (path.startsWith("/categories")) {
+            if (path.startsWith("/categories") || path.startsWith("/reviews")) {
                 return true;
             }
             if (path.equals("/gigs") || path.matches("^/gigs/\\d+$") || path.startsWith("/gigs/freelancer/")) {

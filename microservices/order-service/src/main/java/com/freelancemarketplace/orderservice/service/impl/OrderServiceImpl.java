@@ -1,7 +1,11 @@
 package com.freelancemarketplace.orderservice.service.impl;
 
 import com.freelancemarketplace.orderservice.client.GigClient;
+import com.freelancemarketplace.orderservice.client.WalletClient;
 import com.freelancemarketplace.orderservice.client.dto.GigResponse;
+import com.freelancemarketplace.orderservice.client.dto.LockEscrowRequest;
+import com.freelancemarketplace.orderservice.client.dto.RefundEscrowRequest;
+import com.freelancemarketplace.orderservice.client.dto.ReleaseEscrowRequest;
 import com.freelancemarketplace.orderservice.dto.request.CreateOrderRequest;
 import com.freelancemarketplace.orderservice.dto.response.OrderResponse;
 import com.freelancemarketplace.orderservice.entity.Order;
@@ -26,6 +30,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final GigClient gigClient;
+    private final WalletClient walletClient;
 
     @Override
     @Transactional
@@ -45,7 +50,7 @@ public class OrderServiceImpl implements OrderService {
             throw new BadRequestException("You cannot place an order on your own gig");
         }
 
-        // 3. Create Order with verified data
+        // 3. Save Pending Order to generate Order ID
         Order order = Order.builder()
                 .clientId(authenticatedUserId)
                 .freelancerId(gig.getFreelancerId())
@@ -56,6 +61,25 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         Order savedOrder = orderRepository.save(order);
+
+        // 4. Lock Client Funds via Wallet Service Escrow
+        try {
+            LockEscrowRequest lockRequest = LockEscrowRequest.builder()
+                    .orderId(savedOrder.getId())
+                    .clientId(authenticatedUserId)
+                    .amount(gig.getPrice())
+                    .build();
+            walletClient.lockEscrow(lockRequest);
+        } catch (FeignException.BadRequest e) {
+            log.warn("Escrow lock failed for Order ID {}: Insufficient wallet balance", savedOrder.getId());
+            orderRepository.delete(savedOrder);
+            throw new BadRequestException("Insufficient available balance in your wallet to place this order");
+        } catch (Exception e) {
+            log.error("Failed to communicate with Wallet Service for Order ID {}: {}", savedOrder.getId(), e.getMessage());
+            orderRepository.delete(savedOrder);
+            throw new ApiException("Wallet Service is currently unavailable. Please try again later.", HttpStatus.SERVICE_UNAVAILABLE);
+        }
+
         log.info("Client ID {} successfully created Order ID: {} for Gig ID: {}", authenticatedUserId, savedOrder.getId(), gig.getId());
         return mapToResponse(savedOrder);
     }
@@ -165,9 +189,23 @@ public class OrderServiceImpl implements OrderService {
             throw new BadRequestException("Only IN_PROGRESS orders can be marked as COMPLETED. Current status: " + order.getStatus());
         }
 
+        // Release Escrow to Freelancer
+        try {
+            ReleaseEscrowRequest releaseRequest = ReleaseEscrowRequest.builder()
+                    .orderId(order.getId())
+                    .clientId(order.getClientId())
+                    .freelancerId(order.getFreelancerId())
+                    .amount(order.getAgreedPrice())
+                    .build();
+            walletClient.releaseEscrow(releaseRequest);
+        } catch (Exception e) {
+            log.error("Failed to release escrow for Order ID {}: {}", id, e.getMessage());
+            throw new ApiException("Failed to release escrow funds from Wallet Service", HttpStatus.SERVICE_UNAVAILABLE);
+        }
+
         order.setStatus(OrderStatus.COMPLETED);
         Order updatedOrder = orderRepository.save(order);
-        log.info("Freelancer ID {} marked Order ID: {} as COMPLETED", authenticatedUserId, id);
+        log.info("Freelancer ID {} marked Order ID: {} as COMPLETED and escrow was released", authenticatedUserId, id);
         return mapToResponse(updatedOrder);
     }
 
@@ -191,9 +229,22 @@ public class OrderServiceImpl implements OrderService {
             throw new BadRequestException("Cannot cancel an order that is already " + order.getStatus());
         }
 
+        // Refund Escrow back to Client
+        try {
+            RefundEscrowRequest refundRequest = RefundEscrowRequest.builder()
+                    .orderId(order.getId())
+                    .clientId(order.getClientId())
+                    .amount(order.getAgreedPrice())
+                    .build();
+            walletClient.refundEscrow(refundRequest);
+        } catch (Exception e) {
+            log.error("Failed to refund escrow for Order ID {}: {}", id, e.getMessage());
+            throw new ApiException("Failed to refund escrow funds from Wallet Service", HttpStatus.SERVICE_UNAVAILABLE);
+        }
+
         order.setStatus(OrderStatus.CANCELLED);
         Order updatedOrder = orderRepository.save(order);
-        log.info("Order ID: {} cancelled by User ID: {} (role '{}')", id, authenticatedUserId, userRole);
+        log.info("Order ID: {} cancelled by User ID: {} (role '{}') and escrow refunded", id, authenticatedUserId, userRole);
         return mapToResponse(updatedOrder);
     }
 

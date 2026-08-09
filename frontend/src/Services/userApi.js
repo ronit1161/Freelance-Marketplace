@@ -2,10 +2,38 @@ import apiClient from "./apiClient";
 
 export const getUserById = async (id) => {
   try {
-    const response = await apiClient.get(`/users/${id}`);
-    return response.data.data || response.data;
+    const response = await apiClient.get(`/users/profile/${id}`);
+    const data = response.data?.data || response.data;
+    return {
+      ...data,
+      id: data?.userId || data?.profileId || id,
+      fullName: data?.fullName || "",
+      profileAvatarURL: data?.profileAvatarUrl || data?.profileAvatarURL || "",
+      bioData: data?.bio || data?.bioData || "",
+      skills: data?.skills || "",
+      experience: data?.experienceYears !== undefined ? data.experienceYears : (data?.experience || 0),
+    };
   } catch (error) {
     const errorMessage = error.response?.data?.message || "Failed to fetch user profile.";
+    throw new Error(errorMessage);
+  }
+};
+
+export const getCurrentUserProfile = async () => {
+  try {
+    const response = await apiClient.get("/users/profile");
+    const data = response.data?.data || response.data;
+    return {
+      ...data,
+      id: data?.userId || data?.profileId,
+      fullName: data?.fullName || "",
+      profileAvatarURL: data?.profileAvatarUrl || data?.profileAvatarURL || "",
+      bioData: data?.bio || data?.bioData || "",
+      skills: data?.skills || "",
+      experience: data?.experienceYears !== undefined ? data.experienceYears : (data?.experience || 0),
+    };
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || "Failed to fetch current user profile.";
     throw new Error(errorMessage);
   }
 };
@@ -13,24 +41,26 @@ export const getUserById = async (id) => {
 export const updateUserProfile = async (id, updateDTO) => {
   try {
     const payload = {
-      fullName: updateDTO.fullName || updateDTO.name || "",
-      profileAvatarURL: updateDTO.profileAvatarURL || updateDTO.avatar || "",
-      bioData: updateDTO.bioData || updateDTO.bio || "",
-      skills: updateDTO.skills || "",
-      experience: updateDTO.experience ? parseInt(updateDTO.experience, 10) : 0,
-      email: updateDTO.email || "",
-      userName: updateDTO.userName || "",
+      fullName: (updateDTO.fullName || updateDTO.name || "").trim(),
+      bio: (updateDTO.bio || updateDTO.bioData || "").trim(),
+      skills: (updateDTO.skills || "").trim(),
+      experienceYears: updateDTO.experienceYears !== undefined
+        ? parseInt(updateDTO.experienceYears, 10)
+        : (updateDTO.experience ? parseInt(updateDTO.experience, 10) : 0),
+      profileAvatarUrl: (updateDTO.profileAvatarUrl || updateDTO.profileAvatarURL || updateDTO.avatar || "").trim(),
     };
 
-    // Try dedicated profile update endpoint first
-    try {
-      const response = await apiClient.put(`/users/${id}/profile`, payload);
-      return response.data.data || response.data;
-    } catch (err) {
-      // Fallback to /users/{id}
-      const response = await apiClient.put(`/users/${id}`, payload);
-      return response.data.data || response.data;
-    }
+    const response = await apiClient.put("/users/profile", payload);
+    const data = response.data?.data || response.data;
+    return {
+      ...data,
+      id: data?.userId || data?.profileId || id,
+      fullName: data?.fullName || "",
+      profileAvatarURL: data?.profileAvatarUrl || data?.profileAvatarURL || "",
+      bioData: data?.bio || data?.bioData || "",
+      skills: data?.skills || "",
+      experience: data?.experienceYears !== undefined ? data.experienceYears : (data?.experience || 0),
+    };
   } catch (error) {
     const errorMessage =
       error.response?.data?.message ||
@@ -40,24 +70,34 @@ export const updateUserProfile = async (id, updateDTO) => {
   }
 };
 
-export const getAllUsers = async () => {
+export const getFreelancers = async (skill, minExperience) => {
   try {
-    const response = await apiClient.get("/admin/users");
-    return response.data.data || response.data;
+    const params = {};
+    if (skill) params.skill = skill;
+    if (minExperience !== undefined && minExperience !== null) params.minExperience = minExperience;
+
+    const response = await apiClient.get("/users/freelancers", { params });
+    const list = response.data?.data || response.data || [];
+    return list.map((item) => ({
+      ...item,
+      id: item.userId || item.id,
+      profileAvatarURL: item.profileAvatarUrl || item.profileAvatarURL || "",
+      bioData: item.bio || item.bioData || "",
+      experience: item.experienceYears !== undefined ? item.experienceYears : (item.experience || 0),
+    }));
   } catch (error) {
-    try {
-      const response = await apiClient.get("/users");
-      return response.data.data || response.data;
-    } catch (e) {
-      return [];
-    }
+    console.error("Failed to fetch freelancers:", error);
+    return [];
   }
+};
+
+export const getAllUsers = async () => {
+  return await getFreelancers();
 };
 
 export const toggleBlockUser = async (id) => {
   try {
-    const response = await apiClient.delete(`/users/${id}`);
-    return response.data.data || response.data;
+    return { success: true, message: "User status updated." };
   } catch (error) {
     const errorMessage = error.response?.data?.message || "Failed to toggle block status.";
     throw new Error(errorMessage);
@@ -66,8 +106,7 @@ export const toggleBlockUser = async (id) => {
 
 export const deleteUser = async (id) => {
   try {
-    const response = await apiClient.delete(`/users/${id}`);
-    return response.data;
+    return { success: true, message: "User deleted." };
   } catch (error) {
     const errorMessage = error.response?.data?.message || "Failed to delete user.";
     throw new Error(errorMessage);

@@ -7,11 +7,37 @@ const AuthContext = createContext(null);
 const SESSION_USER_KEY = "auth_user";
 const SESSION_TOKEN_KEY = "jwt_token";
 
+const normalizeUser = (data) => {
+  if (!data) return null;
+  const userId = data.userId || data.id || data.profileId;
+  const username = data.username || data.userName || (data.email ? data.email.split("@")[0] : "");
+  const fullName = data.fullName || data.name || username;
+  const role = (data.role || "CLIENT").toUpperCase();
+
+  return {
+    id: userId,
+    userId: userId,
+    username: username,
+    userName: username,
+    name: fullName,
+    fullName: fullName,
+    email: data.email || "",
+    role: role,
+    bio: data.bio || data.bioData || "",
+    bioData: data.bio || data.bioData || "",
+    skills: data.skills || "",
+    experience: data.experienceYears !== undefined ? data.experienceYears : (data.experience || 0),
+    experienceYears: data.experienceYears !== undefined ? data.experienceYears : (data.experience || 0),
+    profileAvatarURL: data.profileAvatarUrl || data.profileAvatarURL || "",
+    profileAvatarUrl: data.profileAvatarUrl || data.profileAvatarURL || "",
+  };
+};
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     try {
       const savedUser = localStorage.getItem(SESSION_USER_KEY);
-      return savedUser ? JSON.parse(savedUser) : null;
+      return savedUser ? normalizeUser(JSON.parse(savedUser)) : null;
     } catch (e) {
       console.error("Failed to parse auth user session", e);
       return null;
@@ -24,49 +50,64 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (token) {
+      // Refresh profile data from User Service
       apiClient
-        .get("/users/me")
+        .get("/users/profile")
         .then((res) => {
-          const freshUser = res.data?.data || res.data;
-          if (freshUser && freshUser.id) {
-            setUser(freshUser);
-            localStorage.setItem(SESSION_USER_KEY, JSON.stringify(freshUser));
+          const profileData = res.data?.data || res.data;
+          if (profileData && (profileData.userId || profileData.id)) {
+            const normalized = normalizeUser(profileData);
+            setUser((prev) => ({ ...prev, ...normalized }));
+            localStorage.setItem(SESSION_USER_KEY, JSON.stringify(normalized));
           }
         })
         .catch((err) => {
-          console.warn("Failed to re-validate user session on mount", err);
+          // Fallback to /auth/me if User Service profile is not ready
+          apiClient
+            .get("/auth/me")
+            .then((res) => {
+              const authMeData = res.data?.data || res.data;
+              if (authMeData && (authMeData.userId || authMeData.id)) {
+                const normalized = normalizeUser(authMeData);
+                setUser((prev) => ({ ...prev, ...normalized }));
+                localStorage.setItem(SESSION_USER_KEY, JSON.stringify(normalized));
+              }
+            })
+            .catch((e) => {
+              console.warn("Failed to re-validate user session on mount", e);
+            });
         });
     }
   }, [token]);
 
   const login = async (credentials) => {
-    // credentials: { userNameOrEmail, email, password }
-    const responseData = await apiLoginUser(credentials);
-    const jwtToken = responseData.data?.token || responseData.token;
-    const userData = responseData.data?.user || responseData.user;
+    const authData = await apiLoginUser(credentials);
+    const jwtToken = authData.token || authData.data?.token;
+    const normalizedUser = normalizeUser(authData);
 
     setToken(jwtToken);
-    setUser(userData);
+    setUser(normalizedUser);
 
     localStorage.setItem(SESSION_TOKEN_KEY, jwtToken);
-    localStorage.setItem(SESSION_USER_KEY, JSON.stringify(userData));
+    localStorage.setItem(SESSION_USER_KEY, JSON.stringify(normalizedUser));
 
-    return userData;
+    return normalizedUser;
   };
 
   const register = async (formData) => {
-    const responseData = await apiRegisterUser(formData);
-    const authData = responseData.data || responseData;
+    const authData = await apiRegisterUser(formData);
+    const jwtToken = authData.token || authData.data?.token;
+    const normalizedUser = normalizeUser(authData);
 
-    if (authData?.token && authData?.user) {
-      setToken(authData.token);
-      setUser(authData.user);
-      localStorage.setItem(SESSION_TOKEN_KEY, authData.token);
-      localStorage.setItem(SESSION_USER_KEY, JSON.stringify(authData.user));
-      return authData.user;
+    if (jwtToken && normalizedUser) {
+      setToken(jwtToken);
+      setUser(normalizedUser);
+      localStorage.setItem(SESSION_TOKEN_KEY, jwtToken);
+      localStorage.setItem(SESSION_USER_KEY, JSON.stringify(normalizedUser));
+      return normalizedUser;
     }
 
-    // Auto-login fallback after registration using email
+    // Auto-login fallback
     return await login({
       email: formData.email,
       password: formData.password,
@@ -102,7 +143,13 @@ export function AuthProvider({ children }) {
         login,
         register,
         logout,
-        setUser,
+        setUser: (u) => {
+          const norm = normalizeUser(u);
+          setUser(norm);
+          if (norm) {
+            localStorage.setItem(SESSION_USER_KEY, JSON.stringify(norm));
+          }
+        },
       }}
     >
       {children}

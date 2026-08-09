@@ -1,6 +1,8 @@
 package com.freelancemarketplace.orderservice.service;
 
 import com.freelancemarketplace.orderservice.client.GigClient;
+import com.freelancemarketplace.orderservice.client.WalletClient;
+import com.freelancemarketplace.orderservice.client.dto.EscrowResponse;
 import com.freelancemarketplace.orderservice.client.dto.GigResponse;
 import com.freelancemarketplace.orderservice.dto.request.CreateOrderRequest;
 import com.freelancemarketplace.orderservice.dto.response.OrderResponse;
@@ -9,9 +11,13 @@ import com.freelancemarketplace.orderservice.entity.OrderStatus;
 import com.freelancemarketplace.orderservice.repository.OrderRepository;
 import com.freelancemarketplace.orderservice.service.impl.OrderServiceImpl;
 import com.freelancemarketplace.shared.dto.ApiResponse;
+import com.freelancemarketplace.shared.exception.ApiException;
 import com.freelancemarketplace.shared.exception.BadRequestException;
 import com.freelancemarketplace.shared.exception.ForbiddenException;
 import com.freelancemarketplace.shared.exception.ResourceNotFoundException;
+import feign.FeignException;
+import feign.Request;
+import feign.RequestTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +28,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +45,9 @@ class OrderServiceTest {
 
     @Mock
     private GigClient gigClient;
+
+    @Mock
+    private WalletClient walletClient;
 
     @InjectMocks
     private OrderServiceImpl orderService;
@@ -74,7 +84,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("Client should successfully place an order with price & freelancerId populated from Gig Service")
+    @DisplayName("Client should successfully place an order with price & escrow locked via Wallet Service")
     void createOrder_Client_Success() {
         CreateOrderRequest request = CreateOrderRequest.builder()
                 .gigId(10L)
@@ -89,6 +99,7 @@ class OrderServiceTest {
             o.setUpdatedAt(LocalDateTime.now());
             return o;
         });
+        when(walletClient.lockEscrow(any())).thenReturn(ApiResponse.success(new EscrowResponse()));
 
         OrderResponse response = orderService.createOrder(request, 100L, "ROLE_CLIENT");
 
@@ -101,7 +112,33 @@ class OrderServiceTest {
         assertThat(response.getStatus()).isEqualTo(OrderStatus.PENDING);
 
         verify(gigClient).getGigById(10L);
+        verify(walletClient).lockEscrow(any());
         verify(orderRepository).save(any(Order.class));
+    }
+
+    @Test
+    @DisplayName("Order creation fails and rollbacks if wallet has insufficient funds")
+    void createOrder_InsufficientWalletBalance_ThrowsBadRequestException() {
+        CreateOrderRequest request = CreateOrderRequest.builder()
+                .gigId(10L)
+                .requirements("Build backend microservices")
+                .build();
+
+        when(gigClient.getGigById(10L)).thenReturn(ApiResponse.success(sampleGig));
+        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
+            Order o = invocation.getArgument(0);
+            o.setId(1L);
+            return o;
+        });
+
+        Request feignRequest = Request.create(Request.HttpMethod.POST, "/wallet/escrow/lock", Collections.emptyMap(), null, new RequestTemplate());
+        when(walletClient.lockEscrow(any())).thenThrow(new FeignException.BadRequest("Insufficient funds", feignRequest, null, null));
+
+        assertThatThrownBy(() -> orderService.createOrder(request, 100L, "ROLE_CLIENT"))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Insufficient available balance in your wallet");
+
+        verify(orderRepository).delete(any(Order.class));
     }
 
     @Test
@@ -158,7 +195,6 @@ class OrderServiceTest {
     @Test
     @DisplayName("Client attempting to order their own gig should throw BadRequestException")
     void createOrder_SelfOrder_ThrowsException() {
-        // User 200 is the freelancer who created gig 10
         CreateOrderRequest request = CreateOrderRequest.builder()
                 .gigId(10L)
                 .requirements("Self order")
@@ -202,7 +238,6 @@ class OrderServiceTest {
     void getOrderById_UnauthorizedUser_ThrowsForbiddenException() {
         when(orderRepository.findById(1L)).thenReturn(Optional.of(sampleOrder));
 
-        // User 300 is neither client (100) nor freelancer (200)
         assertThatThrownBy(() -> orderService.getOrderById(1L, 300L, "ROLE_CLIENT"))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessageContaining("You do not have permission to view this order");
@@ -271,30 +306,34 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("Assigned freelancer should successfully mark an IN_PROGRESS order as COMPLETED")
+    @DisplayName("Assigned freelancer should successfully mark an IN_PROGRESS order as COMPLETED and release escrow")
     void completeOrder_Success() {
         sampleOrder.setStatus(OrderStatus.IN_PROGRESS);
         when(orderRepository.findById(1L)).thenReturn(Optional.of(sampleOrder));
+        when(walletClient.releaseEscrow(any())).thenReturn(ApiResponse.success(new EscrowResponse()));
         when(orderRepository.save(any(Order.class))).thenReturn(sampleOrder);
 
         OrderResponse response = orderService.completeOrder(1L, 200L, "ROLE_FREELANCER");
 
         assertThat(response).isNotNull();
         assertThat(sampleOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        verify(walletClient).releaseEscrow(any());
         verify(orderRepository).save(sampleOrder);
     }
 
     @Test
-    @DisplayName("Client or freelancer should successfully cancel an order")
+    @DisplayName("Client or freelancer should successfully cancel an order and refund escrow")
     void cancelOrder_Success() {
         sampleOrder.setStatus(OrderStatus.PENDING);
         when(orderRepository.findById(1L)).thenReturn(Optional.of(sampleOrder));
+        when(walletClient.refundEscrow(any())).thenReturn(ApiResponse.success(new EscrowResponse()));
         when(orderRepository.save(any(Order.class))).thenReturn(sampleOrder);
 
         OrderResponse response = orderService.cancelOrder(1L, 100L, "ROLE_CLIENT");
 
         assertThat(response).isNotNull();
         assertThat(sampleOrder.getStatus()).isEqualTo(OrderStatus.CANCELLED);
+        verify(walletClient).refundEscrow(any());
         verify(orderRepository).save(sampleOrder);
     }
 

@@ -1,19 +1,42 @@
 import apiClient from "./apiClient";
+import { getAllCategories } from "./categoryApi";
+import { getAllActiveGigs } from "./gigApi";
+import { getAllOrders } from "./orderApi";
+import { getFreelancers } from "./userApi";
 
 export const getDashboardStats = async () => {
   try {
-    const response = await apiClient.get("/admin/dashboard");
-    const data = response.data.data || response.data;
+    const [categories, gigs, orders, freelancers] = await Promise.all([
+      getAllCategories().catch(() => []),
+      getAllActiveGigs().catch(() => []),
+      getAllOrders().catch(() => []),
+      getFreelancers().catch(() => []),
+    ]);
+
+    const totalOrders = orders.length;
+    const totalClients = new Set(orders.map((o) => o.clientId)).size;
+    const totalFreelancers = freelancers.length;
+    const totalUsers = totalClients + totalFreelancers;
+    const totalRevenue = orders
+      .filter((o) => o.status === "COMPLETED")
+      .reduce((sum, o) => sum + (Number(o.agreedPrice) || 0), 0);
+
     return {
-      totalUsers: data.totalUsers || 0,
-      totalGigs: data.totalGigs || 0,
-      totalOrders: data.totalOrders || 0,
-      totalRevenue: data.totalRevenue || 0,
+      totalUsers: totalUsers || 0,
+      totalClients: totalClients || 0,
+      totalFreelancers: totalFreelancers || 0,
+      totalGigs: gigs.length || 0,
+      totalCategories: categories.length || 0,
+      totalOrders: totalOrders || 0,
+      totalRevenue: totalRevenue || 0,
     };
   } catch (error) {
     return {
       totalUsers: 0,
+      totalClients: 0,
+      totalFreelancers: 0,
       totalGigs: 0,
+      totalCategories: 0,
       totalOrders: 0,
       totalRevenue: 0,
     };
@@ -21,18 +44,13 @@ export const getDashboardStats = async () => {
 };
 
 export const getAllUsers = async () => {
-  try {
-    const response = await apiClient.get("/admin/users");
-    return response.data.data || response.data || [];
-  } catch (error) {
-    return [];
-  }
+  return await getFreelancers();
 };
 
 export const deleteGigByAdmin = async (gigId) => {
   try {
-    const response = await apiClient.delete(`/admin/gigs/${gigId}`);
-    return response.data;
+    const response = await apiClient.delete(`/gigs/${gigId}`);
+    return response.data?.data || response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || "Failed to delete gig.";
     throw new Error(errorMessage);
@@ -41,18 +59,18 @@ export const deleteGigByAdmin = async (gigId) => {
 
 export const deleteOrderByAdmin = async (orderId) => {
   try {
-    const response = await apiClient.delete(`/admin/orders/${orderId}`);
-    return response.data;
+    const response = await apiClient.patch(`/orders/${orderId}/cancel`);
+    return response.data?.data || response.data;
   } catch (error) {
-    const errorMessage = error.response?.data?.message || "Failed to delete order.";
+    const errorMessage = error.response?.data?.message || "Failed to cancel order.";
     throw new Error(errorMessage);
   }
 };
 
 export const getAllReviews = async () => {
   try {
-    const response = await apiClient.get("/admin/reviews");
-    return response.data.data || response.data || [];
+    const response = await apiClient.get("/reviews");
+    return response.data?.data || response.data || [];
   } catch (error) {
     return [];
   }
@@ -60,8 +78,8 @@ export const getAllReviews = async () => {
 
 export const deleteReviewByAdmin = async (reviewId) => {
   try {
-    const response = await apiClient.delete(`/admin/reviews/${reviewId}`);
-    return response.data;
+    const response = await apiClient.delete(`/reviews/${reviewId}`);
+    return response.data?.data || response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || "Failed to delete review.";
     throw new Error(errorMessage);
@@ -72,8 +90,8 @@ export const deleteReview = deleteReviewByAdmin;
 
 export const getAllTransactions = async () => {
   try {
-    const response = await apiClient.get("/admin/wallet-transactions");
-    return response.data.data?.content || response.data.data || response.data || [];
+    const response = await apiClient.get("/wallet/transactions");
+    return response.data?.data || response.data || [];
   } catch (error) {
     return [];
   }

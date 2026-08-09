@@ -1,27 +1,32 @@
 import apiClient from "./apiClient";
 
-export const loginUser = async ({ email, userNameOrEmail, password }) => {
-  const loginIdentifier = (email || userNameOrEmail || "").trim();
+export const loginUser = async ({ email, userNameOrEmail, identifier, password }) => {
+  const loginIdentifier = (identifier || email || userNameOrEmail || "").trim();
   const response = await apiClient.post("/auth/login", {
+    identifier: loginIdentifier,
     email: loginIdentifier,
     password,
   });
-  return response.data;
+  return response.data?.data || response.data;
 };
 
 export const registerUser = async (formData) => {
-  const userName = formData.userName || (formData.email ? formData.email.split("@")[0] : "");
-  const fullNameValue = (formData.fullName || formData.name || userName).trim();
+  const userName = (formData.username || formData.userName || (formData.email ? formData.email.split("@")[0] : "")).trim();
+  const emailValue = (formData.email || "").trim().toLowerCase();
+  const roleValue = (formData.role || "CLIENT").toUpperCase();
+
   const payload = {
-    userName: userName.trim(),
-    email: (formData.email || "").trim().toLowerCase(),
+    username: userName,
+    email: emailValue,
     password: formData.password,
-    name: fullNameValue,
-    fullName: fullNameValue,
-    role: (formData.role || "CLIENT").toUpperCase(),
+    role: roleValue,
   };
 
   const response = await apiClient.post("/auth/register", payload);
-  return response.data;
+  return response.data?.data || response.data;
 };
 
+export const getCurrentAuthUser = async () => {
+  const response = await apiClient.get("/auth/me");
+  return response.data?.data || response.data;
+};
