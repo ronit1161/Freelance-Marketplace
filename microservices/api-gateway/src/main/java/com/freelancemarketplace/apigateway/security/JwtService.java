@@ -34,4 +34,36 @@ public class JwtService {
             return false;
         }
     }
+
+    public io.jsonwebtoken.Claims extractAllClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    public Long extractUserId(io.jsonwebtoken.Claims claims) {
+        Object userIdObj = claims.get("userId");
+        if (userIdObj instanceof Number) {
+            return ((Number) userIdObj).longValue();
+        } else if (userIdObj instanceof String) {
+            try {
+                return Long.parseLong((String) userIdObj);
+            } catch (NumberFormatException ignored) {}
+        }
+        return null;
+    }
+
+    public String extractRole(io.jsonwebtoken.Claims claims) {
+        return claims.get("role", String.class);
+    }
+
+    public String extractEmail(io.jsonwebtoken.Claims claims) {
+        return claims.get("email", String.class);
+    }
+
+    public String extractUsername(io.jsonwebtoken.Claims claims) {
+        return claims.getSubject();
+    }
 }

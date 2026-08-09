@@ -21,19 +21,22 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        String token = null;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+        }
+
         // 1. Allow public endpoints to pass through without mandatory JWT
-        if (isPublic(exchange)) {
+        if (isPublic(exchange) && token == null) {
             return chain.filter(exchange);
         }
 
         // 2. Check for Authorization header on protected endpoints
-        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (token == null) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
-
-        String token = authHeader.substring(7);
 
         // 3. Validate token signature and expiration
         if (!jwtService.validateToken(token)) {
@@ -41,8 +44,33 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
             return exchange.getResponse().setComplete();
         }
 
-        // 4. Token is valid, forward request to downstream service
-        return chain.filter(exchange);
+        // 4. Token is valid, extract claims and attach identity headers to downstream request
+        try {
+            io.jsonwebtoken.Claims claims = jwtService.extractAllClaims(token);
+            Long userId = jwtService.extractUserId(claims);
+            String role = jwtService.extractRole(claims);
+            String email = jwtService.extractEmail(claims);
+            String username = jwtService.extractUsername(claims);
+
+            org.springframework.http.server.reactive.ServerHttpRequest.Builder requestBuilder = exchange.getRequest().mutate();
+            if (userId != null) {
+                requestBuilder.header("X-User-Id", String.valueOf(userId));
+            }
+            if (role != null) {
+                requestBuilder.header("X-User-Role", role);
+            }
+            if (email != null) {
+                requestBuilder.header("X-User-Email", email);
+            }
+            if (username != null) {
+                requestBuilder.header("X-User-Name", username);
+            }
+
+            return chain.filter(exchange.mutate().request(requestBuilder.build()).build());
+        } catch (Exception e) {
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            return exchange.getResponse().setComplete();
+        }
     }
 
     private boolean isPublic(ServerWebExchange exchange) {

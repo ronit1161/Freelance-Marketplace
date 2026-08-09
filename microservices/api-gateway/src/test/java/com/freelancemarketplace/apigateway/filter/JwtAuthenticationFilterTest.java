@@ -88,7 +88,7 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
-    @DisplayName("Protected endpoint with valid JWT should forward request downstream")
+    @DisplayName("Protected endpoint with valid JWT should forward request downstream with identity headers")
     void filter_ProtectedEndpoint_ValidJwt_ForwardsDownstream() {
         when(filterChain.filter(any(ServerWebExchange.class))).thenReturn(Mono.empty());
 
@@ -98,10 +98,20 @@ class JwtAuthenticationFilterTest {
                 .build();
         MockServerWebExchange exchange = MockServerWebExchange.from(request);
 
+        io.jsonwebtoken.Claims mockClaims = mock(io.jsonwebtoken.Claims.class);
         when(jwtService.validateToken(token)).thenReturn(true);
+        when(jwtService.extractAllClaims(token)).thenReturn(mockClaims);
+        when(jwtService.extractUserId(mockClaims)).thenReturn(100L);
+        when(jwtService.extractRole(mockClaims)).thenReturn("ROLE_CLIENT");
+        when(jwtService.extractEmail(mockClaims)).thenReturn("client@example.com");
+        when(jwtService.extractUsername(mockClaims)).thenReturn("client_user");
 
         filter.filter(exchange, filterChain).block();
 
-        verify(filterChain).filter(exchange);
+        verify(filterChain).filter(argThat(ex -> {
+            String userId = ex.getRequest().getHeaders().getFirst("X-User-Id");
+            String userRole = ex.getRequest().getHeaders().getFirst("X-User-Role");
+            return "100".equals(userId) && "ROLE_CLIENT".equals(userRole);
+        }));
     }
 }

@@ -12,7 +12,8 @@ const normalizeUser = (data) => {
   const userId = data.userId || data.id || data.profileId;
   const username = data.username || data.userName || (data.email ? data.email.split("@")[0] : "");
   const fullName = data.fullName || data.name || username;
-  const role = (data.role || "CLIENT").toUpperCase();
+  const rawRole = (data.role || "CLIENT").toUpperCase();
+  const role = rawRole.startsWith("ROLE_") ? rawRole.substring(5) : rawRole;
 
   return {
     id: userId,
