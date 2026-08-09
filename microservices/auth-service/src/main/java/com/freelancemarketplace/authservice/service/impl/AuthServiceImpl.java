@@ -16,6 +16,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.freelancemarketplace.authservice.client.UserClient;
+import com.freelancemarketplace.shared.dto.InitializeProfileRequest;
+import org.springframework.http.HttpStatus;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -24,6 +28,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthUserRepository authUserRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
+    private final UserClient userClient;
 
     @Override
     @Transactional
@@ -61,7 +66,21 @@ public class AuthServiceImpl implements AuthService {
         AuthUser savedUser = authUserRepository.save(authUser);
         log.info("Successfully registered AuthUser with ID: {}", savedUser.getId());
 
-        // 6. Generate JWT Token
+        // 6. Synchronously initialize user profile in User Service via OpenFeign
+        try {
+            userClient.initializeProfile(
+                    InitializeProfileRequest.builder()
+                            .userId(savedUser.getId())
+                            .role(savedUser.getRole())
+                            .fullName(savedUser.getUsername())
+                            .build()
+            );
+        } catch (Exception e) {
+            log.error("Failed to initialize profile in User Service for user ID {}: {}", savedUser.getId(), e.getMessage());
+            throw new ApiException("User profile creation failed. Please try again later.", HttpStatus.SERVICE_UNAVAILABLE);
+        }
+
+        // 7. Generate JWT Token
         String token = jwtUtils.generateToken(savedUser);
 
         return AuthResponse.builder()

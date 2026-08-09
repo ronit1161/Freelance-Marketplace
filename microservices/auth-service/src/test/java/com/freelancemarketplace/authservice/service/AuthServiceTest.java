@@ -28,6 +28,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
+import com.freelancemarketplace.authservice.client.UserClient;
+
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
 
@@ -39,6 +41,9 @@ class AuthServiceTest {
 
     @Mock
     private JwtUtils jwtUtils;
+
+    @Mock
+    private UserClient userClient;
 
     @InjectMocks
     private AuthServiceImpl authService;
