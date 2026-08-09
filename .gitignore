@@ -99,3 +99,25 @@ temp/
 tmp/
 *.tmp
 /.metadata/
+
+# =========================
+# Python / FastAPI
+# =========================
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# =========================
+# .NET / C#
+# =========================
+bin/
+obj/
+*.user
+*.suo
+
+

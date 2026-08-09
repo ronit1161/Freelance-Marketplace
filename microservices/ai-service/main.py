@@ -1,19 +1,47 @@
+from contextlib import asynccontextmanager
+import logging
 # pyrefly: ignore [missing-import]
 import uvicorn
 # pyrefly: ignore [missing-import]
 from fastapi import FastAPI
 # pyrefly: ignore [missing-import]
 from fastapi.middleware.cors import CORSMiddleware
+# pyrefly: ignore [missing-import]
+import py_eureka_client.eureka_client as eureka_client
 
 from app.config import settings
 from app.controllers.ai_controller import router as ai_router
+
+logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    if settings.eureka_server:
+        try:
+            await eureka_client.init_async(
+                eureka_server=settings.eureka_server,
+                app_name=settings.eureka_app_name,
+                instance_port=settings.port,
+                instance_host="localhost"
+            )
+            logger.info(f"Registered {settings.eureka_app_name} with Eureka Server at {settings.eureka_server}")
+        except Exception as e:
+            logger.warning(f"Eureka registration failed: {e}")
+    yield
+    try:
+        await eureka_client.stop_async()
+    except Exception:
+        pass
+
 
 app = FastAPI(
     title=settings.app_name,
     description="Microservice for GenAI functionality powered by Google Gemini and API Keys",
     version="1.0.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan
 )
 
 # Configure CORS
@@ -45,3 +73,5 @@ if __name__ == "__main__":
         port=settings.port,
         reload=(settings.app_env == "development")
     )
+
+

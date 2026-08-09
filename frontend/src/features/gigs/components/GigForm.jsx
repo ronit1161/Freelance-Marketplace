@@ -30,7 +30,8 @@ export default function GigForm({
           <input
             type="text"
             required
-            placeholder="e.g. I will build a modern responsive React web application"
+            placeholder="e.g. Modern Responsive React Web Application Development"
+
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="w-full p-3.5 border border-gray-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"

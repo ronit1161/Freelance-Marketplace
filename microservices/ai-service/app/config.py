@@ -9,9 +9,15 @@ class Settings(BaseSettings):
     host: str = "0.0.0.0"
     port: int = 8000
     
+    # Eureka Settings
+    eureka_server: str = "http://localhost:8761/eureka/"
+    eureka_app_name: str = "AI-SERVICE"
+
     # GenAI Settings
-    gemini_api_key: str = "your_gemini_api_key_here"
-    default_model: str = "gemini-2.5-flash"
+    gemini_api_key: str = ""
+    default_model: str = "gemini-2.0-flash"
+
+
 
     model_config = SettingsConfigDict(
         env_file=".env",

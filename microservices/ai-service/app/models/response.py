@@ -3,7 +3,8 @@ from pydantic import BaseModel, Field
 
 
 class GigResponse(BaseModel):
-    title: str = Field(..., description="Gig title from freelancer perspective", example="I will build a modern React web app")
+    title: str = Field(..., description="Gig title from freelancer perspective", example="Modern Responsive React Web Application")
+
     description: str = Field(..., description="Detailed description of the service offered")
     price: int = Field(..., description="Estimated price in INR", example=5000)
     deliveryDays: int = Field(..., description="Estimated delivery days", example=3)

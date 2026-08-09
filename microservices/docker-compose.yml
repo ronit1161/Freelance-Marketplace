@@ -9,7 +9,9 @@ services:
     container_name: marketplace-mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-manager}
+
+
     ports:
       - "${MYSQL_PORT:-3306}:3306"
     volumes:
