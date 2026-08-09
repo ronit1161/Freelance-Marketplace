@@ -6,13 +6,11 @@ import com.freelancemarketplace.authservice.repository.AuthUserRepository;
 import com.freelancemarketplace.shared.dto.InitializeProfileRequest;
 import com.freelancemarketplace.shared.dto.Role;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class AdminDataInitializer {
@@ -28,8 +26,6 @@ public class AdminDataInitializer {
             String adminUsername = "admin";
 
             if (!authUserRepository.existsByEmail(adminEmail) && !authUserRepository.existsByUsername(adminUsername)) {
-                log.info("No default admin user found. Creating default Administrator account...");
-
                 AuthUser adminUser = AuthUser.builder()
                         .username(adminUsername)
                         .email(adminEmail)
@@ -40,7 +36,6 @@ public class AdminDataInitializer {
                         .build();
 
                 AuthUser savedAdmin = authUserRepository.save(adminUser);
-                log.info("Default Admin created successfully with ID: {} (email: {}, password: Admin@12345)", savedAdmin.getId(), adminEmail);
 
                 try {
                     userClient.initializeProfile(
@@ -50,12 +45,8 @@ public class AdminDataInitializer {
                                     .fullName("System Administrator")
                                     .build()
                     );
-                    log.info("Admin profile initialized in user-service");
-                } catch (Exception e) {
-                    log.warn("Could not immediately initialize Admin profile in user-service (service might still be connecting): {}", e.getMessage());
+                } catch (Exception ignored) {
                 }
-            } else {
-                log.info("Admin user already exists in auth_users.");
             }
         };
     }

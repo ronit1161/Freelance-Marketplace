@@ -13,7 +13,8 @@ export const loginUser = async ({ email, userNameOrEmail, identifier, password }
 export const registerUser = async (formData) => {
   const userName = (formData.username || formData.userName || (formData.email ? formData.email.split("@")[0] : "")).trim();
   const emailValue = (formData.email || "").trim().toLowerCase();
-  const roleValue = (formData.role || "CLIENT").toUpperCase();
+  const roleRaw = (formData.role || "CLIENT").toUpperCase();
+  const roleValue = roleRaw.startsWith("ROLE_") ? roleRaw : `ROLE_${roleRaw}`;
 
   const payload = {
     username: userName,

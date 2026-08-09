@@ -6,7 +6,6 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -20,14 +19,11 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ErrorResponse> handleApiException(ApiException ex, HttpServletRequest request) {
-        log.warn("API Exception occurred [{}]: {}", ex.getStatus(), ex.getMessage());
-
         ErrorResponse error = ErrorResponse.builder()
                 .success(false)
                 .status(ex.getStatus().value())
@@ -49,8 +45,6 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
 
-        log.warn("Validation failed for path {}: {}", request.getRequestURI(), errors);
-
         ErrorResponse error = ErrorResponse.builder()
                 .success(false)
                 .status(HttpStatus.BAD_REQUEST.value())
@@ -66,8 +60,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(org.springframework.http.converter.HttpMessageNotReadableException ex, HttpServletRequest request) {
-        log.warn("Malformed JSON request at {}: {}", request.getRequestURI(), ex.getMessage());
-
         String message = "Malformed JSON request or invalid field format";
         if (ex.getCause() != null && ex.getCause().getMessage() != null) {
             message = ex.getCause().getMessage();
@@ -87,8 +79,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex, HttpServletRequest request) {
-        log.warn("Bad credentials at {}: {}", request.getRequestURI(), ex.getMessage());
-
         ErrorResponse error = ErrorResponse.builder()
                 .success(false)
                 .status(HttpStatus.UNAUTHORIZED.value())
@@ -103,8 +93,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
-        log.warn("Access denied at {}: {}", request.getRequestURI(), ex.getMessage());
-
         ErrorResponse error = ErrorResponse.builder()
                 .success(false)
                 .status(HttpStatus.FORBIDDEN.value())
@@ -119,8 +107,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({ExpiredJwtException.class, MalformedJwtException.class, SignatureException.class})
     public ResponseEntity<ErrorResponse> handleJwtExceptions(Exception ex, HttpServletRequest request) {
-        log.warn("JWT Exception at {}: {}", request.getRequestURI(), ex.getMessage());
-
         ErrorResponse error = ErrorResponse.builder()
                 .success(false)
                 .status(HttpStatus.UNAUTHORIZED.value())
@@ -135,8 +121,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex, HttpServletRequest request) {
-        log.error("Unhandled internal server error at {}: ", request.getRequestURI(), ex);
-
         ErrorResponse error = ErrorResponse.builder()
                 .success(false)
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())

@@ -13,7 +13,7 @@ public interface OrderClient {
     @GetMapping("/{id}")
     ApiResponse<OrderResponse> getOrderById(
             @PathVariable("id") Long id,
-            @RequestHeader(value = "X-User-Id", required = false) Long authenticatedUserId,
-            @RequestHeader(value = "X-User-Role", required = false) String authenticatedUserRole
+            @RequestHeader("X-User-Id") Long authenticatedUserId,
+            @RequestHeader("X-User-Role") String authenticatedUserRole
     );
 }

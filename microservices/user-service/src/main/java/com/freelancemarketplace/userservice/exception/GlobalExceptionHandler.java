@@ -3,7 +3,6 @@ package com.freelancemarketplace.userservice.exception;
 import com.freelancemarketplace.shared.exception.ApiException;
 import com.freelancemarketplace.shared.exception.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -16,14 +15,11 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ErrorResponse> handleApiException(ApiException ex, HttpServletRequest request) {
-        log.warn("API Exception occurred [{}]: {}", ex.getStatus(), ex.getMessage());
-
         ErrorResponse error = ErrorResponse.builder()
                 .success(false)
                 .status(ex.getStatus().value())
@@ -45,8 +41,6 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
 
-        log.warn("Validation failed for path {}: {}", request.getRequestURI(), errors);
-
         ErrorResponse error = ErrorResponse.builder()
                 .success(false)
                 .status(HttpStatus.BAD_REQUEST.value())
@@ -62,8 +56,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MissingRequestHeaderException.class)
     public ResponseEntity<ErrorResponse> handleMissingHeader(MissingRequestHeaderException ex, HttpServletRequest request) {
-        log.warn("Missing required request header: {} at {}", ex.getHeaderName(), request.getRequestURI());
-
         ErrorResponse error = ErrorResponse.builder()
                 .success(false)
                 .status(HttpStatus.UNAUTHORIZED.value())
@@ -78,8 +70,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoResourceFound(org.springframework.web.servlet.resource.NoResourceFoundException ex, HttpServletRequest request) {
-        log.warn("Resource not found at {}: {}", request.getRequestURI(), ex.getMessage());
-
         ErrorResponse error = ErrorResponse.builder()
                 .success(false)
                 .status(HttpStatus.NOT_FOUND.value())
@@ -94,8 +84,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex, HttpServletRequest request) {
-        log.error("Unhandled internal server error at {}: ", request.getRequestURI(), ex);
-
         ErrorResponse error = ErrorResponse.builder()
                 .success(false)
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())

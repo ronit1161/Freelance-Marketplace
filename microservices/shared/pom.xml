@@ -20,8 +20,6 @@
 
     <modules>
         <module>common-dto</module>
-        <module>common-security</module>
-        <module>common-utils</module>
         <module>common-exception</module>
     </modules>
 

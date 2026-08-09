@@ -11,14 +11,11 @@ import com.freelancemarketplace.userservice.entity.UserProfile;
 import com.freelancemarketplace.userservice.repository.UserProfileRepository;
 import com.freelancemarketplace.userservice.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserProfileServiceImpl implements UserProfileService {
@@ -26,9 +23,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     private final UserProfileRepository userProfileRepository;
 
     @Override
-    @Transactional(readOnly = true)
     public UserProfileResponse getProfileByUserId(Long userId) {
-        log.info("Fetching profile for user ID: {}", userId);
         UserProfile profile = userProfileRepository.findByUserIdAndDeletedFalse(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("UserProfile", "userId", userId));
 
@@ -38,7 +33,6 @@ public class UserProfileServiceImpl implements UserProfileService {
     @Override
     @Transactional
     public UserProfileResponse updateProfile(Long userId, UpdateUserProfileRequest request) {
-        log.info("Updating profile for user ID: {}", userId);
         UserProfile profile = userProfileRepository.findByUserIdAndDeletedFalse(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("UserProfile", "userId", userId));
 
@@ -59,17 +53,13 @@ public class UserProfileServiceImpl implements UserProfileService {
         }
 
         UserProfile updatedProfile = userProfileRepository.save(profile);
-        log.info("Successfully updated profile for user ID: {}", userId);
         return mapToResponse(updatedProfile);
     }
 
     @Override
     @Transactional
     public UserProfileResponse initializeProfile(InitializeProfileRequest request) {
-        log.info("Initializing profile for user ID: {} with role: {}", request.getUserId(), request.getRole());
-
         if (userProfileRepository.existsByUserId(request.getUserId())) {
-            log.warn("Profile already exists for user ID: {}", request.getUserId());
             throw new ConflictException(String.format("Profile already exists for user ID: %d", request.getUserId()));
         }
 
@@ -85,21 +75,17 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .build();
 
         UserProfile savedProfile = userProfileRepository.save(profile);
-        log.info("Successfully created initial profile with ID: {} for user ID: {}", savedProfile.getId(), request.getUserId());
         return mapToResponse(savedProfile);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<FreelancerProfileResponse> getFreelancers(String skill, Integer minExperience) {
-        log.info("Searching freelancers with skill filter: '{}' and minExperience: '{}'", skill, minExperience);
-
         String cleanedSkill = (skill != null && !skill.trim().isEmpty()) ? skill.trim() : null;
         List<UserProfile> freelancers = userProfileRepository.searchFreelancers(Role.ROLE_FREELANCER, cleanedSkill, minExperience);
 
         return freelancers.stream()
                 .map(this::mapToFreelancerResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private UserProfileResponse mapToResponse(UserProfile entity) {

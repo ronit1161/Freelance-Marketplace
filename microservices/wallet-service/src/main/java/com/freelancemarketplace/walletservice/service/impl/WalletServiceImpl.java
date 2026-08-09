@@ -12,14 +12,12 @@ import com.freelancemarketplace.walletservice.repository.WalletRepository;
 import com.freelancemarketplace.walletservice.repository.WalletTransactionRepository;
 import com.freelancemarketplace.walletservice.service.WalletService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class WalletServiceImpl implements WalletService {
@@ -31,17 +29,7 @@ public class WalletServiceImpl implements WalletService {
     @Transactional
     public WalletResponse getOrCreateWallet(Long userId) {
         enforceAuthentication(userId);
-
-        Wallet wallet = walletRepository.findByUserId(userId)
-                .orElseGet(() -> {
-                    log.info("Creating new wallet for User ID: {}", userId);
-                    return walletRepository.save(Wallet.builder()
-                            .userId(userId)
-                            .availableBalance(BigDecimal.ZERO)
-                            .escrowBalance(BigDecimal.ZERO)
-                            .build());
-                });
-
+        Wallet wallet = getOrCreateWalletEntity(userId);
         return mapToResponse(wallet);
     }
 
@@ -54,20 +42,10 @@ public class WalletServiceImpl implements WalletService {
         boolean isAdmin = "ROLE_ADMIN".equalsIgnoreCase(userRole);
 
         if (!isSelf && !isAdmin) {
-            log.warn("Access denied: User ID {} tried to view wallet of User ID {}", authenticatedUserId, targetUserId);
             throw new ForbiddenException("You do not have permission to view this wallet");
         }
 
-        Wallet wallet = walletRepository.findByUserId(targetUserId)
-                .orElseGet(() -> {
-                    log.info("Auto-initializing wallet for User ID: {}", targetUserId);
-                    return walletRepository.save(Wallet.builder()
-                            .userId(targetUserId)
-                            .availableBalance(BigDecimal.ZERO)
-                            .escrowBalance(BigDecimal.ZERO)
-                            .build());
-                });
-
+        Wallet wallet = getOrCreateWalletEntity(targetUserId);
         return mapToResponse(wallet);
     }
 
@@ -76,12 +54,7 @@ public class WalletServiceImpl implements WalletService {
     public WalletResponse deposit(Long userId, DepositRequest request) {
         enforceAuthentication(userId);
 
-        Wallet wallet = walletRepository.findByUserId(userId)
-                .orElseGet(() -> walletRepository.save(Wallet.builder()
-                        .userId(userId)
-                        .availableBalance(BigDecimal.ZERO)
-                        .escrowBalance(BigDecimal.ZERO)
-                        .build()));
+        Wallet wallet = getOrCreateWalletEntity(userId);
 
         BigDecimal depositAmount = request.getAmount();
         wallet.setAvailableBalance(wallet.getAvailableBalance().add(depositAmount));
@@ -96,25 +69,27 @@ public class WalletServiceImpl implements WalletService {
                 .build();
         transactionRepository.save(tx);
 
-        log.info("User ID {} deposited {}. New available balance: {}", userId, depositAmount, updatedWallet.getAvailableBalance());
         return mapToResponse(updatedWallet);
     }
 
     @Override
-    @Transactional
     public List<WalletTransactionResponse> getTransactionsByUserId(Long userId) {
         enforceAuthentication(userId);
 
-        Wallet wallet = walletRepository.findByUserId(userId)
+        Wallet wallet = getOrCreateWalletEntity(userId);
+
+        return transactionRepository.findByWalletIdOrderByCreatedAtDesc(wallet.getId()).stream()
+                .map(this::mapToTxResponse)
+                .toList();
+    }
+
+    private Wallet getOrCreateWalletEntity(Long userId) {
+        return walletRepository.findByUserId(userId)
                 .orElseGet(() -> walletRepository.save(Wallet.builder()
                         .userId(userId)
                         .availableBalance(BigDecimal.ZERO)
                         .escrowBalance(BigDecimal.ZERO)
                         .build()));
-
-        return transactionRepository.findByWalletIdOrderByCreatedAtDesc(wallet.getId()).stream()
-                .map(this::mapToTxResponse)
-                .toList();
     }
 
     private void enforceAuthentication(Long userId) {

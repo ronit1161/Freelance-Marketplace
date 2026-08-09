@@ -16,14 +16,12 @@ import com.freelancemarketplace.shared.dto.ApiResponse;
 import com.freelancemarketplace.shared.exception.*;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
@@ -71,21 +69,17 @@ public class OrderServiceImpl implements OrderService {
                     .build();
             walletClient.lockEscrow(lockRequest);
         } catch (FeignException.BadRequest e) {
-            log.warn("Escrow lock failed for Order ID {}: Insufficient wallet balance", savedOrder.getId());
             orderRepository.delete(savedOrder);
             throw new BadRequestException("Insufficient available balance in your wallet to place this order");
         } catch (Exception e) {
-            log.error("Failed to communicate with Wallet Service for Order ID {}: {}", savedOrder.getId(), e.getMessage());
             orderRepository.delete(savedOrder);
             throw new ApiException("Wallet Service is currently unavailable. Please try again later.", HttpStatus.SERVICE_UNAVAILABLE);
         }
 
-        log.info("Client ID {} successfully created Order ID: {} for Gig ID: {}", authenticatedUserId, savedOrder.getId(), gig.getId());
         return mapToResponse(savedOrder);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public OrderResponse getOrderById(Long id, Long authenticatedUserId, String userRole) {
         enforceAuthentication(authenticatedUserId);
 
@@ -97,8 +91,6 @@ public class OrderServiceImpl implements OrderService {
         boolean isAdmin = "ROLE_ADMIN".equalsIgnoreCase(userRole);
 
         if (!isClient && !isFreelancer && !isAdmin) {
-            log.warn("Access denied: User ID {} (role '{}') tried to access Order ID {} (Client: {}, Freelancer: {})",
-                    authenticatedUserId, userRole, id, order.getClientId(), order.getFreelancerId());
             throw new ForbiddenException("You do not have permission to view this order");
         }
 
@@ -106,7 +98,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<OrderResponse> getMyOrders(Long authenticatedUserId, String userRole) {
         enforceAuthentication(authenticatedUserId);
 
@@ -145,7 +136,6 @@ public class OrderServiceImpl implements OrderService {
 
         order.setStatus(OrderStatus.ACCEPTED);
         Order updatedOrder = orderRepository.save(order);
-        log.info("Freelancer ID {} accepted Order ID: {}", authenticatedUserId, id);
         return mapToResponse(updatedOrder);
     }
 
@@ -168,7 +158,6 @@ public class OrderServiceImpl implements OrderService {
 
         order.setStatus(OrderStatus.IN_PROGRESS);
         Order updatedOrder = orderRepository.save(order);
-        log.info("Freelancer ID {} marked Order ID: {} as IN_PROGRESS", authenticatedUserId, id);
         return mapToResponse(updatedOrder);
     }
 
@@ -199,13 +188,11 @@ public class OrderServiceImpl implements OrderService {
                     .build();
             walletClient.releaseEscrow(releaseRequest);
         } catch (Exception e) {
-            log.error("Failed to release escrow for Order ID {}: {}", id, e.getMessage());
             throw new ApiException("Failed to release escrow funds from Wallet Service", HttpStatus.SERVICE_UNAVAILABLE);
         }
 
         order.setStatus(OrderStatus.COMPLETED);
         Order updatedOrder = orderRepository.save(order);
-        log.info("Freelancer ID {} marked Order ID: {} as COMPLETED and escrow was released", authenticatedUserId, id);
         return mapToResponse(updatedOrder);
     }
 
@@ -238,13 +225,11 @@ public class OrderServiceImpl implements OrderService {
                     .build();
             walletClient.refundEscrow(refundRequest);
         } catch (Exception e) {
-            log.error("Failed to refund escrow for Order ID {}: {}", id, e.getMessage());
             throw new ApiException("Failed to refund escrow funds from Wallet Service", HttpStatus.SERVICE_UNAVAILABLE);
         }
 
         order.setStatus(OrderStatus.CANCELLED);
         Order updatedOrder = orderRepository.save(order);
-        log.info("Order ID: {} cancelled by User ID: {} (role '{}') and escrow refunded", id, authenticatedUserId, userRole);
         return mapToResponse(updatedOrder);
     }
 
@@ -258,11 +243,9 @@ public class OrderServiceImpl implements OrderService {
         } catch (FeignException.NotFound e) {
             throw new ResourceNotFoundException("Gig", "id", gigId);
         } catch (FeignException e) {
-            log.error("Feign error communicating with Gig Service for Gig ID {}: {}", gigId, e.getMessage());
             throw new ApiException("Gig Service is currently unavailable. Please try again later.", HttpStatus.SERVICE_UNAVAILABLE);
         } catch (Exception e) {
             if (e instanceof ApiException) throw (ApiException) e;
-            log.error("Unexpected error communicating with Gig Service for Gig ID {}: {}", gigId, e.getMessage());
             throw new ApiException("Gig Service is currently unavailable. Please try again later.", HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
@@ -275,14 +258,12 @@ public class OrderServiceImpl implements OrderService {
 
     private void enforceClient(String userRole, String action) {
         if (userRole == null || !"ROLE_CLIENT".equalsIgnoreCase(userRole)) {
-            log.warn("Role check failed: User with role '{}' attempted to {}", userRole, action);
             throw new ForbiddenException("Only clients are permitted to " + action);
         }
     }
 
     private void enforceFreelancer(String userRole, String action) {
         if (userRole == null || !"ROLE_FREELANCER".equalsIgnoreCase(userRole)) {
-            log.warn("Role check failed: User with role '{}' attempted to {}", userRole, action);
             throw new ForbiddenException("Only freelancers are permitted to " + action);
         }
     }

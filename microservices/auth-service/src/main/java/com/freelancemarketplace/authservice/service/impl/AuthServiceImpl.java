@@ -1,5 +1,6 @@
 package com.freelancemarketplace.authservice.service.impl;
 
+import com.freelancemarketplace.authservice.client.UserClient;
 import com.freelancemarketplace.authservice.dto.request.LoginRequest;
 import com.freelancemarketplace.authservice.dto.request.RegisterRequest;
 import com.freelancemarketplace.authservice.dto.response.AuthResponse;
@@ -8,19 +9,15 @@ import com.freelancemarketplace.authservice.entity.AuthUser;
 import com.freelancemarketplace.authservice.repository.AuthUserRepository;
 import com.freelancemarketplace.authservice.security.JwtUtils;
 import com.freelancemarketplace.authservice.service.AuthService;
+import com.freelancemarketplace.shared.dto.InitializeProfileRequest;
 import com.freelancemarketplace.shared.dto.Role;
 import com.freelancemarketplace.shared.exception.*;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.freelancemarketplace.authservice.client.UserClient;
-import com.freelancemarketplace.shared.dto.InitializeProfileRequest;
-import org.springframework.http.HttpStatus;
-
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -33,8 +30,6 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        log.info("Processing registration request for username: {} and email: {}", request.getUsername(), request.getEmail());
-
         // 1. Enforce Role Restriction: ADMIN cannot be registered publicly
         if (request.getRole() == Role.ROLE_ADMIN) {
             throw new BadRequestException("ADMIN registration is strictly restricted and cannot be created through public registration");
@@ -64,7 +59,6 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         AuthUser savedUser = authUserRepository.save(authUser);
-        log.info("Successfully registered AuthUser with ID: {}", savedUser.getId());
 
         // 6. Synchronously initialize user profile in User Service via OpenFeign
         try {
@@ -76,7 +70,6 @@ public class AuthServiceImpl implements AuthService {
                             .build()
             );
         } catch (Exception e) {
-            log.error("Failed to initialize profile in User Service for user ID {}: {}", savedUser.getId(), e.getMessage());
             throw new ApiException("User profile creation failed. Please try again later.", HttpStatus.SERVICE_UNAVAILABLE);
         }
 
@@ -95,10 +88,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
         String identifier = request.getIdentifier().trim();
-        log.info("Processing login attempt for identifier: {}", identifier);
 
         // 1. Retrieve User Credentials
         AuthUser user = authUserRepository.findByIdentifier(identifier)
@@ -106,25 +97,21 @@ public class AuthServiceImpl implements AuthService {
 
         // 2. Verify Password
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
-            log.warn("Failed login attempt - invalid password for identifier: {}", identifier);
             throw new UnauthorizedException("Invalid username/email or password");
         }
 
         // 3. Verify Account State - Active Flag
         if (!user.isActive()) {
-            log.warn("Failed login attempt - account disabled for identifier: {}", identifier);
             throw new AccountDisabledException("Account is currently disabled. Please contact support.");
         }
 
         // 4. Verify Account State - Blocked Flag
         if (user.isBlocked()) {
-            log.warn("Failed login attempt - account blocked for identifier: {}", identifier);
             throw new AccountBlockedException("Account has been suspended by administration.");
         }
 
         // 5. Generate JWT Token
         String token = jwtUtils.generateToken(user);
-        log.info("User {} successfully authenticated with ID: {}", user.getUsername(), user.getId());
 
         return AuthResponse.builder()
                 .token(token)
@@ -161,7 +148,6 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public AuthResponse getCurrentUser(String username) {
         AuthUser user = authUserRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("AuthUser", "username", username));

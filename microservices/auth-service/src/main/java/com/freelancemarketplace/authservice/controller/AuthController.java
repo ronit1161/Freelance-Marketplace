@@ -8,14 +8,12 @@ import com.freelancemarketplace.authservice.service.AuthService;
 import com.freelancemarketplace.shared.dto.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-@Slf4j
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -25,7 +23,6 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest request) {
-        log.info("Received public registration request for: {}", request.getEmail());
         AuthResponse response = authService.register(request);
         return new ResponseEntity<>(
                 ApiResponse.success("User registered successfully", response),
@@ -35,7 +32,6 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
-        log.info("Received login request for identifier: {}", request.getIdentifier());
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(
                 ApiResponse.success("Authentication successful", response)

@@ -58,16 +58,6 @@
             </dependency>
             <dependency>
                 <groupId>com.freelancemarketplace</groupId>
-                <artifactId>common-security</artifactId>
-                <version>${shared.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.freelancemarketplace</groupId>
-                <artifactId>common-utils</artifactId>
-                <version>${shared.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.freelancemarketplace</groupId>
                 <artifactId>common-exception</artifactId>
                 <version>${shared.version}</version>
             </dependency>

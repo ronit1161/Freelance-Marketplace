@@ -17,14 +17,12 @@ import com.freelancemarketplace.walletservice.repository.WalletRepository;
 import com.freelancemarketplace.walletservice.repository.WalletTransactionRepository;
 import com.freelancemarketplace.walletservice.service.EscrowService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Optional;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EscrowServiceImpl implements EscrowService {
@@ -36,15 +34,11 @@ public class EscrowServiceImpl implements EscrowService {
     @Override
     @Transactional
     public EscrowResponse lockEscrow(LockEscrowRequest request) {
-        log.info("Attempting to lock escrow of {} for Order ID {} (Client ID {})",
-                request.getAmount(), request.getOrderId(), request.getClientId());
-
         // 1. Idempotency Check
         Optional<Escrow> existingEscrowOpt = escrowRepository.findByOrderId(request.getOrderId());
         if (existingEscrowOpt.isPresent()) {
             Escrow existingEscrow = existingEscrowOpt.get();
             if (existingEscrow.getStatus() == EscrowStatus.LOCKED) {
-                log.info("Idempotent hit: Escrow already locked for Order ID {}", request.getOrderId());
                 return mapToResponse(existingEscrow);
             }
             throw new ConflictException(String.format("Escrow for Order ID %d already exists with status %s",
@@ -52,16 +46,9 @@ public class EscrowServiceImpl implements EscrowService {
         }
 
         // 2. Client Wallet Check
-        Wallet clientWallet = walletRepository.findByUserId(request.getClientId())
-                .orElseGet(() -> walletRepository.save(Wallet.builder()
-                        .userId(request.getClientId())
-                        .availableBalance(BigDecimal.ZERO)
-                        .escrowBalance(BigDecimal.ZERO)
-                        .build()));
+        Wallet clientWallet = getOrCreateWallet(request.getClientId());
 
         if (clientWallet.getAvailableBalance().compareTo(request.getAmount()) < 0) {
-            log.warn("Insufficient available funds for Client ID {}. Required: {}, Available: {}",
-                    request.getClientId(), request.getAmount(), clientWallet.getAvailableBalance());
             throw new BadRequestException(String.format("Insufficient available balance. Required: %s, Available: %s",
                     request.getAmount(), clientWallet.getAvailableBalance()));
         }
@@ -90,22 +77,17 @@ public class EscrowServiceImpl implements EscrowService {
                 .build();
         transactionRepository.save(tx);
 
-        log.info("Successfully locked {} in escrow for Order ID {}", request.getAmount(), request.getOrderId());
         return mapToResponse(savedEscrow);
     }
 
     @Override
     @Transactional
     public EscrowResponse releaseEscrow(ReleaseEscrowRequest request) {
-        log.info("Attempting to release escrow for Order ID {} to Freelancer ID {}",
-                request.getOrderId(), request.getFreelancerId());
-
         // 1. Escrow & Idempotency Check
         Escrow escrow = escrowRepository.findByOrderId(request.getOrderId())
                 .orElseThrow(() -> new ResourceNotFoundException("Escrow", "orderId", request.getOrderId()));
 
         if (escrow.getStatus() == EscrowStatus.RELEASED) {
-            log.info("Idempotent hit: Escrow already released for Order ID {}", request.getOrderId());
             return mapToResponse(escrow);
         }
 
@@ -126,13 +108,7 @@ public class EscrowServiceImpl implements EscrowService {
         walletRepository.save(clientWallet);
 
         // 3. Freelancer Wallet Credit
-        Wallet freelancerWallet = walletRepository.findByUserId(request.getFreelancerId())
-                .orElseGet(() -> walletRepository.save(Wallet.builder()
-                        .userId(request.getFreelancerId())
-                        .availableBalance(BigDecimal.ZERO)
-                        .escrowBalance(BigDecimal.ZERO)
-                        .build()));
-
+        Wallet freelancerWallet = getOrCreateWallet(request.getFreelancerId());
         freelancerWallet.setAvailableBalance(freelancerWallet.getAvailableBalance().add(escrow.getAmount()));
         walletRepository.save(freelancerWallet);
 
@@ -151,23 +127,17 @@ public class EscrowServiceImpl implements EscrowService {
                 .build();
         transactionRepository.save(freelancerTx);
 
-        log.info("Successfully released {} from escrow to Freelancer ID {} for Order ID {}",
-                escrow.getAmount(), request.getFreelancerId(), request.getOrderId());
         return mapToResponse(updatedEscrow);
     }
 
     @Override
     @Transactional
     public EscrowResponse refundEscrow(RefundEscrowRequest request) {
-        log.info("Attempting to refund escrow for Order ID {} to Client ID {}",
-                request.getOrderId(), request.getClientId());
-
         // 1. Escrow & Idempotency Check
         Escrow escrow = escrowRepository.findByOrderId(request.getOrderId())
                 .orElseThrow(() -> new ResourceNotFoundException("Escrow", "orderId", request.getOrderId()));
 
         if (escrow.getStatus() == EscrowStatus.REFUNDED) {
-            log.info("Idempotent hit: Escrow already refunded for Order ID {}", request.getOrderId());
             return mapToResponse(escrow);
         }
 
@@ -202,9 +172,16 @@ public class EscrowServiceImpl implements EscrowService {
                 .build();
         transactionRepository.save(clientTx);
 
-        log.info("Successfully refunded {} to Client ID {} for Order ID {}",
-                escrow.getAmount(), request.getClientId(), request.getOrderId());
         return mapToResponse(updatedEscrow);
+    }
+
+    private Wallet getOrCreateWallet(Long userId) {
+        return walletRepository.findByUserId(userId)
+                .orElseGet(() -> walletRepository.save(Wallet.builder()
+                        .userId(userId)
+                        .availableBalance(BigDecimal.ZERO)
+                        .escrowBalance(BigDecimal.ZERO)
+                        .build()));
     }
 
     private EscrowResponse mapToResponse(Escrow escrow) {

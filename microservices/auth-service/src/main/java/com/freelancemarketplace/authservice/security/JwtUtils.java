@@ -5,7 +5,6 @@ import com.freelancemarketplace.shared.dto.Role;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-@Slf4j
 @Component
 public class JwtUtils {
 
@@ -74,7 +72,7 @@ public class JwtUtils {
 
     public Role extractRole(String token) {
         String roleStr = extractClaim(token, claims -> claims.get("role", String.class));
-        return Role.fromString(roleStr);
+        return roleStr != null ? Role.valueOf(roleStr) : null;
     }
 
     public Date extractExpiration(String token) {
@@ -105,16 +103,9 @@ public class JwtUtils {
                     .build()
                     .parseSignedClaims(token);
             return true;
-        } catch (SecurityException | MalformedJwtException e) {
-            log.error("Invalid JWT signature/token format: {}", e.getMessage());
-        } catch (ExpiredJwtException e) {
-            log.error("Expired JWT token: {}", e.getMessage());
-        } catch (UnsupportedJwtException e) {
-            log.error("Unsupported JWT token: {}", e.getMessage());
-        } catch (IllegalArgumentException e) {
-            log.error("JWT claims string is empty or null: {}", e.getMessage());
+        } catch (Exception e) {
+            return false;
         }
-        return false;
     }
 
     public boolean isTokenExpired(String token) {

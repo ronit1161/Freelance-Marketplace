@@ -12,7 +12,6 @@ import com.freelancemarketplace.shared.exception.ForbiddenException;
 import com.freelancemarketplace.shared.exception.ResourceNotFoundException;
 import com.freelancemarketplace.shared.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GigServiceImpl implements GigService {
@@ -53,12 +51,10 @@ public class GigServiceImpl implements GigService {
                 .build();
 
         Gig savedGig = gigRepository.save(gig);
-        log.info("Freelancer ID {} successfully created Gig ID: '{}'", authenticatedUserId, savedGig.getId());
         return mapToResponse(savedGig);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public GigResponse getGigById(Long id) {
         Gig gig = gigRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Gig", "id", id));
@@ -66,7 +62,6 @@ public class GigServiceImpl implements GigService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<GigResponse> getAllGigs(Long categoryId, BigDecimal minPrice, BigDecimal maxPrice, String search, String sortBy) {
         Sort sort = resolveSort(sortBy);
         String searchParam = (search != null && !search.trim().isEmpty()) ? search.trim() : null;
@@ -77,7 +72,6 @@ public class GigServiceImpl implements GigService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<GigResponse> getGigsByFreelancerId(Long freelancerId) {
         return gigRepository.findByFreelancerIdAndDeletedFalse(freelancerId).stream()
                 .map(this::mapToResponse)
@@ -85,7 +79,6 @@ public class GigServiceImpl implements GigService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<GigResponse> getMyGigs(Long authenticatedUserId, String userRole) {
         enforceAuthentication(authenticatedUserId);
         enforceFreelancer(userRole, "view your gigs");
@@ -106,8 +99,6 @@ public class GigServiceImpl implements GigService {
 
         // CRITICAL OWNERSHIP CHECK
         if (!gig.getFreelancerId().equals(authenticatedUserId)) {
-            log.warn("Unauthorized modification attempt: User ID {} tried to modify Gig ID {} owned by Freelancer ID {}",
-                    authenticatedUserId, id, gig.getFreelancerId());
             throw new ForbiddenException("You do not have permission to update this gig");
         }
 
@@ -125,7 +116,6 @@ public class GigServiceImpl implements GigService {
         }
 
         Gig updatedGig = gigRepository.save(gig);
-        log.info("Freelancer ID {} successfully updated Gig ID: {}", authenticatedUserId, id);
         return mapToResponse(updatedGig);
     }
 
@@ -141,15 +131,12 @@ public class GigServiceImpl implements GigService {
         boolean isAdmin = "ROLE_ADMIN".equalsIgnoreCase(userRole);
 
         if (!isOwner && !isAdmin) {
-            log.warn("Unauthorized delete attempt: User ID {} (role '{}') tried to delete Gig ID {} owned by Freelancer ID {}",
-                    authenticatedUserId, userRole, id, gig.getFreelancerId());
             throw new ForbiddenException("You do not have permission to delete this gig");
         }
 
         // Soft deletion
         gig.setDeleted(true);
         gigRepository.save(gig);
-        log.info("Gig ID {} successfully soft-deleted by User ID {} (role '{}')", id, authenticatedUserId, userRole);
     }
 
     private void enforceAuthentication(Long authenticatedUserId) {
@@ -160,7 +147,6 @@ public class GigServiceImpl implements GigService {
 
     private void enforceFreelancer(String userRole, String action) {
         if (userRole == null || !"ROLE_FREELANCER".equalsIgnoreCase(userRole)) {
-            log.warn("Role check failed: User with role '{}' attempted to {}", userRole, action);
             throw new ForbiddenException("Only freelancers are permitted to " + action);
         }
     }

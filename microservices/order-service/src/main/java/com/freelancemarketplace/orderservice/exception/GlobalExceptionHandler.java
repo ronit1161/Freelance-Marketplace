@@ -3,7 +3,6 @@ package com.freelancemarketplace.orderservice.exception;
 import com.freelancemarketplace.shared.exception.ApiException;
 import com.freelancemarketplace.shared.exception.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -15,14 +14,11 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ErrorResponse> handleApiException(ApiException ex, HttpServletRequest request) {
-        log.warn("API Exception [{}]: {} at {}", ex.getStatus(), ex.getMessage(), request.getRequestURI());
-
         ErrorResponse error = ErrorResponse.builder()
                 .success(false)
                 .status(ex.getStatus().value())
@@ -44,8 +40,6 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
 
-        log.warn("Validation failed for {}: {}", request.getRequestURI(), errors);
-
         ErrorResponse error = ErrorResponse.builder()
                 .success(false)
                 .status(HttpStatus.BAD_REQUEST.value())
@@ -61,8 +55,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex, HttpServletRequest request) {
-        log.error("Unhandled internal server error at {}: ", request.getRequestURI(), ex);
-
         ErrorResponse error = ErrorResponse.builder()
                 .success(false)
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())

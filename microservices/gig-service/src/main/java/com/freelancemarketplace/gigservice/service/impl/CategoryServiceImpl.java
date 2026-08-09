@@ -10,13 +10,11 @@ import com.freelancemarketplace.shared.exception.ConflictException;
 import com.freelancemarketplace.shared.exception.ForbiddenException;
 import com.freelancemarketplace.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
@@ -24,7 +22,6 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Override
-    @Transactional(readOnly = true)
     public List<CategoryResponse> getAllCategories() {
         return categoryRepository.findAllByActiveTrue().stream()
                 .map(this::mapToResponse)
@@ -32,7 +29,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public CategoryResponse getCategoryById(Long id) {
         Category category = categoryRepository.findByIdAndActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "id", id));
@@ -56,7 +52,6 @@ public class CategoryServiceImpl implements CategoryService {
                 .build();
 
         Category savedCategory = categoryRepository.save(category);
-        log.info("Admin created new Category ID: {}, Name: '{}'", savedCategory.getId(), savedCategory.getName());
         return mapToResponse(savedCategory);
     }
 
@@ -80,7 +75,6 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         Category updatedCategory = categoryRepository.save(category);
-        log.info("Admin updated Category ID: {}", updatedCategory.getId());
         return mapToResponse(updatedCategory);
     }
 
@@ -94,12 +88,10 @@ public class CategoryServiceImpl implements CategoryService {
 
         category.setActive(false);
         categoryRepository.save(category);
-        log.info("Admin soft-deleted Category ID: {}", id);
     }
 
     private void enforceAdmin(String userRole, String action) {
         if (userRole == null || !"ROLE_ADMIN".equalsIgnoreCase(userRole)) {
-            log.warn("Access denied: role '{}' attempted to {}", userRole, action);
             throw new ForbiddenException("Only administrators are permitted to " + action);
         }
     }
