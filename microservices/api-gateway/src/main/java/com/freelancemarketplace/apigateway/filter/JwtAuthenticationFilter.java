@@ -6,12 +6,11 @@ import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-
-import org.springframework.http.HttpMethod;
 
 @Component
 @RequiredArgsConstructor
@@ -21,6 +20,11 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        // Always allow CORS preflight requests
+        if (HttpMethod.OPTIONS.equals(exchange.getRequest().getMethod())) {
+            return chain.filter(exchange);
+        }
+
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         String token = null;
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -80,7 +84,6 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         if (path.startsWith("/auth/register") || path.startsWith("/auth/login") || path.startsWith("/actuator") || path.startsWith("/api/v1/ai")) {
             return true;
         }
-
 
         if (HttpMethod.GET.equals(method)) {
             if (path.startsWith("/categories") || path.startsWith("/reviews")) {

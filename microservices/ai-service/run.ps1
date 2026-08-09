@@ -1,2 +1,3 @@
 Write-Host "Starting AI Microservice on port 8000..." -ForegroundColor Green
-.\venv\Scripts\python.exe main.py
+Set-Location $PSScriptRoot
+& "$PSScriptRoot\venv\Scripts\python.exe" main.py
