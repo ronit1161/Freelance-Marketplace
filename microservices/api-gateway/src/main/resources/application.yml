@@ -50,14 +50,11 @@ spring:
           predicates:
             - Path=/api/v1/ai/**
 
-
-
       globalcors:
         corsConfigurations:
           '[/**]':
-            allowedOrigins:
-              - "http://localhost:5173"
-              - "http://localhost:3000"
+            allowedOriginPatterns:
+              - "*"
             allowedMethods:
               - GET
               - POST
@@ -68,6 +65,7 @@ spring:
             allowedHeaders:
               - "*"
             allowCredentials: true
+
 
 eureka:
   client:
