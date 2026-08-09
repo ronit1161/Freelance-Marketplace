@@ -228,7 +228,7 @@ export default function MyGigsPage() {
                 <option value="ALL">All Categories</option>
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
-                    {cat.categoryName}
+                    {cat.categoryName || cat.name}
                   </option>
                 ))}
               </select>

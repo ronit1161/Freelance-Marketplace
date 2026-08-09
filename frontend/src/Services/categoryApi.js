@@ -1,9 +1,23 @@
 import apiClient from "./apiClient";
 
+export const normalizeCategory = (cat) => {
+  if (!cat) return null;
+  const name = cat.name || cat.categoryName || "";
+  return {
+    ...cat,
+    id: cat.id,
+    name: name,
+    categoryName: name,
+    description: cat.description || "",
+    active: cat.active !== undefined ? cat.active : true,
+  };
+};
+
 export const getAllCategories = async () => {
   try {
     const response = await apiClient.get("/categories");
-    return response.data?.data || response.data || [];
+    const data = response.data?.data || response.data || [];
+    return Array.isArray(data) ? data.map(normalizeCategory) : [];
   } catch (error) {
     const errorMessage = error.response?.data?.message || "Failed to fetch categories.";
     throw new Error(errorMessage);
@@ -13,7 +27,8 @@ export const getAllCategories = async () => {
 export const getCategoryById = async (id) => {
   try {
     const response = await apiClient.get(`/categories/${id}`);
-    return response.data?.data || response.data;
+    const data = response.data?.data || response.data;
+    return normalizeCategory(data);
   } catch (error) {
     const errorMessage = error.response?.data?.message || "Failed to fetch category.";
     throw new Error(errorMessage);
@@ -29,7 +44,8 @@ export const createCategory = async (categoryName, description = "") => {
       name: (nameValue || "").trim(),
       description: (descValue || "").trim(),
     });
-    return response.data?.data || response.data;
+    const data = response.data?.data || response.data;
+    return normalizeCategory(data);
   } catch (error) {
     const errorMessage = error.response?.data?.message || "Failed to create category.";
     throw new Error(errorMessage);
@@ -45,7 +61,8 @@ export const updateCategory = async (id, categoryName, description = "") => {
       name: (nameValue || "").trim(),
       description: (descValue || "").trim(),
     });
-    return response.data?.data || response.data;
+    const data = response.data?.data || response.data;
+    return normalizeCategory(data);
   } catch (error) {
     const errorMessage = error.response?.data?.message || "Failed to update category.";
     throw new Error(errorMessage);

@@ -46,7 +46,7 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public WalletResponse getWalletByUserId(Long targetUserId, Long authenticatedUserId, String userRole) {
         enforceAuthentication(authenticatedUserId);
 
@@ -101,7 +101,7 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public List<WalletTransactionResponse> getTransactionsByUserId(Long userId) {
         enforceAuthentication(userId);
 

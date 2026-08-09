@@ -19,4 +19,8 @@ public class CategoryResponse {
     private boolean active;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public String getCategoryName() {
+        return name;
+    }
 }

@@ -59,7 +59,7 @@ export default function GigForm({
               </option>
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
-                  {cat.categoryName}
+                  {cat.categoryName || cat.name}
                 </option>
               ))}
             </select>

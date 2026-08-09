@@ -80,9 +80,15 @@ export default function CategoryManagementPage() {
   // Handle Add/Edit Modal Open
   const handleOpenModal = (category = null) => {
     setEditingCategory(category);
-    setCategoryNameInput(category ? category.categoryName : "");
+    setCategoryNameInput(category ? (category.categoryName || category.name || "") : "");
     setFormError("");
     setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setCategoryNameInput("");
+    setEditingCategory(null);
   };
 
   // Handle Form Submit
@@ -105,14 +111,11 @@ export default function CategoryManagementPage() {
         await createCategory(trimmedName);
         showSuccess(`Category "${trimmedName}" created successfully.`);
       }
-
-      setIsModalOpen(false);
-      setCategoryNameInput("");
-      setEditingCategory(null);
+      handleCloseModal();
       await loadCategoryData();
     } catch (err) {
-      console.error("Error saving category:", err);
-      setFormError(err?.message || "Failed to save category.");
+      console.error("Save category error:", err);
+      setFormError(err?.message || "Failed to save category. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -127,7 +130,7 @@ export default function CategoryManagementPage() {
     });
   };
 
-  // Handle Delete Action
+  // Handle Delete Confirmation
   const handleConfirmDelete = async () => {
     const category = deleteModal.category;
     if (!category) return;
@@ -137,17 +140,19 @@ export default function CategoryManagementPage() {
 
     try {
       await deleteCategory(category.id);
-      showSuccess(`Category "${category.categoryName}" deleted successfully.`);
+      const catName = category.categoryName || category.name || "";
+      showSuccess(`Category "${catName}" deleted successfully.`);
       await loadCategoryData();
     } catch (err) {
       console.error("Delete category error:", err);
-      setError(err?.message || `Cannot delete category "${category.categoryName}".`);
+      const catName = category.categoryName || category.name || "";
+      setError(err?.message || `Cannot delete category "${catName}".`);
     }
   };
 
   // Filter categories based on search query
   const filteredCategories = categories.filter((c) =>
-    (c.categoryName || "").toLowerCase().includes(searchQuery.toLowerCase())
+    (c.categoryName || c.name || "").toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -257,7 +262,7 @@ export default function CategoryManagementPage() {
                     return (
                       <tr key={cat.id} className="hover:bg-gray-50/50 transition">
                         <td className="py-4 px-3 font-mono text-xs text-slate-500">#{cat.id}</td>
-                        <td className="py-4 font-bold text-slate-900">{cat.categoryName}</td>
+                        <td className="py-4 font-bold text-slate-900">{cat.categoryName || cat.name}</td>
                         <td className="py-4">
                           <span className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold">
                             <Layers size={12} />
@@ -370,7 +375,7 @@ export default function CategoryManagementPage() {
             </div>
 
             <p className="text-xs text-slate-600 leading-relaxed bg-gray-50 p-4 rounded-2xl border border-gray-200">
-              Are you sure you want to delete category <strong className="text-slate-900">"{deleteModal.category.categoryName}"</strong>? 
+              Are you sure you want to delete category <strong className="text-slate-900">"{deleteModal.category.categoryName || deleteModal.category.name}"</strong>? 
               <br /><br />
               <span className="text-gray-500 italic">Note: Categories with assigned active Gigs cannot be deleted.</span>
             </p>
