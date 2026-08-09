@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
+import org.springframework.http.HttpMethod;
 
 @Component
 @RequiredArgsConstructor
@@ -19,22 +19,14 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
     private final JwtService jwtService;
 
-    private static final List<String> PUBLIC_ENDPOINTS = List.of(
-            "/auth/register",
-            "/auth/login",
-            "/actuator"
-    );
-
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        String path = exchange.getRequest().getURI().getPath();
-
-        // 1. Allow public endpoints to pass through without JWT
-        if (isPublic(path)) {
+        // 1. Allow public endpoints to pass through without mandatory JWT
+        if (isPublic(exchange)) {
             return chain.filter(exchange);
         }
 
-        // 2. Check for Authorization header
+        // 2. Check for Authorization header on protected endpoints
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
@@ -53,8 +45,27 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         return chain.filter(exchange);
     }
 
-    private boolean isPublic(String path) {
-        return PUBLIC_ENDPOINTS.stream().anyMatch(path::startsWith);
+    private boolean isPublic(ServerWebExchange exchange) {
+        String path = exchange.getRequest().getURI().getPath();
+        HttpMethod method = exchange.getRequest().getMethod();
+
+        if (path.startsWith("/auth/register") || path.startsWith("/auth/login") || path.startsWith("/actuator")) {
+            return true;
+        }
+
+        if (HttpMethod.GET.equals(method)) {
+            if (path.startsWith("/categories")) {
+                return true;
+            }
+            if (path.equals("/gigs") || path.matches("^/gigs/\\d+$") || path.startsWith("/gigs/freelancer/")) {
+                return true;
+            }
+            if (path.startsWith("/users/freelancers") || path.matches("^/users/profile/\\d+$")) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
