@@ -2,19 +2,20 @@ version: '3.8'
 
 services:
   # ---------------------------------------------------------------------------
-  # Database Service (MySQL 8.x)
+  # Database Service (MySQL 8.0) - Optimized for Free Tier (1GB RAM)
   # ---------------------------------------------------------------------------
   mysql:
     image: mysql:8.0
     container_name: marketplace-mysql
     restart: always
+    command:
+      - --performance_schema=OFF
+      - --innodb_buffer_pool_size=64M
+      - --max_connections=40
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
-
-
-
-    ports:
-      - "${MYSQL_PORT:-3306}:3306"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+      MYSQL_USER: ${MYSQL_USER:-marketplace_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-marketplace_pass}
     volumes:
       - mysql_data:/var/lib/mysql
       - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -25,84 +26,219 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 15s
 
   # ---------------------------------------------------------------------------
   # Discovery Server (Eureka Server)
   # ---------------------------------------------------------------------------
   discovery-server:
     build:
-      context: ./discovery-server
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./discovery-server/Dockerfile
     container_name: marketplace-discovery-server
+    restart: always
     ports:
       - "${DISCOVERY_SERVER_PORT:-8761}:8761"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_INSTANCE_HOSTNAME=discovery-server
+      - JAVA_OPTS=-Xms32m -Xmx128m -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     networks:
       - marketplace-network
 
   # ---------------------------------------------------------------------------
-  # API Gateway (Spring Cloud Gateway)
+  # Auth Service (Port: 8081 - Internal)
+  # ---------------------------------------------------------------------------
+  auth-service:
+    build:
+      context: .
+      dockerfile: ./auth-service/Dockerfile
+    container_name: marketplace-auth-service
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+      discovery-server:
+        condition: service_started
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USER=${MYSQL_USER:-marketplace_user}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-marketplace_pass}
+      - MYSQL_DB_AUTH=freelance_auth_db
+      - EUREKA_SERVER_URL=http://discovery-server:8761/eureka/
+      - EUREKA_INSTANCE_HOSTNAME=auth-service
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+      - JWT_SECRET=${JWT_SECRET:-404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+      - JWT_EXPIRATION_MS=${JWT_EXPIRATION_MS:-86400000}
+      - JAVA_OPTS=-Xms32m -Xmx128m -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+    networks:
+      - marketplace-network
+
+  # ---------------------------------------------------------------------------
+  # User Service (Port: 8082 - Internal)
+  # ---------------------------------------------------------------------------
+  user-service:
+    build:
+      context: .
+      dockerfile: ./user-service/Dockerfile
+    container_name: marketplace-user-service
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+      discovery-server:
+        condition: service_started
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USER=${MYSQL_USER:-marketplace_user}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-marketplace_pass}
+      - MYSQL_DB_USER=freelance_user_db
+      - EUREKA_SERVER_URL=http://discovery-server:8761/eureka/
+      - EUREKA_INSTANCE_HOSTNAME=user-service
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+      - JAVA_OPTS=-Xms32m -Xmx128m -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+    networks:
+      - marketplace-network
+
+  # ---------------------------------------------------------------------------
+  # Gig Service (Port: 8083 - Internal)
+  # ---------------------------------------------------------------------------
+  gig-service:
+    build:
+      context: .
+      dockerfile: ./gig-service/Dockerfile
+    container_name: marketplace-gig-service
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+      discovery-server:
+        condition: service_started
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USER=${MYSQL_USER:-marketplace_user}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-marketplace_pass}
+      - MYSQL_DB_GIG=freelance_gig_db
+      - EUREKA_SERVER_URL=http://discovery-server:8761/eureka/
+      - EUREKA_INSTANCE_HOSTNAME=gig-service
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+      - JAVA_OPTS=-Xms32m -Xmx128m -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+    networks:
+      - marketplace-network
+
+  # ---------------------------------------------------------------------------
+  # Order Service (Port: 8084 - Internal)
+  # ---------------------------------------------------------------------------
+  order-service:
+    build:
+      context: .
+      dockerfile: ./order-service/Dockerfile
+    container_name: marketplace-order-service
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+      discovery-server:
+        condition: service_started
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USER=${MYSQL_USER:-marketplace_user}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-marketplace_pass}
+      - MYSQL_DB_ORDER=freelance_order_db
+      - EUREKA_SERVER_URL=http://discovery-server:8761/eureka/
+      - EUREKA_INSTANCE_HOSTNAME=order-service
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+      - JAVA_OPTS=-Xms32m -Xmx128m -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+    networks:
+      - marketplace-network
+
+  # ---------------------------------------------------------------------------
+  # Wallet Service (Port: 8085 - Internal)
+  # ---------------------------------------------------------------------------
+  wallet-service:
+    build:
+      context: .
+      dockerfile: ./wallet-service/Dockerfile
+    container_name: marketplace-wallet-service
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+      discovery-server:
+        condition: service_started
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USER=${MYSQL_USER:-marketplace_user}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-marketplace_pass}
+      - MYSQL_DB_WALLET=freelance_wallet_db
+      - EUREKA_SERVER_URL=http://discovery-server:8761/eureka/
+      - EUREKA_INSTANCE_HOSTNAME=wallet-service
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+      - JAVA_OPTS=-Xms32m -Xmx128m -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+    networks:
+      - marketplace-network
+
+  # ---------------------------------------------------------------------------
+  # Review Service (Port: 8086 - Internal)
+  # ---------------------------------------------------------------------------
+  review-service:
+    build:
+      context: .
+      dockerfile: ./review-service/Dockerfile
+    container_name: marketplace-review-service
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+      discovery-server:
+        condition: service_started
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USER=${MYSQL_USER:-marketplace_user}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-marketplace_pass}
+      - MYSQL_DB_REVIEW=freelance_review_db
+      - EUREKA_SERVER_URL=http://discovery-server:8761/eureka/
+      - EUREKA_INSTANCE_HOSTNAME=review-service
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+      - JAVA_OPTS=-Xms32m -Xmx128m -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+    networks:
+      - marketplace-network
+
+  # ---------------------------------------------------------------------------
+  # API Gateway (Port: 8080 - Public Entry Point)
   # ---------------------------------------------------------------------------
   api-gateway:
     build:
-      context: ./api-gateway
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./api-gateway/Dockerfile
     container_name: marketplace-api-gateway
+    restart: always
     ports:
       - "${API_GATEWAY_PORT:-8080}:8080"
+    depends_on:
+      discovery-server:
+        condition: service_started
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
-    depends_on:
-      - discovery-server
+      - EUREKA_SERVER_URL=http://discovery-server:8761/eureka/
+      - EUREKA_INSTANCE_HOSTNAME=api-gateway
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+      - JWT_SECRET=${JWT_SECRET:-404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+      - JAVA_OPTS=-Xms32m -Xmx128m -XX:+TieredCompilation -XX:TieredStopAtLevel=1
     networks:
       - marketplace-network
-
-  # ---------------------------------------------------------------------------
-  # FUTURE MICROSERVICES PLACEHOLDERS
-  # ---------------------------------------------------------------------------
-  # auth-service:
-  #   build: ./auth-service
-  #   container_name: marketplace-auth-service
-  #   ports: ["8081:8081"]
-  #   depends_on: [discovery-server, mysql]
-  #
-  # user-service:
-  #   build: ./user-service
-  #   container_name: marketplace-user-service
-  #   ports: ["8082:8082"]
-  #   depends_on: [discovery-server, mysql]
-  #
-  # gig-service:
-  #   build: ./gig-service
-  #   container_name: marketplace-gig-service
-  #   ports: ["8083:8083"]
-  #   depends_on: [discovery-server, mysql]
-  #
-  # order-service:
-  #   build: ./order-service
-  #   container_name: marketplace-order-service
-  #   ports: ["8084:8084"]
-  #   depends_on: [discovery-server, mysql]
-  #
-  # wallet-service:
-  #   build: ./wallet-service
-  #   container_name: marketplace-wallet-service
-  #   ports: ["8085:8085"]
-  #   depends_on: [discovery-server, mysql]
-  #
-  # review-service:
-  #   build: ./review-service
-  #   container_name: marketplace-review-service
-  #   ports: ["8086:8086"]
-  #   depends_on: [discovery-server, mysql]
-  #
-  # notification-service (.NET 8):
-  #   build: ./notification-service
-  #   container_name: marketplace-notification-service
-  #   ports: ["8087:8087"]
-  #   depends_on: [discovery-server]
 
 networks:
   marketplace-network:
@@ -110,3 +246,4 @@ networks:
 
 volumes:
   mysql_data:
+    driver: local
