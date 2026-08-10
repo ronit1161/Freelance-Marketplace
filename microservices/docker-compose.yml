@@ -11,7 +11,7 @@ services:
     command:
       - --performance_schema=OFF
       - --innodb_buffer_pool_size=64M
-      - --max_connections=40
+      - --max_connections=150
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
       MYSQL_USER: ${MYSQL_USER:-marketplace_user}
