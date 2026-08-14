@@ -1,0 +1,3 @@
+@echo off
+echo Starting AI Microservice on port 8000...
+.\venv\Scripts\python.exe main.py
