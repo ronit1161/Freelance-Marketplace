@@ -42,7 +42,7 @@ spring:
           predicates:
             - Path=/reviews/**
         - id: notification-service
-          uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8087}
+          uri: lb://NOTIFICATION-SERVICE
           predicates:
             - Path=/notifications/**
         - id: ai-service
