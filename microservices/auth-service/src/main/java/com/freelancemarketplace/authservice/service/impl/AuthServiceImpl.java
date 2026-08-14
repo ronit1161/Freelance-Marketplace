@@ -9,6 +9,7 @@ import com.freelancemarketplace.authservice.entity.AuthUser;
 import com.freelancemarketplace.authservice.repository.AuthUserRepository;
 import com.freelancemarketplace.authservice.security.JwtUtils;
 import com.freelancemarketplace.authservice.service.AuthService;
+import com.freelancemarketplace.authservice.dto.response.UserSummaryResponse;
 import com.freelancemarketplace.shared.dto.InitializeProfileRequest;
 import com.freelancemarketplace.shared.dto.Role;
 import com.freelancemarketplace.shared.exception.*;
@@ -17,6 +18,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -157,6 +161,44 @@ public class AuthServiceImpl implements AuthService {
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .role(user.getRole())
+                .build();
+    }
+
+    @Override
+    public List<com.freelancemarketplace.authservice.dto.response.UserSummaryResponse> getAllUsers() {
+        return authUserRepository.findAll().stream()
+                .map(u -> com.freelancemarketplace.authservice.dto.response.UserSummaryResponse.builder()
+                        .id(u.getId())
+                        .username(u.getUsername())
+                        .email(u.getEmail())
+                        .role(u.getRole())
+                        .active(u.isActive())
+                        .blocked(u.isBlocked())
+                        .createdAt(u.getCreatedAt())
+                        .build())
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    @Override
+    public com.freelancemarketplace.authservice.dto.response.UserSummaryResponse toggleBlockUser(Long userId, Long currentAdminId) {
+        AuthUser user = authUserRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+
+        if (user.getRole() == com.freelancemarketplace.shared.dto.Role.ROLE_ADMIN) {
+            throw new com.freelancemarketplace.shared.exception.BadRequestException("Cannot block administrator accounts");
+        }
+
+        user.setBlocked(!user.isBlocked());
+        AuthUser saved = authUserRepository.save(user);
+
+        return com.freelancemarketplace.authservice.dto.response.UserSummaryResponse.builder()
+                .id(saved.getId())
+                .username(saved.getUsername())
+                .email(saved.getEmail())
+                .role(saved.getRole())
+                .active(saved.isActive())
+                .blocked(saved.isBlocked())
+                .createdAt(saved.getCreatedAt())
                 .build();
     }
 }

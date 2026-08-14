@@ -57,4 +57,37 @@ public class AuthController {
                 ApiResponse.success("Current authenticated user retrieved", response)
         );
     }
+
+    @GetMapping("/admin/users")
+    public ResponseEntity<ApiResponse<java.util.List<com.freelancemarketplace.authservice.dto.response.UserSummaryResponse>>> getAllUsers(
+            @RequestHeader(value = "X-User-Role", required = false) String userRole,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        boolean isAdmin = (userRole != null && "ROLE_ADMIN".equalsIgnoreCase(userRole)) ||
+                (userDetails != null && userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equalsIgnoreCase("ROLE_ADMIN")));
+        if (!isAdmin) {
+            throw new com.freelancemarketplace.shared.exception.ForbiddenException("Only administrators can view all users");
+        }
+        return ResponseEntity.ok(
+                ApiResponse.success("Users retrieved successfully", authService.getAllUsers())
+        );
+    }
+
+    @PatchMapping("/admin/users/{userId}/toggle-block")
+    public ResponseEntity<ApiResponse<com.freelancemarketplace.authservice.dto.response.UserSummaryResponse>> toggleBlockUser(
+            @PathVariable Long userId,
+            @RequestHeader(value = "X-User-Id", required = false) Long currentAdminId,
+            @RequestHeader(value = "X-User-Role", required = false) String userRole,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        boolean isAdmin = (userRole != null && "ROLE_ADMIN".equalsIgnoreCase(userRole)) ||
+                (userDetails != null && userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equalsIgnoreCase("ROLE_ADMIN")));
+        if (!isAdmin) {
+            throw new com.freelancemarketplace.shared.exception.ForbiddenException("Only administrators can block/unblock users");
+        }
+        com.freelancemarketplace.authservice.dto.response.UserSummaryResponse response = authService.toggleBlockUser(userId, currentAdminId);
+        return ResponseEntity.ok(
+                ApiResponse.success("User block status updated", response)
+        );
+    }
 }
