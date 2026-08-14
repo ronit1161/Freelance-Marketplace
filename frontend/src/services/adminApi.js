@@ -2,21 +2,21 @@ import apiClient from "./apiClient";
 import { getAllCategories } from "./categoryApi";
 import { getAllActiveGigs } from "./gigApi";
 import { getAllOrders } from "./orderApi";
-import { getFreelancers } from "./userApi";
+import { getAllUsers } from "./userApi";
 
 export const getDashboardStats = async () => {
   try {
-    const [categories, gigs, orders, freelancers] = await Promise.all([
+    const [categories, gigs, orders, users] = await Promise.all([
       getAllCategories().catch(() => []),
       getAllActiveGigs().catch(() => []),
       getAllOrders().catch(() => []),
-      getFreelancers().catch(() => []),
+      getAllUsers().catch(() => []),
     ]);
 
     const totalOrders = orders.length;
-    const totalClients = new Set(orders.map((o) => o.clientId)).size;
-    const totalFreelancers = freelancers.length;
-    const totalUsers = totalClients + totalFreelancers;
+    const totalClients = users.filter((u) => u.role?.toUpperCase() === "CLIENT").length;
+    const totalFreelancers = users.filter((u) => u.role?.toUpperCase() === "FREELANCER").length;
+    const totalUsers = users.length;
     const totalRevenue = orders
       .filter((o) => o.status === "COMPLETED")
       .reduce((sum, o) => sum + (Number(o.agreedPrice) || 0), 0);
@@ -43,9 +43,7 @@ export const getDashboardStats = async () => {
   }
 };
 
-export const getAllUsers = async () => {
-  return await getFreelancers();
-};
+export { getAllUsers };
 
 export const deleteGigByAdmin = async (gigId) => {
   try {

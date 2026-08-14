@@ -92,12 +92,31 @@ export const getFreelancers = async (skill, minExperience) => {
 };
 
 export const getAllUsers = async () => {
-  return await getFreelancers();
+  try {
+    const response = await apiClient.get("/auth/admin/users");
+    const list = response.data?.data || response.data || [];
+    return list.map((item) => ({
+      ...item,
+      id: item.id || item.userId,
+      userName: item.username || item.userName || "",
+      fullName: item.fullName || item.username || item.userName || `User #${item.id}`,
+      email: item.email || "",
+      role: item.role ? item.role.replace("ROLE_", "") : "USER",
+      isBlocked: !!item.blocked || !!item.isBlocked,
+      isActive: item.active !== undefined ? item.active : true,
+      createdOn: item.createdAt || item.createdOn || "",
+    }));
+  } catch (error) {
+    console.error("Failed to fetch admin users:", error);
+    const errorMessage = error.response?.data?.message || "Failed to fetch users.";
+    throw new Error(errorMessage);
+  }
 };
 
 export const toggleBlockUser = async (id) => {
   try {
-    return { success: true, message: "User status updated." };
+    const response = await apiClient.patch(`/auth/admin/users/${id}/toggle-block`);
+    return response.data?.data || response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || "Failed to toggle block status.";
     throw new Error(errorMessage);

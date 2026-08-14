@@ -140,9 +140,21 @@ const Dashboard = () => {
                 {users.map((u) => (
                   <tr key={u.id} className="border-b border-gray-50 transition-all hover:bg-gray-50/50">
                     <td className="py-4 px-2 font-mono text-sm text-slate-600">#{u.id}</td>
-                    <td className="py-4 font-semibold text-slate-900">{u.fullName} ({u.userName})</td>
+                    <td className="py-4 font-semibold text-slate-900">
+                      {u.userName ? `@${u.userName}` : u.fullName}
+                    </td>
                     <td className="py-4 text-slate-600 text-sm">{u.email}</td>
-                    <td className="py-4 text-sm font-medium text-slate-700">{u.role}</td>
+                    <td className="py-4 text-sm font-medium">
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                        u.role?.toUpperCase() === 'ADMIN'
+                          ? 'bg-purple-100 text-purple-700'
+                          : u.role?.toUpperCase() === 'FREELANCER'
+                            ? 'bg-blue-100 text-blue-700'
+                            : 'bg-teal-100 text-teal-700'
+                      }`}>
+                        {u.role}
+                      </span>
+                    </td>
                     <td>
                       <span
                         className={`px-3 py-1 text-xs font-semibold rounded-full ${
@@ -155,16 +167,20 @@ const Dashboard = () => {
                       </span>
                     </td>
                     <td className="text-right py-4 px-2">
-                      <button
-                        onClick={() => handleToggleBlock(u.id)}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition ${
-                          u.isBlocked
-                            ? "bg-emerald-600 text-white hover:bg-emerald-700"
-                            : "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
-                        }`}
-                      >
-                        {u.isBlocked ? "Unblock" : "Block User"}
-                      </button>
+                      {u.role?.toUpperCase() !== 'ADMIN' ? (
+                        <button
+                          onClick={() => handleToggleBlock(u.id)}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition ${
+                            u.isBlocked
+                              ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                              : "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
+                          }`}
+                        >
+                          {u.isBlocked ? "Unblock" : "Block User"}
+                        </button>
+                      ) : (
+                        <span className="text-xs text-slate-400 font-medium italic">System</span>
+                      )}
                     </td>
                   </tr>
                 ))}
